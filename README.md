@@ -1,6 +1,6 @@
 # Bryan’s Arcade
 
-Open `index.html` in a browser for the game-selection grid. Each game has an illustrated scene. Ghost Pop is playable; Dad Dug, Bryan’s Turf (the working title for a territory-capture game), and Pac-Bryan are marked Coming soon. Filter the grid by availability. The page is self-contained; no build, server, or downloaded assets are required.
+Open `index.html` in a browser for the game-selection grid. Each game has an illustrated scene. Ghost Pop is playable; Dad Dug, Eviction, and Pac-Bryan are marked Coming soon. Filter the grid by availability. The page is self-contained; no build, server, or downloaded assets are required.
 
 ## Ghost Pop
 
