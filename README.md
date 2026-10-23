@@ -1,6 +1,10 @@
-# Ghost Pop
+# Bryan’s Arcade
 
-Open `ghost-pop.html` in a browser. The game is self-contained; no build or server is required. The Other Games link points to the future `index.html`.
+Open `index.html` in a browser for the game-selection grid. Each game has an illustrated scene. Ghost Pop is playable; Dad Dug, Bryan’s Turf (the working title for a territory-capture game), and Pac-Bryan are marked Coming soon. Filter the grid by availability. The page is self-contained; no build, server, or downloaded assets are required.
+
+## Ghost Pop
+
+Open `ghost-pop.html` in a browser, or choose Ghost Pop from the arcade. The game is self-contained; no build or server is required. The Other Games link returns to `index.html`.
 
 Classic uses 6 colors, 18 columns, 20 rows, and 7 starting rows. Every 5 non-popping shots adds 2 rows. Popping ghosts preserves that counter. At the last chance, the next-color preview becomes a row warning; eliminated colors cannot return through the queue or row waves.
 

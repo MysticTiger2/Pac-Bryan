@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101719">
+  <meta name="description" content="A little arcade with a lot of personality. Play Ghost Pop and meet Dad Dug, Bryan's Turf, and Pac-Bryan.">
+  <title>Tiger’s Arcade</title>
+  <style>
+    :root{color-scheme:dark;--bg:#101719;--panel:#182124;--line:#334044;--text:#f3f0df;--muted:#a7b4b4;--lime:#d4f578;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text)}
+    *{box-sizing:border-box}body{margin:0}button,a{-webkit-tap-highlight-color:transparent}button{font:inherit}a{color:inherit}button:focus-visible,a:focus-visible{outline:3px solid var(--lime);outline-offset:6px}[hidden]{display:none!important}
+    .wrap{width:min(1120px,calc(100% - 64px));margin:auto}.topbar{height:100px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);gap:20px}.brand{display:flex;align-items:center;gap:12px;font-size:17px;font-weight:800;letter-spacing:.045em}.brand-icon{width:30px;height:30px;color:var(--lime)}.mono{font-family:Consolas,'Courier New',monospace}.top-note{font-size:11px;color:var(--muted);letter-spacing:.08em;display:flex;align-items:center;gap:9px}.light{width:6px;height:6px;border-radius:50%;background:var(--lime);box-shadow:0 0 10px #d4f540}
+    .intro{padding:56px 0 38px;display:flex;justify-content:space-between;align-items:flex-end;gap:30px}.eyebrow{font-size:11px;color:var(--lime);letter-spacing:.16em;margin:0 0 16px;text-transform:uppercase}h1{font-size:clamp(38px,5.2vw,65px);line-height:1.04;letter-spacing:-.055em;margin:0;font-weight:800}h1 span{color:var(--lime)}.intro-copy{max-width:265px;margin:0 0 4px;color:var(--muted);font-size:14px;line-height:1.7}.intro-copy strong{color:var(--text);font-weight:400}
+    .library-bar{display:flex;justify-content:space-between;align-items:center;gap:18px;margin-bottom:22px}.filters{display:flex;gap:7px;flex-wrap:wrap}.filter{border:1px solid transparent;color:var(--muted);background:transparent;border-radius:6px;padding:9px 13px;cursor:pointer;font-size:12px;line-height:1.3}.filter:hover{color:var(--text);background:#222d30}.filter[aria-pressed=true]{color:var(--text);border-color:#485456;background:#263134}.filter .count{margin-left:6px;color:var(--lime);font-size:11px}.game-count{font-size:11px;color:var(--muted);white-space:nowrap}
+    .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px}.card{background:var(--panel);border:1px solid var(--line);border-radius:11px;overflow:hidden;position:relative;transition:border-color .2s,transform .2s}.card.playable:hover{transform:translateY(-3px);border-color:var(--lime)}.card-link{display:block;text-decoration:none;height:100%}.card-link:focus-visible{outline-offset:-4px;border-radius:10px}.scene{position:relative;overflow:hidden;aspect-ratio:2.08;background:#0b1219;border-bottom:1px solid var(--line)}canvas{display:block;width:100%;height:100%;image-rendering:pixelated}.scene::after{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(transparent 0 3px,#0000000c 3px 4px)}.scene-label{position:absolute;top:15px;left:16px;font-size:9px;letter-spacing:.12em;color:#dde7dfad}.scene-corner{position:absolute;bottom:13px;right:16px;font-size:9px;letter-spacing:.08em;color:#e9eddd88}.card-body{padding:21px 24px 22px}.card-heading{display:flex;align-items:center;justify-content:space-between;gap:12px}h2{margin:0;font-size:25px;letter-spacing:-.04em}.status{display:inline-flex;align-items:center;gap:6px;font-size:9px;letter-spacing:.07em;text-transform:uppercase;white-space:nowrap;color:#bec9c9;border:1px solid #465052;border-radius:4px;padding:5px 7px}.status.ready{color:var(--lime);border-color:#758d434d;background:#c7ed6f09}.status.ready::before{content:"";width:5px;height:5px;border-radius:50%;background:currentColor}.description{font-size:13px;color:var(--muted);line-height:1.65;margin:10px 0 18px}.card-bottom{display:flex;align-items:center;justify-content:space-between;gap:15px}.genre{color:#9dadad;font-size:10px;letter-spacing:.03em}.play-cta{font-size:12px;font-weight:700;color:var(--lime);display:flex;align-items:center;gap:12px}.arrow{font-size:20px;font-weight:400;line-height:1;transition:transform .2s}.card-link:hover .arrow{transform:translateX(4px)}.soon-note{font-size:10px;color:#8a9b9d}.working-title{font-size:10px;line-height:1.5;color:#a7b4b4;margin:0 0 12px}.footer{display:flex;align-items:center;justify-content:space-between;gap:20px;border-top:1px solid var(--line);margin-top:44px;padding:23px 0 28px;color:#93a3a5;font-size:10px;line-height:1.6;letter-spacing:.02em}.footer span:last-child{color:#bfc9ba}.footer .coin{color:var(--lime);margin-right:6px}
+    @media(min-width:1500px){.wrap{width:min(1240px,calc(100% - 100px))}}
+    @media(max-width:700px){.wrap{width:calc(100% - 36px)}.topbar{height:78px}.brand{font-size:14px;gap:8px}.brand-icon{width:25px;height:25px}.top-note{font-size:9px;letter-spacing:0}.intro{padding:36px 0 28px;display:block}.intro-copy{max-width:330px;margin:20px 0 0;font-size:13px}.grid{grid-template-columns:1fr;gap:20px}.library-bar{align-items:flex-start;gap:8px}.filter{padding:8px 9px;font-size:11px}.game-count{padding-top:9px;font-size:10px}.filters{gap:2px}.card-body{padding:19px 20px}.footer{margin-top:30px;align-items:flex-start}.footer span:last-child{text-align:right;max-width:130px}h2{font-size:24px}}
+    @media(max-width:370px){.top-note{display:none}.game-count{display:none}.card-heading{gap:6px}.status{font-size:8px}}
+    @media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;scroll-behavior:auto!important}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="topbar">
+      <div class="brand"><svg class="brand-icon" viewBox="0 0 30 30" fill="none" aria-hidden="true"><path d="M8 5h14v3h4v17h-6v-5H10v5H4V8h4V5Z" fill="currentColor"/><path d="M10 9v8M6 13h8" stroke="#101719" stroke-width="3"/><path d="M20 10h3v3h-3zM17 14h3v3h-3z" fill="#101719"/></svg> TIGER’S ARCADE</div>
+      <div class="top-note mono"><span class="light"></span> NO COINS REQUIRED</div>
+    </header>
+    <main>
+      <section class="intro" aria-labelledby="page-title">
+        <div><p class="eyebrow mono">Small arcade. Big dad energy.</p><h1 id="page-title">Good games.<br><span>Questionable names.</span></h1></div>
+        <p class="intro-copy">A few familiar ideas. A little family flair.<br><strong>Pick a game. Make yourself at home.</strong></p>
+      </section>
+      <div class="library-bar">
+        <div class="filters" role="group" aria-label="Filter games">
+          <button class="filter" data-filter="all" aria-pressed="true">All games <span class="count mono">04</span></button>
+          <button class="filter" data-filter="ready" aria-pressed="false">Ready to play</button>
+          <button class="filter" data-filter="soon" aria-pressed="false">Coming soon</button>
+        </div>
+        <span class="game-count mono" id="game-count" role="status">4 games · 1 ready</span>
+      </div>
+      <section class="grid" aria-label="Games">
+        <article class="card playable" data-status="ready">
+          <a class="card-link" href="ghost-pop.html" aria-label="Play Ghost Pop">
+            <div class="scene"><canvas id="ghost-scene" width="640" height="308" role="img" aria-label="Colorful rows of ghosts above a yellow launcher aiming a shot"></canvas><span class="scene-label mono" aria-hidden="true">01 / MATCH. AIM. POP.</span><span class="scene-corner mono" aria-hidden="true">HIGH SCORE MATERIAL</span></div>
+            <div class="card-body"><div class="card-heading"><h2>Ghost Pop</h2><span class="status ready mono">Ready to play</span></div><p class="description">A little aim. A big chain reaction. Give these ghosts a pop.</p><div class="card-bottom"><span class="genre mono">PUZZLE / BUBBLE SHOOTER</span><span class="play-cta">Let’s play <span class="arrow" aria-hidden="true">↗</span></span></div></div>
+          </a>
+        </article>
+        <article class="card" data-status="soon">
+          <div class="scene"><canvas id="dad-scene" width="640" height="308" role="img" aria-label="A helmeted dad digs tunnels through layers of earth, surrounded by rocks and monsters"></canvas><span class="scene-label mono" aria-hidden="true">02 / CAN YOU DIG IT?</span><span class="scene-corner mono" aria-hidden="true">WATCH YOUR HARD HAT</span></div>
+          <div class="card-body"><div class="card-heading"><h2>Dad Dug</h2><span class="status mono">Coming soon</span></div><p class="description">Dig deep. Dodge trouble. Dad’s got some underground business.</p><div class="card-bottom"><span class="genre mono">ACTION / DIGGING</span><span class="soon-note mono">In the works</span></div></div>
+        </article>
+        <article class="card" data-status="soon">
+          <div class="scene"><canvas id="turf-scene" width="640" height="308" role="img" aria-label="A glowing green trail claims territory on a blue grid while ghosts roam the open area"></canvas><span class="scene-label mono" aria-hidden="true">03 / A LITTLE SPACE, PLEASE.</span><span class="scene-corner mono" aria-hidden="true">CLAIM YOUR CORNER</span></div>
+          <div class="card-body"><div class="card-heading"><h2>Bryan’s Turf</h2><span class="status mono">Coming soon</span></div><p class="description">Draw the line. Claim the board. Keep the ghosts off your lawn.</p><div class="card-bottom"><span class="genre mono">ARCADE / TERRITORY</span><span class="soon-note mono">Working title</span></div></div>
+        </article>
+        <article class="card" data-status="soon">
+          <div class="scene"><canvas id="pac-scene" width="640" height="308" role="img" aria-label="Yellow Pac-Bryan munches pellets in a blue neon maze with colorful ghosts in pursuit"></canvas><span class="scene-label mono" aria-hidden="true">04 / ONE MORE PELLET.</span><span class="scene-corner mono" aria-hidden="true">AN APPETITE FOR ARCADE</span></div>
+          <div class="card-body"><div class="card-heading"><h2>Pac-Bryan</h2><span class="status mono">Coming soon</span></div><p class="description">You know the drill. Eat the dots. Avoid the ghosts. Be Bryan.</p><div class="card-bottom"><span class="genre mono">CLASSIC / MAZE CHASE</span><span class="soon-note mono">In the works</span></div></div>
+        </article>
+      </section>
+    </main>
+    <footer class="footer mono"><span><span class="coin" aria-hidden="true">✦</span> Made for the love of the game.</span><span>Free plays. Unlimited “one more.”</span></footer>
+  </div>
+  <script>
+    // All artwork is drawn locally; the arcade also works directly from disk.
+    const colors={yellow:'#f6dc6b',pink:'#ec83a5',blue:'#72bbec',mint:'#7ecdb0',purple:'#b39be8',orange:'#eda66a'};
+    function setup(id,bg){const c=document.getElementById(id).getContext('2d');c.fillStyle=bg;c.fillRect(0,0,640,308);return c}
+    function rect(c,x,y,w,h,color){c.fillStyle=color;c.fillRect(x,y,w,h)}
+    function ghost(c,x,y,color,s=1){c.save();c.translate(x,y);c.scale(s,s);c.fillStyle=color;c.beginPath();c.moveTo(-16,16);c.lineTo(-16,-3);c.quadraticCurveTo(-16,-20,0,-20);c.quadraticCurveTo(16,-20,16,-3);c.lineTo(16,16);c.lineTo(8,10);c.lineTo(0,16);c.lineTo(-8,10);c.closePath();c.fill();rect(c,-9,-7,7,10,'#fff6dc');rect(c,3,-7,7,10,'#fff6dc');rect(c,-6,-4,4,5,'#192b42');rect(c,6,-4,4,5,'#192b42');c.restore()}
+    function pac(c,x,y,r=19){c.fillStyle=colors.yellow;c.beginPath();c.moveTo(x,y);c.arc(x,y,r,.22*Math.PI,1.78*Math.PI);c.closePath();c.fill();rect(c,x-2,y-12,4,4,'#26313a')}
+    function grid(c,x,y,w,h,step,color){c.strokeStyle=color;c.lineWidth=1;c.beginPath();for(let i=x;i<=x+w;i+=step){c.moveTo(i,y);c.lineTo(i,y+h)}for(let j=y;j<=y+h;j+=step){c.moveTo(x,j);c.lineTo(x+w,j)}c.stroke()}
+    {
+      const c=setup('ghost-scene','#142131');
+      grid(c,0,0,640,308,32,'#1a2b3c');
+      const rows=[[0,1,1,2,2,3,3,4],[1,0,2,2,3,4,4],[0,0,1,3,3,4],[0,1,1,3]];
+      const palette=[colors.pink,colors.yellow,colors.blue,colors.mint,colors.purple];
+      rows.forEach((row,r)=>row.forEach((color,col)=>ghost(c,174+col*42+(r%2)*21,69+r*38,palette[color],.83)));
+      c.strokeStyle='#d4f57875';c.lineWidth=2;c.setLineDash([3,9]);c.beginPath();c.moveTo(320,275);c.lineTo(369,161);c.stroke();c.setLineDash([]);
+      [[395,158],[411,141],[391,130]].forEach(([x,y],i)=>{rect(c,x,y,4,4,colors.mint);rect(c,x-5,y-7,2,2,'#d5f8cf')});
+      rect(c,279,288,82,4,'#3b505e');pac(c,320,273,22);ghost(c,367,273,colors.mint,.55);
+    }
+    {
+      const c=setup('dad-scene','#30251f');
+      rect(c,0,41,640,11,'#667645');rect(c,0,52,640,72,'#775239');rect(c,0,124,640,91,'#62412f');rect(c,0,215,640,93,'#49352a');
+      for(let y=64;y<308;y+=16)for(let x=0;x<640;x+=23){const n=(x*7+y*11)%13;rect(c,x+(y%3)*3,y,n%3+2,2,n<6?'#b17a454b':'#30251f5c')}
+      c.strokeStyle='#211f21';c.lineWidth=34;c.lineJoin='round';c.lineCap='round';c.beginPath();c.moveTo(190,43);c.lineTo(190,92);c.lineTo(420,92);c.lineTo(420,171);c.lineTo(269,171);c.lineTo(269,245);c.lineTo(480,245);c.moveTo(318,92);c.lineTo(318,171);c.moveTo(190,92);c.lineTo(190,225);c.lineTo(124,225);c.stroke();
+      function rock(x,y){c.fillStyle='#929386';c.beginPath();c.moveTo(x-20,y+9);c.lineTo(x-17,y-10);c.lineTo(x-4,y-20);c.lineTo(x+14,y-16);c.lineTo(x+23,y+9);c.lineTo(x+9,y+17);c.closePath();c.fill();rect(c,x-10,y-12,14,5,'#bab9a4');rect(c,x+10,y,7,9,'#6b7068')}
+      rock(111,116);rock(371,211);rock(486,149);ghost(c,420,92,colors.orange,.7);ghost(c,175,224,colors.pink,.7);
+      // Hard hat, face, overalls, boots, and a hose.
+      rect(c,266,150,17,11,'#f3c39b');rect(c,262,144,22,8,'#f1d56b');rect(c,258,151,30,4,'#ffe38b');rect(c,265,162,18,17,'#79b6bb');rect(c,259,165,6,9,'#f3c39b');rect(c,282,165,12,5,'#f3c39b');rect(c,265,179,7,7,'#e7e6ce');rect(c,279,179,8,7,'#e7e6ce');rect(c,277,155,3,3,'#292827');rect(c,273,161,10,3,'#6a4933');
+      c.strokeStyle='#afbdad';c.lineWidth=3;c.beginPath();c.moveTo(294,167);c.lineTo(339,167);c.lineTo(339,155);c.stroke();rect(c,333,150,13,5,'#d1dfc1');
+      rect(c,511,26,3,15,'#99a477');rect(c,504,27,17,3,'#99a477');
+    }
+    {
+      const c=setup('turf-scene','#112b34');grid(c,0,0,640,308,26,'#23414a');
+      c.fillStyle='#478879';c.beginPath();c.moveTo(80,46);c.lineTo(236,46);c.lineTo(236,124);c.lineTo(314,124);c.lineTo(314,202);c.lineTo(158,202);c.lineTo(158,254);c.lineTo(80,254);c.closePath();c.fill();
+      grid(c,80,46,156,78,26,'#669c832f');grid(c,80,124,234,78,26,'#91b88726');grid(c,80,202,78,52,26,'#91b88726');
+      c.strokeStyle='#8fd4a2';c.lineWidth=2;c.strokeRect(80,46,468,208);
+      c.strokeStyle='#d4f578';c.lineWidth=3;c.setLineDash([6,5]);c.beginPath();c.moveTo(314,176);c.lineTo(392,176);c.lineTo(392,98);c.lineTo(470,98);c.stroke();c.setLineDash([]);
+      rect(c,462,90,16,16,colors.yellow);rect(c,466,94,8,8,'#fff2ba');ghost(c,475,209,colors.pink,.8);ghost(c,339,72,colors.blue,.7);
+      c.fillStyle='#c5e8b7';c.font='bold 19px Consolas,monospace';c.fillText('32%',100,82);c.font='9px Consolas,monospace';c.fillStyle='#c5e8b7b0';c.fillText('YOUR TURF',101,98);
+    }
+    {
+      const c=setup('pac-scene','#14182c');
+      c.strokeStyle='#596ee1';c.lineWidth=3;c.lineJoin='round';
+      const blocks=[[57,49,144,39],[239,49,69,39],[346,49,69,39],[453,49,130,39],[57,126,66,67],[161,126,78,29],[453,126,54,67],[545,126,38,67],[161,193,78,29],[57,231,66,39],[161,260,147,30],[346,231,69,59],[453,231,130,39]];
+      blocks.forEach(([x,y,w,h])=>{c.fillStyle='#1c2341';c.fillRect(x,y,w,h);c.strokeRect(x,y,w,h)});
+      c.beginPath();c.moveTo(20,93);c.lineTo(20,18);c.lineTo(620,18);c.lineTo(620,290);c.lineTo(453,290);c.moveTo(20,132);c.lineTo(20,290);c.lineTo(123,290);c.stroke();
+      // A continuous pellet corridor, with a cleared stretch behind Bryan.
+      for(let x=38;x<620;x+=25){if(x<287||x>360)rect(c,x,106,4,4,'#e8d9a1');rect(c,x,210,4,4,'#e8d9a1')}
+      for(let y=57;y<270;y+=25){rect(c,139,y,4,4,'#e8d9a1');rect(c,527,y,4,4,'#e8d9a1')}
+      rect(c,278,146,128,39,'#242d50');c.strokeRect(278,146,128,39);rect(c,326,143,30,6,'#d48eb5');ghost(c,306,168,colors.blue,.53);ghost(c,337,168,colors.pink,.53);ghost(c,368,168,colors.orange,.53);
+      pac(c,327,108,21);ghost(c,228,108,colors.pink,.78);ghost(c,186,108,colors.mint,.78);
+      c.fillStyle='#ffe7aa';c.beginPath();c.arc(529,108,7,0,Math.PI*2);c.fill();
+    }
+    const filterButtons=document.querySelectorAll('[data-filter]');
+    filterButtons.forEach(button=>button.addEventListener('click',()=>{
+      const filter=button.dataset.filter;
+      filterButtons.forEach(item=>item.setAttribute('aria-pressed',String(item===button)));
+      document.querySelectorAll('[data-status]').forEach(card=>{card.hidden=filter!=='all'&&card.dataset.status!==filter});
+      document.getElementById('game-count').textContent=filter==='all'?'4 games · 1 ready':filter==='ready'?'1 game ready':'3 games coming soon';
+    }));
+  </script>
+</body>
+</html>
