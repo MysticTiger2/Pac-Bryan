@@ -1,0 +1,324 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Pac-Ghost Pop</title>
+<style>
+  :root{color-scheme:dark;font-family:system-ui,Segoe UI,sans-serif;background:#090d20;color:#e9edff}
+  *{box-sizing:border-box}body{display:flow-root;margin:0;min-height:100dvh;background:radial-gradient(circle at 50% 10%,#263366,#090d20 75%)}
+  [hidden]{display:none!important}button,input{font:inherit}button,a,input{touch-action:manipulation}button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid #fff;outline-offset:4px}
+  button,.button{display:inline-block;background:#ffe36e;color:#1d2450;border:1px solid transparent;border-radius:10px;font-weight:800;padding:10px 15px;cursor:pointer;text-decoration:none;text-align:center}button:hover,.button:hover{filter:brightness(1.12)}button:disabled{opacity:.5;cursor:default}.secondary{background:#25345d;color:#e3eaff;border-color:#687db0}.small{font-size:12px;padding:8px 11px}
+  .shell{width:min(98%,1160px);margin:12px auto;padding:16px;border:1px solid #5463a055;border-radius:20px;background:#111936ee;box-shadow:0 24px 90px #0008}
+  header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}h1{font-size:clamp(19px,4vw,30px);letter-spacing:.03em;margin:0;color:#ffe56b}h2{margin:0 0 10px;color:#ffe56b}p{line-height:1.55}.sub,.hint{color:#b5c2e8;font-size:12px}.sub{margin:3px 0 0}.hint{line-height:1.5;margin:0}.eyebrow{text-transform:uppercase;letter-spacing:.13em;font-size:11px;color:#a9bae4;margin:0 0 8px}.screen{max-width:840px;margin:auto}.intro{margin:22px 0}.intro p{color:#b9c5e8;margin:8px 0}
+  .modes{display:grid;grid-template-columns:1fr 1fr;gap:14px}.mode{padding:20px;text-align:left;background:#18234b;border:2px solid #425582;color:#e9edff;min-height:148px}.mode[aria-pressed=true]{border-color:#ffe36e;background:#263355}.mode strong{display:block;font-size:23px;margin-bottom:8px}.mode span{display:block;font-size:13px;font-weight:400;line-height:1.6;color:#c2cdef}.actions{display:flex;gap:10px;flex-wrap:wrap;margin:20px 0}.custom{padding:18px;background:#131e40;border:1px solid #425582;border-radius:14px;margin-top:18px}.fields{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.field{font-size:12px;color:#c3cff1}.field input{display:block;width:100%;margin-top:5px;background:#0a1330;color:white;border:1px solid #6377a8;border-radius:7px;padding:9px}.field small{display:block;color:#93a5d0;margin-top:4px}.custom .actions{margin-bottom:0}.notice{font-size:12px;color:#ffdd94;min-height:1.5em}.swatches{display:flex;gap:7px;align-items:center;flex-wrap:wrap}.swatch{width:24px;height:24px;border:1px solid #ffffff99;border-radius:7px;color:#fff;font-weight:800;text-shadow:0 1px 3px #000;text-align:center;font-size:12px;line-height:22px}.palette-settings{margin:20px 0;padding-top:16px;border-top:1px solid #445581}.palette-settings .actions{margin:12px 0}.palette-settings p{margin:8px 0}
+  .game-layout{display:grid;grid-template-columns:minmax(0,1fr) 210px;gap:16px;align-items:center}.board-wrap{display:flex;align-items:center;justify-content:center;min-width:0;height:min(760px,calc(100dvh - 122px))}.game{position:relative;flex-shrink:0;outline:2px solid #6c83bd;border-radius:4px;background:#090f2b;touch-action:none;overflow:hidden;cursor:crosshair}canvas{display:block;width:100%;height:100%;touch-action:none}.rail{display:flex;flex-direction:column;gap:14px}.stats{display:grid;grid-template-columns:1fr 1fr;gap:6px}.stat{border:1px solid #44548c77;border-radius:10px;background:#1a2550;padding:8px;text-align:center}.stat:first-child{grid-column:1/-1}.stat small{display:block;font-size:10px;letter-spacing:.08em;color:#a9bae4;text-transform:uppercase}.stat b{font-size:22px;font-variant-numeric:tabular-nums}.queue{display:flex;align-items:center;gap:10px;padding:10px;background:#0d1737;border:1px solid #465c90;border-radius:10px;min-height:68px}.queue canvas{width:42px;height:42px;flex:0 0 42px}.queue strong{display:block;font-size:12px}.queue span{font-size:11px;color:#b9c9ee}.row-status{font-size:13px;color:#ffe36e;margin:0}.rail-actions{display:grid;grid-template-columns:1fr 1fr;gap:7px}.rail-actions button{font-size:12px;padding:9px 7px}.rail-actions button:last-child{grid-column:1/-1}
+  .overlay{position:absolute;inset:0;background:#060b24e8;display:flex;align-items:center;justify-content:center;padding:16px;z-index:2}.panel{width:min(100%,420px);max-height:100%;overflow:auto;padding:24px 18px;text-align:center;background:#18234b;border:1px solid #7386d3;border-radius:16px}.panel h2{font-size:27px}.panel p{font-size:13px;color:#c8d4f8}.result{font-size:26px;font-weight:850;margin:10px 0;color:#ffe36e}.panel .actions{justify-content:center;margin-bottom:0}table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}th,td{text-align:right;padding:12px 8px;border-bottom:1px solid #3c4e79;font-size:13px}th:first-child,td:first-child{text-align:left}th{color:#b8c8ee;font-size:11px;text-transform:uppercase}.empty{padding:30px 12px;text-align:center;color:#bdc9ec}.scores-wrap{overflow:auto}.storage-note{margin:8px 0 0;font-size:12px;color:#ffdd94}
+  @media(max-width:760px) and (orientation:portrait){.shell{padding:11px;margin:8px auto}header{margin-bottom:12px}.game-layout{display:flex;flex-direction:column;gap:12px}.board-wrap{width:100%;height:min(760px,calc(100dvh - 293px))}.rail{width:100%;display:grid;grid-template-columns:1fr 1fr;gap:8px}.stats{grid-template-columns:repeat(3,1fr);grid-column:1/-1}.stat:first-child{grid-column:auto}.stat{padding:5px}.stat b{font-size:19px}.queue{min-height:56px;padding:6px}.row-status{align-self:center}.rail-actions{grid-column:1/-1;display:flex}.rail-actions button{flex:1}.rail>.hint{grid-column:1/-1;font-size:11px}.fields{grid-template-columns:1fr 1fr}.modes{gap:9px}.mode{padding:14px}.mode strong{font-size:20px}.intro{margin:15px 0}}
+  @media(orientation:landscape) and (max-height:540px){.shell{margin:5px auto;padding:9px}header{margin-bottom:8px}h1{font-size:19px}header .sub{display:none}.game-layout{grid-template-columns:minmax(0,1fr) 190px;gap:12px}.board-wrap{height:calc(100dvh - 78px)}.rail{gap:7px}.stats{grid-template-columns:repeat(3,1fr)}.stat:first-child{grid-column:auto}.stat{padding:4px}.stat b{font-size:17px}.stat small{font-size:8px}.queue{min-height:46px;padding:5px}.queue canvas{width:32px;height:32px;flex-basis:32px}.rail>.hint{font-size:10px}.rail-actions button{padding:6px;font-size:11px}.panel{padding:12px}.panel h2{font-size:20px}.panel p{margin:8px 0}.result{font-size:22px}}
+  .rail-actions button:last-child{grid-column:auto}
+  .queue{position:absolute;display:flex;flex-direction:column;gap:0;min-height:0;width:calc(var(--unit,1px)*130);padding:0;border:0;border-radius:0;background:none;transform:translate(-50%,-50%);text-align:center;pointer-events:none}
+  .queue canvas{width:calc(var(--unit,1px)*54);height:calc(var(--unit,1px)*54);flex:none}.queue strong{font-size:calc(var(--unit,1px)*12);line-height:1.15}.queue span{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}.rail>.row-status{grid-column:1/-1}
+  dialog{width:min(92vw,440px);max-height:90dvh;overflow:auto;border:1px solid #7386d3;border-radius:16px;padding:22px;background:#18234b;color:#e9edff;box-shadow:0 20px 80px #000b}dialog::backdrop{background:#030719bd}.setting{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:18px 0}.setting input{width:22px;height:22px;accent-color:#ffe36e}.setting select,.name-entry input{background:#0a1330;color:#fff;border:1px solid #6377a8;border-radius:8px;padding:9px;font:inherit}.setting select{min-width:100px}.name-entry{margin-top:16px;text-align:left}.name-entry label{display:block;font-size:13px;margin-bottom:7px}.name-entry .name-controls{display:flex;gap:7px}.name-entry input{min-width:0;width:100%;font-size:16px}.name-entry button{font-size:13px;white-space:nowrap}.assist-legend{padding:12px;border:1px solid #53699d;border-radius:8px;font-size:12px;line-height:1.6;color:#d2def8}.scores-wrap td:nth-child(2){max-width:180px;overflow-wrap:anywhere;text-align:left}
+  @media(max-width:760px) and (orientation:portrait){.panel{padding:16px 12px}.panel h2{font-size:24px}.panel p{margin:8px 0;line-height:1.4}.panel .result{font-size:23px;margin:8px 0}.panel .actions{margin:12px 0 0}.name-entry{margin-top:10px}}
+</style>
+</head>
+<body>
+<main class="shell">
+  <header><div><h1>ᗧ PAC-GHOST POP</h1><p class="sub" id="subtitle" hidden></p></div><a class="button secondary small" href="index.html">Other Games</a></header>
+  <section class="screen" id="menuScreen">
+    <div class="intro"><h2>Choose a mode</h2><p>Match ghosts of the same color and clear the board.</p></div>
+    <div class="modes" aria-label="Game modes">
+      <button class="mode" data-mode="classic" aria-pressed="true"><strong>Classic</strong><span id="classicDetails" style="white-space:pre-line">Six colors · 18 columns · 20 rows<br>Two new rows every 5 non-popping shots.<br>Local top 10 high scores.</span></button>
+      <button class="mode" data-mode="easy" aria-pressed="false"><strong>Easy</strong><span id="easyDetails" style="white-space:pre-line">5 colors · 2 new rows every 7 non-popping shots.<br>Local top 10 high scores.</span></button>
+      <button class="mode" data-mode="super-easy" aria-pressed="false"><strong>Super-Easy</strong><span id="superEasyDetails" style="white-space:pre-line">4 colors · 1 new row every 7 non-popping shots.<br>Local top 10 high scores.</span></button>
+      <button class="mode" data-mode="custom" aria-pressed="false"><strong>Custom Mode</strong><span>Adjust the board and game rules.<br>Saved preferences. No high scores.</span></button>
+    </div>
+    <form class="custom" id="customForm" hidden><h2>Custom settings</h2><p class="hint">Starts with Classic rules. Preferences save on Play or when a valid value changes.</p><div class="fields" id="customFields"></div><div class="actions"><button type="button" class="secondary small" id="resetCustom">Reset to Classic</button></div><p class="notice" id="customNotice" aria-live="polite"></p></form>
+    <div class="actions"><button id="play">Play Classic</button><button class="secondary" id="showScores">High scores</button></div>
+    <p class="hint" id="modeInfo">Clear the board for a 100× finish bonus. Finishing in fewer shots earns a higher score.</p>
+    <div class="palette-settings"><p class="eyebrow">Colors and settings</p><div class="swatches" id="swatches" aria-label="Current ghost colors"></div><div class="actions"><button class="secondary small" id="randomize">Randomize colors</button><button class="secondary small" id="resetPalette">Default colors</button><button class="secondary small" id="openSettings">Settings</button></div><p class="hint">Colorblind mode, color assist, and game speed are available in Settings. Your preferences are saved.</p></div>
+  </section>
+  <section id="gameScreen" hidden>
+    <div class="game-layout"><div class="board-wrap" id="boardWrap"><div class="game" id="game"><canvas id="canvas" width="774" height="828" tabindex="0" aria-label="Ghost shooter. Drag to aim and release to shoot, or use arrow keys and Space."></canvas>
+      <div class="overlay" id="overlay" hidden><div class="panel"><h2 id="endTitle"></h2><p id="endInfo"></p><div class="result" id="endResult"></div><p id="endFormula"></p><p id="endSaved" aria-live="polite"></p><form class="name-entry" id="nameForm" hidden><label for="playerName">Name for this high score</label><div class="name-controls"><input id="playerName" name="playerName" maxlength="24" autocomplete="nickname" placeholder="Anonymous"><button type="submit">Save name</button></div></form><div class="actions"><button id="again">Play again</button><button class="secondary" id="endMenu">Main menu</button></div></div></div>
+      <div class="queue" id="shotQueue" aria-live="polite"><canvas id="nextCanvas" width="84" height="84" aria-hidden="true"></canvas><div><strong id="nextLabel">NEXT</strong><span id="nextInfo">Upcoming shot</span></div></div>
+    </div></div>
+    <aside class="rail"><div class="stats"><div class="stat"><small>Points</small><b id="score">0</b></div><div class="stat"><small>Shots</small><b id="shots">0</b></div><div class="stat"><small>Colors left</small><b id="colors">6</b></div></div>
+      <p class="row-status" id="rowStatus" aria-live="polite"></p>
+      <div class="rail-actions"><button class="secondary" id="restart">Restart</button><button class="secondary" id="menu">Main menu</button><button class="secondary" id="gameRandomize">Randomize colors</button><button class="secondary" id="gameSettings">Settings</button></div>
+      <p class="hint" id="gameHint"></p>
+    </aside></div>
+  </section>
+  <section class="screen" id="scoresScreen" hidden><p class="eyebrow">On this browser</p><h2 id="scoresTitle">Classic · Top 10</h2><p class="hint" id="scoresHelp"></p><div class="scores-wrap"><table><thead><tr><th>Rank</th><th>Name</th><th>Score</th><th>Result</th><th>Points</th><th>Shots</th><th>Date</th></tr></thead><tbody id="scoreRows"></tbody></table></div><p class="empty" id="emptyScores">No scores yet. Your first game starts the leaderboard.</p><div class="actions"><button id="scoresBack">Back to modes</button></div></section>
+  <p class="storage-note" id="storageNote" role="status" hidden></p>
+</main>
+<dialog id="settingsDialog" aria-labelledby="settingsTitle"><h2 id="settingsTitle">Settings</h2>
+  <label class="setting" for="colorblind"><span>Colorblind mode</span><input type="checkbox" id="colorblind"></label><p class="hint">Show large color numbers on ghosts, shots, and the next-shot preview.</p>
+  <label class="setting" for="colorAssist"><span>Color assist mode</span><input type="checkbox" id="colorAssist"></label><p class="assist-legend">Current shot: dark blue for 0.7 seconds, then white for 0.3 seconds.<br>Next shot: cyan, unless new rows are due.<br>Other colors: orange. If current and next match, the current-shot pulse takes priority.</p>
+  <label class="setting" for="gameSpeed"><span>Game speed</span><select id="gameSpeed"><option value="fast">Fast</option><option value="slow">Slow</option></select></label><p class="hint">Fast: quicker shots, normal mouth animation. Slow: slower shots, half-speed mouth animation.</p>
+  <div class="actions"><button class="secondary small" id="settingsRandomize">Randomize colors</button><button class="small" id="closeSettings">Done</button></div>
+</dialog>
+<script>
+(()=>{'use strict';
+const $=id=>document.getElementById(id),cv=$('canvas'),ctx=cv.getContext('2d'),nextCtx=$('nextCanvas').getContext('2d');
+// Each mode owns its rules. A running game takes a snapshot; the next game can use new values.
+// maxBounces limits the aim guide only; live shots have no bounce cap.
+const CLASSIC=Object.freeze({colors:6,columns:18,maxRows:20,initialRows:7,rowEvery:5,rowsAdded:2,maxBounces:1,aimDistance:340,collisionFactor:.89,matchSize:3,popPoints:100,chainBonus:.35,dropPoints:175,winMultiplier:100,shotExponent:1.5});
+const MODES={
+  classic:{name:'Classic',rules:CLASSIC,recordsScores:true},
+  easy:{name:'Easy',rules:Object.freeze({...CLASSIC,colors:5,rowEvery:7}),recordsScores:true},
+  'super-easy':{name:'Super-Easy',rules:Object.freeze({...CLASSIC,colors:4,rowEvery:7,rowsAdded:1}),recordsScores:true},
+  custom:{name:'Custom Mode',recordsScores:false}
+};
+const AIM_INPUT=Object.freeze({step:.025,holdStep:.015,delay:.1,interval:.025});
+const REACTION_INTERVAL=.085;
+const heldArrows=new Map();
+const FIELDS=[
+  ['colors','Ghost colors',1,36,1],['columns','Grid columns',4,48,1],['maxRows','Grid rows',6,60,1],['initialRows','Starting rows',1,58,1],
+  ['rowEvery','Non-popping shots per row wave',1,100,1],['rowsAdded','Rows added per wave',1,20,1],['maxBounces','Aim guide wall bounces',0,100,1,'Actual shots can always bounce freely.'],['aimDistance','Aim line length',0,10000,1,'How far the dotted guide extends, in board units.'],
+  ['collisionFactor','Collision tightness',.65,1,.01,'Lower lets shots squeeze through smaller gaps.'],['matchSize','Ghosts needed for a match',2,20,1],['popPoints','Points per matched ghost',0,100000,1],['chainBonus','Extra chain bonus per ghost',0,10,.05],['dropPoints','Points per falling ghost',0,100000,1],['winMultiplier','Win score multiplier',1,10000,1],['shotExponent','Shot penalty exponent',0,5,.1]
+];
+const DEFAULT_COLORS=['#ff5964','#54c9ff','#ffb543','#a789ff','#19864b','#ef79d6'];
+const STORAGE={custom:'pacGhostPop.custom.v1',palettes:'pacGhostPop.palettes.v1',scores:'pacGhostPop.scores.v1',settings:'pacGhostPop.settings.v1'};
+function storageError(){$('storageNote').hidden=false;$('storageNote').textContent='Browser storage is unavailable. You can play, but settings and scores will only last for this session.'}
+function read(key,fallback){try{const value=localStorage.getItem(key);return value===null?fallback:JSON.parse(value)}catch{return fallback}}
+function save(key,value){try{localStorage.setItem(key,JSON.stringify(value));return true}catch{storageError();return false}}
+try{const probe='pacGhostPop.storageProbe';localStorage.setItem(probe,'1');localStorage.removeItem(probe)}catch{storageError()}
+function validRules(raw){const result={...CLASSIC};if(raw&&typeof raw==='object')for(const [name,,min,max,step] of FIELDS){const n=Number(raw[name]);if(Number.isFinite(n)&&n>=min&&n<=max&&Math.abs((n-min)/step-Math.round((n-min)/step))<.00001)result[name]=n}result.initialRows=Math.min(result.initialRows,result.maxRows-2);result.rowsAdded=Math.min(result.rowsAdded,result.maxRows-1);return result}
+let customRules=validRules(read(STORAGE.custom,{})),palettes=read(STORAGE.palettes,{}),highScores=read(STORAGE.scores,{});
+const savedSettings=read(STORAGE.settings,{});
+let settings={colorblind:savedSettings?.colorblind===true,colorAssist:savedSettings?.colorAssist===true,speed:savedSettings?.speed==='slow'?'slow':'fast',playerName:typeof savedSettings?.playerName==='string'?savedSettings.playerName.slice(0,24):''};
+if(!palettes||typeof palettes!=='object'||Array.isArray(palettes))palettes={};
+if(!highScores||typeof highScores!=='object'||Array.isArray(highScores))highScores={};
+let selectedMode='classic',activeMode=null,screen='menu',rules={...CLASSIC},palette=DEFAULT_COLORS.slice();
+let W,H,R=19.5,DX=42,DY=36,TOP=R,SHOOT,DANGER;
+let grid=new Map(),parity=0,loaded=null,next=null,projectile=null,aim=-Math.PI/2,points=0,shots=0,misses=0,ended=true,particles=[],popText=[],lastTime=performance.now(),dragPointer=null,assistTime=0,pendingScore=null,reaction=null;
+const rand=a=>a[Math.floor(Math.random()*a.length)],key=(r,c)=>r+','+c;
+const valid=(r,c)=>r>=0&&r<rules.maxRows&&c>=0&&c<rules.columns;
+const position=(r,c)=>({x:R+c*DX+((r+parity)&1)*DX/2,y:TOP+r*DY});
+const get=(r,c)=>grid.get(key(r,c));
+function set(r,c,color){grid.set(key(r,c),{r,c,color})}
+function neighbors(r,c){const s=(r+parity)&1;return [[r,c-1],[r,c+1],[r-1,c-1+s],[r-1,c+s],[r+1,c-1+s],[r+1,c+s]].filter(([a,b])=>valid(a,b))}
+function boardColors(){return [...new Set([...grid.values()].map(g=>g.color))]}
+function makeShot(){const choices=boardColors();return choices.length?rand(choices):null}
+function rowImminent(){return misses===rules.rowEvery-1}
+function validPalette(colors,count){return Array.isArray(colors)&&colors.length===count&&colors.every(color=>typeof color==='string'&&(/^#[0-9a-f]{6}$/i.test(color)||/^hsl\((\d+(?:\.\d+)?) 72% (?:43|60|63)%\)$/.test(color)))}
+// Each random color is sampled independently from the full RGB range, with no hue-spacing constraint.
+function createPalette(count){return Array.from({length:count},()=> '#'+Math.floor(Math.random()*0x1000000).toString(16).padStart(6,'0'))}
+function defaultPalette(count){return count<=DEFAULT_COLORS.length?DEFAULT_COLORS.slice(0,count):Array.from({length:count},(_,i)=>`hsl(${(i*360/count).toFixed(1)} 72% ${i*360/count>90&&i*360/count<165?'43':'60'}%)`)}
+function getPalette(count){if(!validPalette(palettes[count],count)){palettes[count]=defaultPalette(count);save(STORAGE.palettes,palettes)}return palettes[count].slice()}
+function selectedRules(){return selectedMode==='custom'?customRules:MODES[selectedMode].rules}
+function renderSwatches(){const colors=getPalette(selectedRules().colors);$('swatches').replaceChildren(...colors.map((color,i)=>{const el=document.createElement('span');el.className='swatch';el.style.background=color;el.textContent=settings.colorblind?i+1:'';el.title=`Ghost color ${i+1}`;return el}))}
+function changePalette(reset=false){const count=screen==='game'?rules.colors:selectedRules().colors,colors=reset?defaultPalette(count):createPalette(count);palettes[count]=colors;save(STORAGE.palettes,palettes);if(screen==='game'){palette=colors;sync()}renderSwatches()}
+function buildFields(){for(const [name,label,min,max,step,hint] of FIELDS){const wrap=document.createElement('label');wrap.className='field';wrap.textContent=label;const input=document.createElement('input');input.type='number';input.id='rule-'+name;input.name=name;input.min=min;input.max=max;input.step=step;input.required=true;input.value=customRules[name];wrap.append(input);if(hint){const help=document.createElement('small');help.textContent=hint;wrap.append(help)}$('customFields').append(wrap)}}
+function readCustom(report=false){const form=$('customForm');$('rule-initialRows').setCustomValidity('');$('rule-rowsAdded').setCustomValidity('');const raw=Object.fromEntries(new FormData(form));if(!form.checkValidity()){if(report)form.reportValidity();return null}if(Number(raw.initialRows)>Number(raw.maxRows)-2){$('rule-initialRows').setCustomValidity('Leave at least two empty rows below the starting ghosts.');if(report)form.reportValidity();return null}if(Number(raw.rowsAdded)>=Number(raw.maxRows)){$('rule-rowsAdded').setCustomValidity('Add fewer rows than the grid contains.');if(report)form.reportValidity();return null}return validRules(raw)}
+function setScreen(name){screen=name;heldArrows.clear();$('menuScreen').hidden=name!=='menu';$('gameScreen').hidden=name!=='game';$('scoresScreen').hidden=name!=='scores';$('subtitle').hidden=name!=='game';$('subtitle').textContent=name==='game'?MODES[activeMode].name:'';dragPointer=null;if(name==='game'){cv.focus({preventScroll:true});requestAnimationFrame(fitBoard)}}
+function selectMode(mode){
+  selectedMode=mode;
+  for(const el of document.querySelectorAll('[data-mode]')){
+    el.setAttribute('aria-pressed',String(el.dataset.mode===mode));
+    const config=MODES[el.dataset.mode].rules;
+    if(config)el.querySelector('span').textContent=`${config.colors} colors · ${config.columns} columns · ${config.maxRows} rows\n${config.rowsAdded} new row${config.rowsAdded===1?'':'s'} every ${config.rowEvery} non-popping shots.\nLocal top 10 high scores.`;
+  }
+  $('customForm').hidden=mode!=='custom';$('play').textContent='Play '+MODES[mode].name;$('showScores').hidden=!MODES[mode].recordsScores;
+  $('modeInfo').textContent=MODES[mode].recordsScores?`Clear the board for a ${MODES[mode].rules.winMultiplier}× finish bonus. Finishing in fewer shots earns a higher score.`:'Custom Mode does not record high scores.';renderSwatches();
+}
+function syncSettings(){$('colorblind').checked=settings.colorblind;$('colorAssist').checked=settings.colorAssist;$('gameSpeed').value=settings.speed}
+function updateSettings(){settings.colorblind=$('colorblind').checked;settings.colorAssist=$('colorAssist').checked;settings.speed=$('gameSpeed').value;save(STORAGE.settings,settings);renderSwatches();if(screen==='game')sync()}
+function openSettings(){cancelDrag();heldArrows.clear();syncSettings();$('settingsDialog').showModal()}
+function shotSpeed(){return 650*(settings.speed==='slow'?.7:1.3)}
+function displayColor(color){
+  if(!settings.colorAssist)return palette[color];
+  const current=projectile?.color??reaction?.color??loaded;
+  if(color===current)return assistTime%1<.7?'#153d99':'#ffffff';
+  if(!rowImminent()&&next!==null&&color===next)return '#00d9ff';
+  return '#ff9c38';
+}
+function fitBoard(){
+  if(screen!=='game')return;
+  const wrap=$('boardWrap'),shellStyle=getComputedStyle(document.querySelector('.shell')),
+    header=document.querySelector('header'),layout=document.querySelector('.game-layout'),layoutStyle=getComputedStyle(layout),
+    stacked=layoutStyle.display==='flex',rail=document.querySelector('.rail');
+  const shellSpace=['marginTop','marginBottom','paddingTop','paddingBottom','borderTopWidth','borderBottomWidth'].reduce((sum,k)=>sum+parseFloat(shellStyle[k]),0),
+    headerSpace=header.getBoundingClientRect().height+parseFloat(getComputedStyle(header).marginBottom),
+    railSpace=stacked?rail.getBoundingClientRect().height+parseFloat(layoutStyle.rowGap):0,
+    storageSpace=$('storageNote').hidden?0:$('storageNote').getBoundingClientRect().height+8,
+    available=Math.max(120,Math.min(760,window.innerHeight-shellSpace-headerSpace-railSpace-storageSpace-6)),
+    width=Math.floor(Math.min(wrap.clientWidth,available*W/H)),height=Math.floor(width*H/W);
+  wrap.style.height=height+'px';$('game').style.width=width+'px';$('game').style.height=height+'px';$('game').style.setProperty('--unit',width/W+'px');
+  $('shotQueue').style.left=(SHOOT.x+Math.min(95,W/4))/W*100+'%';$('shotQueue').style.top=(SHOOT.y-5)/H*100+'%';
+}
+function start(){if(selectedMode==='custom'){const values=readCustom(true);if(!values)return;customRules=values;save(STORAGE.custom,values)}activeMode=selectedMode;rules={...(activeMode==='custom'?customRules:MODES[activeMode].rules)};palette=getPalette(rules.colors);palettes[rules.colors]=palette;save(STORAGE.palettes,palettes);
+  W=2*R+(rules.columns-1)*DX+DX/2;DANGER=TOP+(rules.maxRows-1)*DY+R;SHOOT={x:W/2,y:DANGER+65};H=SHOOT.y+40;cv.width=W;cv.height=H;
+  grid=new Map();parity=0;points=0;shots=0;misses=0;ended=false;projectile=null;reaction=null;particles=[];popText=[];aim=-Math.PI/2;dragPointer=null;assistTime=0;pendingScore=null;$('nameForm').hidden=true;
+  for(let r=0;r<rules.initialRows;r++)for(let c=0;c<rules.columns;c++)if(Math.random()<.92)set(r,c,Math.floor(Math.random()*rules.colors));
+  // Ensure even very sparse small boards have a playable starting group.
+  if(!grid.size)for(let c=0;c<rules.columns;c++)set(0,c,0);
+  loaded=makeShot();next=rowImminent()?null:makeShot();$('overlay').hidden=true;$('gameHint').textContent=`Drag to aim; release to shoot. Match ${rules.matchSize}+. Arrows + Space also work. Shots that pop ghosts delay the row counter.`;setScreen('game');sync()}
+function menu(){ended=true;projectile=null;reaction=null;setScreen('menu');selectMode(selectedMode)}
+function drawNextPreview(){nextCtx.clearRect(0,0,84,84);if(!rowImminent()&&next!==null)ghost(nextCtx,42,42,next,31)}
+function drawQueue(){const imminent=rowImminent();$('nextLabel').textContent=imminent?'NEW ROWS NEXT':'NEXT';$('nextInfo').textContent=imminent?`Pop ghosts to delay +${rules.rowsAdded} rows`:next===null?'Resolving…':settings.colorblind?`Ghost color ${next+1}`:'Upcoming shot';$('nextCanvas').hidden=imminent||next===null;drawNextPreview();$('rowStatus').textContent=`+${rules.rowsAdded} rows in ${rules.rowEvery-misses} non-popping shot${rules.rowEvery-misses===1?'':'s'}`}
+function sync(){$('score').textContent=points.toLocaleString();$('shots').textContent=shots;$('colors').textContent=boardColors().length;drawQueue()}
+const scoreValue=(raw,count,win,config)=>raw*(win?config.winMultiplier:1)/Math.pow(Math.max(1,count),config.shotExponent);
+function records(mode){const rows=Array.isArray(highScores[mode])?highScores[mode]:[];return rows.filter(s=>s&&Number.isFinite(s.score)&&s.score>=0&&Number.isFinite(s.points)&&s.points>=0&&Number.isInteger(s.shots)&&s.shots>=1&&typeof s.win==='boolean'&&typeof s.date==='string'&&Number.isFinite(Date.parse(s.date))).sort((a,b)=>b.score-a.score||a.shots-b.shots||a.date.localeCompare(b.date)).slice(0,10)}
+function finish(win){
+  if(ended)return;
+  ended=true;projectile=null;reaction=null;heldArrows.clear();dragPointer=null;pendingScore=null;$('nameForm').hidden=true;
+  const final=scoreValue(points,shots,win,rules);
+  $('endTitle').textContent=win?'BOARD CLEARED':'GAME OVER';
+  $('endInfo').textContent=win?`Every ghost is gone. ${points.toLocaleString()} points in ${shots} shots.`:`The ghosts reached the limit. ${points.toLocaleString()} points in ${shots} shots.`;
+  $('endResult').textContent='Final score: '+final.toLocaleString(undefined,{maximumFractionDigits:2});
+  $('endFormula').textContent=`${points.toLocaleString()} × ${win?rules.winMultiplier:1} ÷ ${Math.max(1,shots)}^${rules.shotExponent}`;
+  if(MODES[activeMode].recordsScores&&shots>0){
+    const entry={score:final,points,shots,win,date:new Date().toISOString(),name:'Anonymous'},
+      ranked=[...records(activeMode),entry].sort((a,b)=>b.score-a.score||a.shots-b.shots||a.date.localeCompare(b.date)).slice(0,10);
+    highScores[activeMode]=ranked;
+    const persisted=save(STORAGE.scores,highScores),rank=ranked.indexOf(entry)+1;
+    $('endSaved').textContent=rank?`#${rank} on this browser${persisted?' · saved':' · this session only'}`:'Outside the local top 10.';
+    if(rank){pendingScore={mode:activeMode,entry,rank};$('playerName').value=settings.playerName;$('nameForm').hidden=false}
+  }else $('endSaved').textContent='Custom Mode · no high score recorded';
+  $('overlay').hidden=false;sync();
+}
+function saveScoreName(event){
+  event.preventDefault();if(!pendingScore)return;
+  const name=$('playerName').value.trim().slice(0,24);
+  pendingScore.entry.name=name||'Anonymous';
+  const persisted=save(STORAGE.scores,highScores);
+  settings.playerName=name;save(STORAGE.settings,settings);
+  $('endSaved').textContent=`#${pendingScore.rank} · ${pendingScore.entry.name}${persisted?' · saved':' · this session only'}`;
+  pendingScore=null;$('nameForm').hidden=true;
+}
+function showScores(){const mode=MODES[selectedMode],config=mode.rules,rows=records(selectedMode);$('scoresTitle').textContent=mode.name+' · Top 10';$('scoresHelp').textContent=`Final score = points × finish multiplier ÷ shots^${config.shotExponent}. A win earns ${config.winMultiplier}×; a loss earns 1×. Finishing in fewer shots earns a higher score.`;$('scoreRows').replaceChildren(...rows.map((s,i)=>{const tr=document.createElement('tr');for(const value of [i+1,typeof s.name==='string'?s.name.slice(0,24):'Anonymous',s.score.toLocaleString(undefined,{maximumFractionDigits:2}),s.win?'Won':'Lost',s.points.toLocaleString(),s.shots,new Date(s.date).toLocaleDateString()]){const td=document.createElement('td');td.textContent=value;tr.append(td)}return tr}));$('emptyScores').hidden=rows.length>0;setScreen('scores')}
+function aimAt(clientX,clientY){const rect=cv.getBoundingClientRect(),x=(clientX-rect.left)*W/rect.width,y=(clientY-rect.top)*H/rect.height;aim=Math.max(-Math.PI+.13,Math.min(-.13,Math.atan2(y-SHOOT.y,x-SHOOT.x)))}
+function fire(){if(screen!=='game'||ended||projectile||reaction||loaded===null||$('settingsDialog').open)return;projectile={x:SHOOT.x,y:SHOOT.y,vx:Math.cos(aim),vy:Math.sin(aim),color:loaded,bounces:0,age:0};loaded=null;shots++;sync()}
+// Breadth-first waves follow matching connections, including paths that bend back toward the shot.
+function connectedWaves(start){
+  const seen=new Set([key(start.r,start.c)]),waves=[[start]];
+  for(let i=0;i<waves.length;i++){
+    const nextWave=[];
+    for(const g of waves[i])for(const [r,c] of neighbors(g.r,g.c)){
+      const k=key(r,c),other=get(r,c);
+      if(other&&other.color===start.color&&!seen.has(k)){seen.add(k);nextWave.push(other)}
+    }
+    if(nextWave.length)waves.push(nextWave);
+  }
+  return waves;
+}
+function burst(g){const p=position(g.r,g.c),color=displayColor(g.color);for(let i=0;i<7;i++){const a=Math.random()*Math.PI*2,s=35+Math.random()*135;particles.push({x:p.x,y:p.y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,life:.35+Math.random()*.35,color})}}
+function floatingGhosts(){
+  const anchored=new Set(),queue=[...grid.values()].filter(g=>g.r===0);
+  for(const g of queue)anchored.add(key(g.r,g.c));
+  for(let i=0;i<queue.length;i++)for(const [r,c] of neighbors(queue[i].r,queue[i].c)){
+    const g=get(r,c),k=key(r,c);
+    if(g&&!anchored.has(k)){anchored.add(k);queue.push(g)}
+  }
+  return [...grid.values()].filter(g=>!anchored.has(key(g.r,g.c)));
+}
+function popReactionWave(){
+  for(const g of reaction.waves[reaction.index++]){grid.delete(key(g.r,g.c));burst(g);reaction.removed++}
+}
+function completeReaction(){
+  const result=reaction,dropped=floatingGhosts();
+  for(const g of dropped){grid.delete(key(g.r,g.c));burst(g)}
+  const bonus=1+(result.removed-rules.matchSize)*rules.chainBonus,
+    earned=Math.round(result.removed*rules.popPoints*bonus+dropped.length*rules.dropPoints),total=result.removed+dropped.length;
+  points+=earned;popText.push({x:Math.max(80,Math.min(W-80,result.origin.x)),y:result.origin.y,text:(total>3?total+'x ':'')+'+'+earned.toLocaleString(),life:1.3});
+  reaction=null;settle(true);
+}
+function addRows(){const old=[...grid.values()],pool=boardColors();if(old.some(g=>g.r+rules.rowsAdded>=rules.maxRows)){finish(false);return false}grid.clear();parity=(parity+rules.rowsAdded)&1;for(const g of old)set(g.r+rules.rowsAdded,g.c,g.color);for(let r=0;r<rules.rowsAdded;r++)for(let c=0;c<rules.columns;c++)set(r,c,rand(pool));popText.push({x:W/2,y:75,text:`+${rules.rowsAdded} NEW ROWS`,life:1.4});return true}
+function settle(popped){projectile=null;if(!grid.size){sync();finish(true);return}if(!popped){misses++;if(misses>=rules.rowEvery){misses=0;if(!addRows())return}}if([...grid.values()].some(g=>position(g.r,g.c).y+R>=DANGER-.01)){sync();finish(false);return}
+  // Queue colors never resurrect an eliminated color. At the last chance there is no reserved next color.
+  const choices=boardColors();loaded=next!==null&&choices.includes(next)?next:makeShot();next=rowImminent()?null:makeShot();sync()}
+function snap(x,y,color,hit){
+  const candidates=hit?neighbors(hit.r,hit.c):Array.from({length:rules.columns},(_,c)=>[0,c]);
+  let best=null,d=Infinity;
+  for(const [r,c] of candidates){if(get(r,c))continue;const p=position(r,c),dd=(p.x-x)**2+(p.y-y)**2;if(dd<d){d=dd;best={r,c}}}
+  if(!best){finish(false);return}
+  projectile=null;loaded=null;set(best.r,best.c,color);
+  const waves=connectedWaves(get(best.r,best.c));
+  if(waves.reduce((count,wave)=>count+wave.length,0)>=rules.matchSize){
+    reaction={waves,index:0,timer:0,removed:0,color,origin:position(best.r,best.c)};
+    popReactionWave();sync();
+  }else settle(false);
+}
+// Both live shots and the guide call this exact collision routine and use the visible canvas walls.
+function traceStep(p,distance,bounceLimit=Infinity){p.x+=p.vx*distance;p.y+=p.vy*distance;const left=R,right=W-R;if(p.x<left||p.x>right){const edge=p.x<left?left:right;if(p.bounces>=bounceLimit){p.x=edge;return {type:'limit'}}p.x=2*edge-p.x;p.vx=-p.vx;p.bounces++}if(p.y<=TOP){p.y=TOP;return {type:'ceiling'}}const contact=2*R*rules.collisionFactor;let nearest=null,nearestDistance=Infinity;for(const g of grid.values()){const q=position(g.r,g.c),d=(p.x-q.x)**2+(p.y-q.y)**2;if(d<contact*contact&&d<nearestDistance){nearest=g;nearestDistance=d}}return nearest?{type:'ghost',ghost:nearest}:null}
+function rotateAim(delta){aim=Math.max(-Math.PI+.13,Math.min(-.13,aim+delta))}
+function updateAim(dt){
+  if(ended||dragPointer!==null||heldArrows.size!==1)return;
+  for(const [key,state] of heldArrows){
+    state.elapsed+=dt;
+    while(state.elapsed+1e-9>=state.next){rotateAim((key==='ArrowLeft'?-1:1)*AIM_INPUT.holdStep);state.next+=AIM_INPUT.interval}
+  }
+}
+function update(dt){
+  assistTime+=dt;updateAim(dt);
+  for(const p of particles){p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=140*dt;p.life-=dt}particles=particles.filter(p=>p.life>0);
+  for(const t of popText){t.y-=32*dt;t.life-=dt}popText=popText.filter(t=>t.life>0);
+  if(ended)return;
+  if(reaction){
+    reaction.timer+=dt;
+    while(reaction&&reaction.timer+1e-9>=REACTION_INTERVAL){
+      reaction.timer-=REACTION_INTERVAL;
+      if(reaction.index<reaction.waves.length)popReactionWave();else completeReaction();
+    }
+    return;
+  }
+  if(!projectile)return;
+  projectile.age+=dt*(settings.speed==='slow'?.5:1);
+  const distance=shotSpeed()*dt,steps=Math.max(1,Math.ceil(distance/3)),step=distance/steps;
+  for(let j=0;j<steps&&projectile;j++){const p=projectile,hit=traceStep(p,step);if(hit)snap(p.x,p.y,p.color,hit.ghost)}
+}
+function colorNumber(context,x,y,color,r){
+  context.save();context.font=`900 ${r*(color>=9?1:1.25)}px system-ui`;
+  context.textAlign='center';context.textBaseline='middle';context.lineJoin='round';
+  context.strokeStyle='#081026';context.lineWidth=Math.max(3,r*.18);context.fillStyle='#fff';
+  context.strokeText(color+1,x,y);context.fillText(color+1,x,y);context.restore();
+}
+function ghost(context,x,y,color,r=R){
+  context.save();context.translate(x,y);
+  const fill=displayColor(color),gradient=context.createLinearGradient(-r,-r,r,r);
+  gradient.addColorStop(0,'#ffffff55');gradient.addColorStop(.35,fill);gradient.addColorStop(1,fill);
+  context.fillStyle=settings.colorAssist?fill:gradient;context.strokeStyle='#ffffffbb';context.lineWidth=1.3;
+  context.beginPath();context.moveTo(-r*.93,r*.8);context.lineTo(-r*.93,-r*.05);context.arc(0,-r*.05,r*.93,Math.PI,0);context.lineTo(r*.93,r*.8);context.lineTo(r*.6,r*.51);context.lineTo(r*.3,r*.85);context.lineTo(0,r*.51);context.lineTo(-r*.3,r*.85);context.lineTo(-r*.6,r*.51);context.closePath();context.fill();context.stroke();
+  if(settings.colorblind)colorNumber(context,0,0,color,r);
+  else for(const ex of [-r*.36,r*.36]){context.fillStyle='white';context.beginPath();context.ellipse(ex,-r*.2,r*.28,r*.33,0,0,Math.PI*2);context.fill();context.fillStyle='#14254f';context.beginPath();context.arc(ex+r*.07,-r*.13,r*.12,0,Math.PI*2);context.fill()}
+  context.restore();
+}
+function pac(x,y,color,r=R,angle=0,mouth=.23*Math.PI){ctx.save();ctx.translate(x,y);ctx.rotate(angle);ctx.fillStyle=displayColor(color);ctx.strokeStyle='#ffffffbb';ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(0,0);ctx.arc(0,0,r,mouth,Math.PI*2-mouth);ctx.closePath();ctx.fill();ctx.stroke();if(!settings.colorblind){ctx.fillStyle='#102040';ctx.beginPath();ctx.arc(r*.06,-r*.53,r*.11,0,Math.PI*2);ctx.fill()}ctx.restore();if(settings.colorblind)colorNumber(ctx,x,y,color,r*.85)}
+function drawGuide(){const p={x:SHOOT.x,y:SHOOT.y,vx:Math.cos(aim),vy:Math.sin(aim),bounces:0};ctx.fillStyle='#e6efff99';for(let distance=0;distance<rules.aimDistance;){const step=Math.min(3,rules.aimDistance-distance),hit=traceStep(p,step,rules.maxBounces);distance+=step;if(hit)break;if(Math.floor(distance/3)%8===0){ctx.beginPath();ctx.arc(p.x,p.y,2.3,0,Math.PI*2);ctx.fill()}}}
+function draw(){ctx.clearRect(0,0,W,H);ctx.fillStyle='#0b1230';ctx.fillRect(0,0,W,H);ctx.fillStyle='#7896ef44';for(let x=21;x<W;x+=42)for(let y=21;y<H;y+=42){ctx.beginPath();ctx.arc(x,y,1.2,0,7);ctx.fill()}ctx.save();ctx.setLineDash([8,8]);ctx.strokeStyle='#ff637a99';ctx.beginPath();ctx.moveTo(0,DANGER);ctx.lineTo(W,DANGER);ctx.stroke();ctx.restore();for(const g of grid.values()){const p=position(g.r,g.c);ghost(ctx,p.x,p.y,g.color)}if(!projectile&&!reaction&&!ended&&loaded!==null)drawGuide();
+  if(projectile){const mouth=.035+(.5+.5*Math.sin(projectile.age*23))*.7;pac(projectile.x,projectile.y,projectile.color,R,Math.atan2(projectile.vy,projectile.vx),mouth)}
+  ctx.fillStyle='#1b2d5f';ctx.beginPath();ctx.arc(SHOOT.x,SHOOT.y+5,32,0,7);ctx.fill();ctx.strokeStyle='#7192d1';ctx.lineWidth=2;ctx.stroke();if(loaded!==null){pac(SHOOT.x,SHOOT.y,loaded,21,aim);ctx.fillStyle='#e0e9ff';ctx.font='bold 12px system-ui';ctx.textAlign='center';ctx.fillText('LOADED',SHOOT.x,SHOOT.y+32)}
+  for(const p of particles){ctx.globalAlpha=Math.min(1,p.life*2);ctx.fillStyle=p.color;ctx.beginPath();ctx.arc(p.x,p.y,3.5,0,7);ctx.fill()}ctx.globalAlpha=1;ctx.textAlign='center';ctx.font='900 23px system-ui';for(const t of popText){ctx.globalAlpha=Math.min(1,t.life);ctx.strokeStyle='#101733';ctx.lineWidth=5;ctx.strokeText(t.text,t.x,t.y);ctx.fillStyle='#ffe16a';ctx.fillText(t.text,t.x,t.y)}ctx.globalAlpha=1}
+function frame(now){const dt=Math.min(.033,(now-lastTime)/1000);lastTime=now;if(screen==='game'){if(!$('settingsDialog').open)update(dt);draw();if(settings.colorAssist)drawNextPreview()}requestAnimationFrame(frame)}
+cv.addEventListener('pointerdown',e=>{if(e.button!==0||!e.isPrimary||ended||projectile||reaction||dragPointer!==null)return;e.preventDefault();heldArrows.clear();dragPointer=e.pointerId;cv.setPointerCapture(e.pointerId);cv.focus({preventScroll:true});aimAt(e.clientX,e.clientY)});
+cv.addEventListener('pointermove',e=>{if(dragPointer===e.pointerId||(e.pointerType==='mouse'&&dragPointer===null))aimAt(e.clientX,e.clientY)});
+cv.addEventListener('pointerup',e=>{if(dragPointer!==e.pointerId)return;e.preventDefault();if(e.button!==0){cancelDrag();return}aimAt(e.clientX,e.clientY);dragPointer=null;if(cv.hasPointerCapture(e.pointerId))cv.releasePointerCapture(e.pointerId);fire()});
+cv.addEventListener('contextmenu',e=>e.preventDefault());
+function cancelDrag(){dragPointer=null;heldArrows.clear()}cv.addEventListener('pointercancel',cancelDrag);cv.addEventListener('lostpointercapture',cancelDrag);window.addEventListener('blur',cancelDrag);document.addEventListener('visibilitychange',()=>{if(document.hidden)cancelDrag()});
+document.addEventListener('keydown',e=>{
+  if(screen!=='game'||ended||dragPointer!==null||$('settingsDialog').open||e.target.closest('input,select,textarea,button,a,[contenteditable]'))return;
+  if(e.key===' '||e.key==='Enter'){e.preventDefault();if(!e.repeat)fire()}
+  else if(e.key==='ArrowLeft'||e.key==='ArrowRight'){
+    e.preventDefault();
+    if(!e.repeat&&!heldArrows.has(e.key)){
+      heldArrows.set(e.key,{elapsed:0,next:AIM_INPUT.delay});rotateAim((e.key==='ArrowLeft'?-1:1)*AIM_INPUT.step);
+    }
+  }
+});
+document.addEventListener('keyup',e=>heldArrows.delete(e.key));
+for(const button of document.querySelectorAll('[data-mode]'))button.onclick=()=>selectMode(button.dataset.mode);
+$('customForm').onsubmit=e=>e.preventDefault();$('customForm').addEventListener('input',()=>{const values=readCustom();$('customNotice').textContent=values?'':'Check the values. Leave at least two empty starting rows; row waves must be smaller than the grid.';if(values){customRules=values;save(STORAGE.custom,values);renderSwatches()}});
+$('resetCustom').onclick=()=>{customRules={...CLASSIC};for(const [name] of FIELDS){$('rule-'+name).value=customRules[name];$('rule-'+name).setCustomValidity('')}$('customNotice').textContent='';save(STORAGE.custom,customRules);renderSwatches()};
+$('play').onclick=start;$('again').onclick=start;$('restart').onclick=start;$('menu').onclick=menu;$('endMenu').onclick=menu;$('showScores').onclick=showScores;$('scoresBack').onclick=()=>setScreen('menu');$('randomize').onclick=()=>changePalette();$('gameRandomize').onclick=()=>{changePalette();if(!ended)cv.focus({preventScroll:true})};$('resetPalette').onclick=()=>changePalette(true);
+$('openSettings').onclick=openSettings;$('gameSettings').onclick=openSettings;$('settingsRandomize').onclick=()=>changePalette();$('closeSettings').onclick=()=>{$('settingsDialog').close();if(screen==='game'&&!ended)cv.focus({preventScroll:true})};
+for(const id of ['colorblind','colorAssist','gameSpeed'])$(id).addEventListener('change',updateSettings);
+$('settingsDialog').addEventListener('close',()=>{if(screen==='game'&&!ended){fitBoard();cv.focus({preventScroll:true})}});
+$('nameForm').onsubmit=saveScoreName;
+new ResizeObserver(fitBoard).observe($('boardWrap'));window.addEventListener('resize',()=>{cancelDrag();fitBoard()});
+buildFields();selectMode('classic');requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
