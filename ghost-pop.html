@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Pac-Ghost Pop</title>
+<title>Ghost Pop</title>
 <style>
   :root{color-scheme:dark;font-family:system-ui,Segoe UI,sans-serif;background:#090d20;color:#e9edff}
   *{box-sizing:border-box}body{display:flow-root;margin:0;min-height:100dvh;background:radial-gradient(circle at 50% 10%,#263366,#090d20 75%)}
@@ -24,7 +24,7 @@
 </head>
 <body>
 <main class="shell">
-  <header><div><h1>ᗧ PAC-GHOST POP</h1><p class="sub" id="subtitle" hidden></p></div><a class="button secondary small" href="index.html">Other Games</a></header>
+  <header><div><h1>ᗧ GHOST POP</h1><p class="sub" id="subtitle" hidden></p></div><a class="button secondary small" href="index.html">Other Games</a></header>
   <section class="screen" id="menuScreen">
     <div class="intro"><h2>Choose a mode</h2><p>Match ghosts of the same color and clear the board.</p></div>
     <div class="modes" aria-label="Game modes">
@@ -36,6 +36,7 @@
     <form class="custom" id="customForm" hidden><h2>Custom settings</h2><p class="hint">Starts with Classic rules. Preferences save on Play or when a valid value changes.</p><div class="fields" id="customFields"></div><div class="actions"><button type="button" class="secondary small" id="resetCustom">Reset to Classic</button></div><p class="notice" id="customNotice" aria-live="polite"></p></form>
     <div class="actions"><button id="play">Play Classic</button><button class="secondary" id="showScores">High scores</button></div>
     <p class="hint" id="modeInfo">Clear the board for a 100× finish bonus. Finishing in fewer shots earns a higher score.</p>
+    <p class="hint">Gamepad: D-pad to move, south button to select, east button to go back.</p>
     <div class="palette-settings"><p class="eyebrow">Colors and settings</p><div class="swatches" id="swatches" aria-label="Current ghost colors"></div><div class="actions"><button class="secondary small" id="randomize">Randomize colors</button><button class="secondary small" id="resetPalette">Default colors</button><button class="secondary small" id="openSettings">Settings</button></div><p class="hint">Colorblind mode, color assist, and game speed are available in Settings. Your preferences are saved.</p></div>
   </section>
   <section id="gameScreen" hidden>
@@ -71,6 +72,8 @@ const MODES={
   custom:{name:'Custom Mode',recordsScores:false}
 };
 const AIM_INPUT=Object.freeze({step:.025,holdStep:.015,delay:.1,interval:.025});
+const GAMEPAD_INPUT=Object.freeze({deadzone:.18,triggerThreshold:.55,navDelay:.28,navInterval:.12});
+const gamepadStates=new Map();
 const REACTION_INTERVAL=.085;
 const heldArrows=new Map();
 const FIELDS=[
@@ -154,7 +157,7 @@ function start(){if(selectedMode==='custom'){const values=readCustom(true);if(!v
   for(let r=0;r<rules.initialRows;r++)for(let c=0;c<rules.columns;c++)if(Math.random()<.92)set(r,c,Math.floor(Math.random()*rules.colors));
   // Ensure even very sparse small boards have a playable starting group.
   if(!grid.size)for(let c=0;c<rules.columns;c++)set(0,c,0);
-  loaded=makeShot();next=rowImminent()?null:makeShot();$('overlay').hidden=true;$('gameHint').textContent=`Drag to aim; release to shoot. Match ${rules.matchSize}+. Arrows + Space also work. Shots that pop ghosts delay the row counter.`;setScreen('game');sync()}
+  loaded=makeShot();next=rowImminent()?null:makeShot();$('overlay').hidden=true;$('gameHint').textContent=`Drag to aim; release to shoot. Match ${rules.matchSize}+. Arrows + Space also work. Gamepad: either stick to aim; either trigger or south button to shoot. Shots that pop ghosts delay the row counter.`;setScreen('game');sync()}
 function menu(){ended=true;projectile=null;reaction=null;setScreen('menu');selectMode(selectedMode)}
 function drawNextPreview(){nextCtx.clearRect(0,0,84,84);if(!rowImminent()&&next!==null)ghost(nextCtx,42,42,next,31)}
 function drawQueue(){const imminent=rowImminent();$('nextLabel').textContent=imminent?'NEW ROWS NEXT':'NEXT';$('nextInfo').textContent=imminent?`Pop ghosts to delay +${rules.rowsAdded} rows`:next===null?'Resolving…':settings.colorblind?`Ghost color ${next+1}`:'Upcoming shot';$('nextCanvas').hidden=imminent||next===null;drawNextPreview();$('rowStatus').textContent=`+${rules.rowsAdded} rows in ${rules.rowEvery-misses} non-popping shot${rules.rowEvery-misses===1?'':'s'}`}
@@ -220,9 +223,9 @@ function popReactionWave(){
 function completeReaction(){
   const result=reaction,dropped=floatingGhosts();
   for(const g of dropped){grid.delete(key(g.r,g.c));burst(g)}
-  const bonus=1+(result.removed-rules.matchSize)*rules.chainBonus,
+  const bonus=1+Math.max(0,result.removed-rules.matchSize)*rules.chainBonus,
     earned=Math.round(result.removed*rules.popPoints*bonus+dropped.length*rules.dropPoints),total=result.removed+dropped.length;
-  points+=earned;popText.push({x:Math.max(80,Math.min(W-80,result.origin.x)),y:result.origin.y,text:(total>3?total+'x ':'')+'+'+earned.toLocaleString(),life:1.3});
+  points+=earned;popText.push({x:Math.max(80,Math.min(W-80,result.origin.x)),y:result.origin.y,text:(total>rules.matchSize?total+'x ':'')+'+'+earned.toLocaleString(),life:1.3});
   reaction=null;settle(true);
 }
 function addRows(){const old=[...grid.values()],pool=boardColors();if(old.some(g=>g.r+rules.rowsAdded>=rules.maxRows)){finish(false);return false}grid.clear();parity=(parity+rules.rowsAdded)&1;for(const g of old)set(g.r+rules.rowsAdded,g.c,g.color);for(let r=0;r<rules.rowsAdded;r++)for(let c=0;c<rules.columns;c++)set(r,c,rand(pool));popText.push({x:W/2,y:75,text:`+${rules.rowsAdded} NEW ROWS`,life:1.4});return true}
@@ -251,6 +254,72 @@ function updateAim(dt){
     while(state.elapsed+1e-9>=state.next){rotateAim((key==='ArrowLeft'?-1:1)*AIM_INPUT.holdStep);state.next+=AIM_INPUT.interval}
   }
 }
+function gamepadScope(){
+  if($('settingsDialog').open)return $('settingsDialog');
+  if(screen==='menu')return $('menuScreen');
+  if(screen==='scores')return $('scoresScreen');
+  if(screen==='game'&&ended)return $('overlay');
+  return null;
+}
+function navigateGamepad(scope,direction){
+  const focused=document.activeElement;
+  if(focused?.tagName==='SELECT'&&(direction===14||direction===15)){
+    focused.selectedIndex=Math.max(0,Math.min(focused.options.length-1,focused.selectedIndex+(direction===14?-1:1)));
+    focused.dispatchEvent(new Event('change',{bubbles:true}));return;
+  }
+  const controls=[...scope.querySelectorAll('button:not(:disabled),input[type="checkbox"],select')].filter(el=>el.getClientRects().length>0),
+    index=controls.indexOf(focused),step=direction===12||direction===14?-1:1;
+  if(controls.length)controls[(index<0?(step>0?0:controls.length-1):(index+step+controls.length)%controls.length)].focus();
+}
+function activateGamepad(scope){
+  const focused=document.activeElement;
+  if(scope.contains(focused)&&focused.matches('button:not(:disabled),input[type="checkbox"]')){focused.click();return}
+  const fallback=scope===$('menuScreen')?$('play'):scope===$('scoresScreen')?$('scoresBack'):scope===$('overlay')?$('again'):$('closeSettings');
+  fallback.click();
+}
+function pollGamepads(dt){
+  let pads;
+  try{pads=typeof navigator.getGamepads==='function'?Array.from(navigator.getGamepads()).filter(p=>p?.connected):[]}catch{pads=[]}
+  const connected=new Set(pads.map(p=>p.index)),interactive=!document.hidden&&document.hasFocus(),inputs=[];
+  for(const index of gamepadStates.keys())if(!connected.has(index))gamepadStates.delete(index);
+  for(const pad of pads){
+    const state=gamepadStates.get(pad.index)||{buttons:[],nav:null,navTime:0,navNext:0,blocked:false};
+    const buttons=Array.from(pad.buttons,(button,index)=>index===6||index===7
+      ?(button.value??(button.pressed?1:0))>=GAMEPAD_INPUT.triggerThreshold
+      :button.pressed||button.value>.5),edges=buttons.map((down,i)=>down&&!state.buttons[i]);
+    state.buttons=buttons;gamepadStates.set(pad.index,state);
+    if(!interactive){state.blocked=true;state.nav=null;continue}
+    if(state.blocked){if(!buttons.some(Boolean))state.blocked=false;state.nav=null;continue}
+    const nav=[12,13,14,15].find(i=>buttons[i]);let navPress=null;
+    if(nav!==state.nav){state.nav=nav;state.navTime=0;state.navNext=GAMEPAD_INPUT.navDelay;if(nav!==undefined)navPress=nav}
+    else if(nav!==undefined){state.navTime+=dt;if(state.navTime>=state.navNext){navPress=nav;state.navNext+=GAMEPAD_INPUT.navInterval}}
+    let stick=null;
+    for(const offset of [0,2]){
+      const x=pad.axes[offset]??0,y=pad.axes[offset+1]??0,magnitude=Math.hypot(x,y);
+      if(Number.isFinite(magnitude)&&magnitude>GAMEPAD_INPUT.deadzone&&(!stick||magnitude>stick.magnitude))stick={x,y,magnitude};
+    }
+    inputs.push({edges,navPress,stick});
+  }
+  const input=inputs.find(p=>p.edges.some(Boolean)||p.navPress!==null)||inputs.find(p=>p.stick);
+  if(!input)return;
+  const {edges,navPress,stick}=input,scope=gamepadScope();
+  if(edges[9]&&screen==='game'&&!ended){if($('settingsDialog').open)$('closeSettings').click();else openSettings();return}
+  if(scope){
+    if(edges[1]){
+      if(scope===$('settingsDialog'))$('closeSettings').click();
+      else if(screen==='scores'){$('scoresBack').click();$('showScores').focus()}
+      else if(screen==='game')menu();
+      return;
+    }
+    if(navPress!==null)navigateGamepad(scope,navPress);
+    if(edges[0])activateGamepad(scope);
+    return;
+  }
+  if(screen!=='game'||ended||dragPointer!==null)return;
+  if(stick){heldArrows.clear();aim=Math.max(-Math.PI+.13,Math.min(-.13,Math.atan2(-Math.abs(stick.y),stick.x)))}
+  if(edges[0]||edges[6]||edges[7])fire();
+}
+function suspendGamepads(){for(const state of gamepadStates.values()){state.blocked=true;state.nav=null}}
 function update(dt){
   assistTime+=dt;updateAim(dt);
   for(const p of particles){p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=140*dt;p.life-=dt}particles=particles.filter(p=>p.life>0);
@@ -291,12 +360,13 @@ function draw(){ctx.clearRect(0,0,W,H);ctx.fillStyle='#0b1230';ctx.fillRect(0,0,
   if(projectile){const mouth=.035+(.5+.5*Math.sin(projectile.age*23))*.7;pac(projectile.x,projectile.y,projectile.color,R,Math.atan2(projectile.vy,projectile.vx),mouth)}
   ctx.fillStyle='#1b2d5f';ctx.beginPath();ctx.arc(SHOOT.x,SHOOT.y+5,32,0,7);ctx.fill();ctx.strokeStyle='#7192d1';ctx.lineWidth=2;ctx.stroke();if(loaded!==null){pac(SHOOT.x,SHOOT.y,loaded,21,aim);ctx.fillStyle='#e0e9ff';ctx.font='bold 12px system-ui';ctx.textAlign='center';ctx.fillText('LOADED',SHOOT.x,SHOOT.y+32)}
   for(const p of particles){ctx.globalAlpha=Math.min(1,p.life*2);ctx.fillStyle=p.color;ctx.beginPath();ctx.arc(p.x,p.y,3.5,0,7);ctx.fill()}ctx.globalAlpha=1;ctx.textAlign='center';ctx.font='900 23px system-ui';for(const t of popText){ctx.globalAlpha=Math.min(1,t.life);ctx.strokeStyle='#101733';ctx.lineWidth=5;ctx.strokeText(t.text,t.x,t.y);ctx.fillStyle='#ffe16a';ctx.fillText(t.text,t.x,t.y)}ctx.globalAlpha=1}
-function frame(now){const dt=Math.min(.033,(now-lastTime)/1000);lastTime=now;if(screen==='game'){if(!$('settingsDialog').open)update(dt);draw();if(settings.colorAssist)drawNextPreview()}requestAnimationFrame(frame)}
+function frame(now){const dt=Math.min(.033,(now-lastTime)/1000);lastTime=now;pollGamepads(dt);if(screen==='game'){if(!$('settingsDialog').open)update(dt);draw();if(settings.colorAssist)drawNextPreview()}requestAnimationFrame(frame)}
 cv.addEventListener('pointerdown',e=>{if(e.button!==0||!e.isPrimary||ended||projectile||reaction||dragPointer!==null)return;e.preventDefault();heldArrows.clear();dragPointer=e.pointerId;cv.setPointerCapture(e.pointerId);cv.focus({preventScroll:true});aimAt(e.clientX,e.clientY)});
 cv.addEventListener('pointermove',e=>{if(dragPointer===e.pointerId||(e.pointerType==='mouse'&&dragPointer===null))aimAt(e.clientX,e.clientY)});
 cv.addEventListener('pointerup',e=>{if(dragPointer!==e.pointerId)return;e.preventDefault();if(e.button!==0){cancelDrag();return}aimAt(e.clientX,e.clientY);dragPointer=null;if(cv.hasPointerCapture(e.pointerId))cv.releasePointerCapture(e.pointerId);fire()});
 cv.addEventListener('contextmenu',e=>e.preventDefault());
-function cancelDrag(){dragPointer=null;heldArrows.clear()}cv.addEventListener('pointercancel',cancelDrag);cv.addEventListener('lostpointercapture',cancelDrag);window.addEventListener('blur',cancelDrag);document.addEventListener('visibilitychange',()=>{if(document.hidden)cancelDrag()});
+function cancelDrag(){dragPointer=null;heldArrows.clear()}cv.addEventListener('pointercancel',cancelDrag);cv.addEventListener('lostpointercapture',cancelDrag);window.addEventListener('blur',()=>{cancelDrag();suspendGamepads()});document.addEventListener('visibilitychange',()=>{if(document.hidden){cancelDrag();suspendGamepads()}});
+window.addEventListener('gamepaddisconnected',e=>gamepadStates.delete(e.gamepad.index));
 document.addEventListener('keydown',e=>{
   if(screen!=='game'||ended||dragPointer!==null||$('settingsDialog').open||e.target.closest('input,select,textarea,button,a,[contenteditable]'))return;
   if(e.key===' '||e.key==='Enter'){e.preventDefault();if(!e.repeat)fire()}

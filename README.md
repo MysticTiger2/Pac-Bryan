@@ -1,6 +1,6 @@
-# Pac-Ghost Pop
+# Ghost Pop
 
-Open `pac-ghost-pop.html` in a browser. The game is self-contained; no build or server is required. The Other Games link points to the future `index.html`.
+Open `ghost-pop.html` in a browser. The game is self-contained; no build or server is required. The Other Games link points to the future `index.html`.
 
 Classic uses 6 colors, 18 columns, 20 rows, and 7 starting rows. Every 5 non-popping shots adds 2 rows. Popping ghosts preserves that counter. At the last chance, the next-color preview becomes a row warning; eliminated colors cannot return through the queue or row waves.
 
@@ -8,7 +8,13 @@ Easy inherits Classic with 5 colors and 7 non-popping shots per two-row wave. Su
 
 Drag and release to shoot with touch or the left mouse button. Right/middle clicks do not shoot. Arrow keys aim and Space/Enter fires during play; form controls keep their usual keyboard behavior. Arrow presses turn 0.025 radians; holding repeats after 100 ms, turning 0.015 radians every 25 ms independently of the operating system's repeat settings. `AIM_INPUT` controls these values. Classic has a 340-unit aim guide with one previewed wall bounce and slightly forgiving collision detection. Actual shots have unlimited wall bounces. The Custom Mode bounce setting applies only to the guide. The next shot is shown immediately to the right of the launcher, including the last-chance row warning.
 
+Gamepads use the browser's [standard gamepad mapping](https://w3c.github.io/gamepad/#remapping). Connect a controller and press a button so the browser can detect it. Either stick points the aim into the upper firing arc; downward stick directions are mirrored upward. A radial deadzone prevents drift. Either trigger or the south face button (Xbox A, Switch B, PlayStation X) shoots once per press, without automatic firing when held through a landing or pop animation. `GAMEPAD_INPUT` controls the deadzone, trigger threshold, and navigation repeat timing.
+
+The D-pad moves between menu buttons and settings controls; south selects, east goes back, and Start/Options opens or closes settings during a game. Left/right adjusts the focused speed selector. Custom numeric settings and high-score names still use keyboard/touch input. Controller presses are suppressed while the page is unfocused; release held buttons after returning. Mouse, touch, and keyboard remain available when the Gamepad API is unavailable.
+
 Matches pop as a chain reaction along same-color connections, starting with the landed shot and advancing one adjacency layer every 85 ms (`REACTION_INTERVAL`). Detached ghosts disappear after the matching waves finish; points, queue changes, and win/loss checks resolve once at the end. Another shot cannot launch during a chain. Restarting or returning to the menu cancels the pending animation.
+
+The pop-count prefix appears only when total removed ghosts exceed the active `matchSize`. Matched-ghost chain bonuses begin only for matches larger than that configured minimum: `1 + max(0, matched - matchSize) * chainBonus`. Falling ghosts retain their separate `dropPoints` reward.
 
 Final scores use `points / shots^1.5` on a loss and `(points * 100) / shots^1.5` on a win. Fewer shots improve the final score for the same points and result. The top 10 completed games for each built-in mode are saved on this browser. Qualifying results include an inline name field; unnamed scores display Anonymous. Custom Mode saves preferences and does not record scores.
 
@@ -28,4 +34,4 @@ LocalStorage keys are `pacGhostPop.custom.v1`, `pacGhostPop.palettes.v1`, `pacGh
 
 The browser tests require Node.js and Playwright (`npm install --no-save --package-lock=false playwright`). They use installed Microsoft Edge on Windows; elsewhere, install Playwright's Chromium with `npx playwright install chromium`. A custom browser executable can be supplied through `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH`.
 
-Run `node --test tests/pac-ghost-pop.test.cjs`. The 19 tests cover touch hold/drag/release/cancel, mouse buttons, keyboard controls and repeat timing, settings persistence, optional numbers, speed/animation rates, assist colors and timing, expanded Custom ranges, independent random colors, connection-based chain reactions, matching and scoring, row waves and color elimination, guide-only wall limits, named high scores, Easy/Super-Easy rules and separate leaderboards, launcher-side previews, and desktop/portrait/landscape layouts. Screenshots are written to `.test-artifacts/`. Tests use isolated browser contexts and do not touch the player's saved data.
+Run `node --test tests/ghost-pop.test.cjs`. The 23 tests cover touch hold/drag/release/cancel, mouse buttons, keyboard controls and repeat timing, simulated gamepad sticks/buttons/triggers/menu navigation/disconnects/focus loss, settings persistence, optional numbers, speed/animation rates, assist colors and timing, expanded Custom ranges, independent random colors, connection-based chain reactions, configurable combo thresholds, matching and scoring, row waves and color elimination, guide-only wall limits, named high scores, Easy/Super-Easy rules and separate leaderboards, launcher-side previews, and desktop/portrait/landscape layouts. Screenshots are written to `.test-artifacts/`. Tests use isolated browser contexts and do not touch the player's saved data.

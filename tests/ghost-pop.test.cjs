@@ -1,4 +1,4 @@
-// Run with: node --test tests/pac-ghost-pop.test.cjs
+// Run with: node --test tests/ghost-pop.test.cjs
 // Requires Playwright and a Chromium installation (Edge on Windows by default).
 const { test, before, after } = require('node:test');
 const assert = require('node:assert/strict');
@@ -7,12 +7,12 @@ const path = require('node:path');
 const http = require('node:http');
 const { chromium } = require('playwright');
 
-const html = fs.readFileSync(path.join(__dirname, '..', 'pac-ghost-pop.html'), 'utf8');
+const html = fs.readFileSync(path.join(__dirname, '..', 'ghost-pop.html'), 'utf8');
 // Expose fixtures only in the test response; the shipped file has no test API.
 const expose = `
 globalThis.gameTest = {
   start, selectMode, settle, snap, finish, scoreValue, createPalette, validPalette,
-  traceStep, position, draw, CLASSIC, MODES, AIM_INPUT, REACTION_INTERVAL, records, update, fire, shotSpeed, displayColor, drawNextPreview,
+  traceStep, position, draw, CLASSIC, MODES, AIM_INPUT, REACTION_INTERVAL, records, update, fire, shotSpeed, displayColor, drawNextPreview,pollGamepads,
   state:()=>({rules, grid:[...grid.values()], parity, loaded, next, points, shots, misses,
     ended, projectile, aim, popText, W,H,R,DANGER,SHOOT,screen,palette,highScores,settings,assistTime,reaction,activeMode}),
   fixture:s=>{if(s.grid)grid=new Map(s.grid.map(g=>[key(g.r,g.c),g]));
@@ -413,6 +413,108 @@ test('Easy and Super-Easy inherit Classic with requested colors/rows and separat
   assert.equal(scores.easy.length,1);assert.equal(scores['super-easy'].length,1);assert.equal(scores.classic,undefined);
   await page.reload();await page.locator('[data-mode=easy]').click();await page.locator('#showScores').click();
   assert.equal(await page.locator('#scoreRows tr').count(),1);
+}));
+
+async function connectFakePad(page) {
+  await page.evaluate(()=>{
+    window.testPad={index:0,connected:true,mapping:'standard',axes:[0,0,0,0],buttons:Array.from({length:17},()=>({pressed:false,value:0}))};
+    window.testPads=[window.testPad];
+    Object.defineProperty(navigator,'getGamepads',{configurable:true,value:()=>window.testPads});
+    gameTest.pollGamepads(.016);
+  });
+}
+async function padButton(page,index,pressed,value=pressed?1:0) {
+  await page.evaluate(({index,pressed,value})=>{
+    window.testPad.buttons[index]={pressed,value};gameTest.pollGamepads(.016);
+  },{index,pressed,value});
+}
+
+test('both gamepad sticks aim with a deadzone; south and either analog trigger fire once per press', async () => withPage(async page => {
+  await start(page);await connectFakePad(page);
+  const initial=(await state(page)).aim;
+  await page.evaluate(()=>{testPad.axes=[.1,.1,0,0];gameTest.pollGamepads(.016)});
+  assert.equal((await state(page)).aim,initial);
+  await page.evaluate(()=>{testPad.axes=[-.7,-.7,0,0];gameTest.pollGamepads(.016)});
+  assert(Math.abs((await state(page)).aim+Math.PI*.75)<1e-9);
+  await page.evaluate(()=>{testPad.axes=[0,0,.7,-.7];gameTest.pollGamepads(.016)});
+  assert(Math.abs((await state(page)).aim+Math.PI*.25)<1e-9);
+  await page.evaluate(()=>{testPad.axes=[0,0,1,0];gameTest.pollGamepads(.016)});
+  assert.equal((await state(page)).aim,-.13);
+  await page.evaluate(()=>{testPad.axes=[0,0,-1,0];gameTest.pollGamepads(.016)});
+  assert.equal((await state(page)).aim,-Math.PI+.13);
+  await padButton(page,0,true);assert.equal((await state(page)).shots,1);
+  await fixture(page,{loaded:0}); // Settle flight; continuing to hold cannot auto-fire.
+  await page.evaluate(()=>gameTest.pollGamepads(.5));assert.equal((await state(page)).shots,1);
+  await padButton(page,0,false);
+  await padButton(page,0,true);assert.equal((await state(page)).shots,2);
+  await padButton(page,0,false);
+  for(const button of [6,7]){
+    await fixture(page,{loaded:0,shots:0});
+    await padButton(page,button,false,.4);assert.equal((await state(page)).shots,0);
+    await padButton(page,button,true,.8);assert.equal((await state(page)).shots,1);
+    await fixture(page,{loaded:0});
+    await page.evaluate(()=>gameTest.pollGamepads(.1));assert.equal((await state(page)).shots,1);
+    await padButton(page,button,false,0);
+  }
+}));
+
+test('gamepad navigates modes, launches Play without an extra shot, and opens/closes settings', async () => withPage(async page => {
+  await connectFakePad(page);
+  await padButton(page,15,true);await padButton(page,15,false);
+  assert.equal(await page.evaluate(()=>document.activeElement.dataset.mode),'classic');
+  await padButton(page,15,true);await padButton(page,15,false);
+  assert.equal(await page.evaluate(()=>document.activeElement.dataset.mode),'easy');
+  await padButton(page,0,true);await padButton(page,0,false);
+  assert.equal(await page.locator('#play').textContent(),'Play Easy');
+  await page.locator('#play').focus();
+  await padButton(page,0,true);
+  assert.equal((await state(page)).activeMode,'easy');assert.equal((await state(page)).shots,0);
+  await page.evaluate(()=>gameTest.pollGamepads(.2));assert.equal((await state(page)).shots,0);
+  await padButton(page,0,false);
+  await padButton(page,9,true);await padButton(page,9,false);
+  assert.equal(await page.locator('#settingsDialog').evaluate(el=>el.open),true);
+  await page.locator('#gameSpeed').focus();
+  await padButton(page,15,true);await padButton(page,15,false);
+  assert.equal((await state(page)).settings.speed,'slow');
+  await padButton(page,1,true);await padButton(page,1,false);
+  assert.equal(await page.locator('#settingsDialog').evaluate(el=>el.open),false);
+  assert.equal((await state(page)).shots,0);
+  await padButton(page,0,true);assert.equal((await state(page)).shots,1);
+}));
+
+test('gamepad ignores busy reactions, focus loss, disconnects, and unavailable APIs safely', async () => withPage(async page => {
+  await start(page);await connectFakePad(page);
+  await fixture(page,{grid:[{r:0,c:0,color:0},{r:0,c:1,color:0},{r:0,c:12,color:1}],loaded:0,next:1,shots:1});
+  await page.evaluate(()=>{const p=gameTest.position(0,2);gameTest.snap(p.x,p.y,0,{r:0,c:1,color:0})});
+  await padButton(page,0,true);assert.equal((await state(page)).shots,1);
+  await page.evaluate(()=>{gameTest.update(1);gameTest.pollGamepads(.016)});
+  assert.equal((await state(page)).shots,1);
+  await padButton(page,0,false);await padButton(page,0,true);
+  assert.equal((await state(page)).shots,2);
+  await fixture(page,{loaded:1,shots:0});
+  await page.evaluate(()=>window.dispatchEvent(new Event('blur')));
+  await page.evaluate(()=>gameTest.pollGamepads(.1));assert.equal((await state(page)).shots,0);
+  await padButton(page,0,false);await padButton(page,0,true);assert.equal((await state(page)).shots,1);
+  await page.evaluate(()=>{testPads=[];gameTest.pollGamepads(.016)});
+  await page.evaluate(()=>{Object.defineProperty(navigator,'getGamepads',{configurable:true,value:()=>{throw new DOMException('Unavailable','SecurityError')}});gameTest.pollGamepads(.016)});
+  await page.evaluate(()=>{Object.defineProperty(navigator,'getGamepads',{configurable:true,value:undefined});gameTest.pollGamepads(.016)});
+}));
+
+test('combo popup and bonus follow Custom match minimums above and below three', async () => withPage(async page => {
+  await start(page);
+  for(const [minimum,matched,loose,expected,text] of [
+    [2,2,0,200,'+200'],[2,3,0,405,'3x +405'],
+    [4,4,0,400,'+400'],[4,5,0,675,'5x +675'],
+    [5,5,0,500,'+500'],[5,6,0,810,'6x +810'],
+    [5,5,1,675,'6x +675'],[5,4,0,0,null]
+  ]){
+    const grid=Array.from({length:matched-1},(_,c)=>({r:0,c,color:0}));
+    grid.push({r:0,c:14,color:1});if(loose)grid.push({r:1,c:0,color:2});
+    await fixture(page,{grid,loaded:0,next:1,points:0,shots:1,rules:{matchSize:minimum}});
+    await page.evaluate(matched=>{const p=gameTest.position(0,matched-1);gameTest.snap(p.x,p.y,0,{r:0,c:matched-2,color:0});gameTest.update(2)},matched);
+    const s=await state(page);assert.equal(s.points,expected,`minimum=${minimum}, matched=${matched}, loose=${loose}`);
+    assert.equal(s.popText[0]?.text??null,text);
+  }
 }));
 
 test('actual game runs and fits desktop, portrait and live landscape rotation', async () => withPage(async page => {
