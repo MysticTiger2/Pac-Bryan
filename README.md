@@ -4,6 +4,8 @@ The homepage lists six games with illustrated scenes. Ghost Pop, Dad Dug, and Ev
 
 Game links use extensionless routes (`ghost-pop`, `dad-dug`, and `eviction`). Home links use `./`, resolving to the GitHub Pages project root, `https://mystictiger2.github.io/Pac-Bryan/`. Serve game routes as the matching `.html` files with `Content-Type: text/html`. Keep `arcade.js` and `arcade.css` alongside the pages, including when opening a game directly from disk.
 
+When pages are opened directly with `file://`, the shared script changes home links to `index.html` and extensionless game links to the matching `.html` files. HTTP(S) links are left alone. The filename stays in the local address bar: browsers do not permit rewriting a file URL's pathname through the History API. Use a local HTTP server with directory-index support for a clean `/Pac-Bryan/` URL and reliable refresh behavior.
+
 ## Quarters
 
 The homepage and paid arcade games display a shared browser-local balance, starting at 5 quarters. Each new Ghost Pop game (including Custom), Dad Dug game, or Eviction game costs one quarter and plays a short coin-slot animation. Restart and Play again begin paid games; resuming, respawning, and advancing rounds or waves do not spend quarters. Eviction testing codes spend a quarter when launching from the menu or game-over screen, but modifying a current run is free. Duplicate starts are ignored during the coin animation. Web Locks serialize balance updates across tabs when available.
@@ -85,7 +87,7 @@ LocalStorage keys are `pacGhostPop.custom.v1`, `pacGhostPop.palettes.v1`, `pacGh
 
 ## Verification
 
-Run `node --test tests/arcade.test.cjs` for the shared quarter system. Its nine tests cover the five-quarter starting balance, cross-page persistence, project-root home links, last-quarter starts, zero-credit blocking and recovery links, paid restarts, free pause/resume, duplicate starts, simultaneous spending across tabs, invalid Custom settings, malformed balances, unavailable storage, phone/landscape layouts, free Quarters Please access, and custom reset confirmation with balances above, equal to, and below five. Game-mechanics suites seed ample test-only credits so stress scenarios can run independently of the starting allowance.
+Run `node --test tests/arcade.test.cjs` for the shared quarter system. Its ten tests cover direct-file navigation and refresh, the five-quarter starting balance, cross-page persistence, project-root home links, last-quarter starts, zero-credit blocking and recovery links, paid restarts, free pause/resume, duplicate starts, simultaneous spending across tabs, invalid Custom settings, malformed balances, unavailable storage, phone/landscape layouts, free Quarters Please access, and custom reset confirmation with balances above, equal to, and below five. Game-mechanics suites seed ample test-only credits so stress scenarios can run independently of the starting allowance.
 
 The browser tests require Node.js and Playwright (`npm install --no-save --package-lock=false playwright`). They use installed Microsoft Edge on Windows; elsewhere, install Playwright's Chromium with `npx playwright install chromium`. A custom browser executable can be supplied through `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH`.
 

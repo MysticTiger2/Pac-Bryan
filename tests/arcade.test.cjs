@@ -3,6 +3,7 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const path=require('node:path');
 const http=require('node:http');
+const {pathToFileURL}=require('node:url');
 const {chromium}=require('playwright');
 const root=path.join(__dirname,'..'),key='tigerArcade.quarters.v1';
 let server,browser,base;
@@ -31,6 +32,24 @@ const balance=page=>page.evaluate(()=>Arcade.balance());
 const idle=page=>page.waitForFunction(()=>!Arcade.busy);
 const seed=(page,value)=>page.evaluate(({key,value})=>localStorage.setItem(key,String(value)),{key,value});
 async function start(page){await page.locator('#play').click();await idle(page)}
+
+test('direct-file home links open index.html and game cards resolve to real files',async()=>withPage(async page=>{
+  const home=pathToFileURL(path.join(root,'index.html')).href;
+  for(const game of ['ghost-pop','dad-dug','eviction','quarters-please']){
+    await page.goto(pathToFileURL(path.join(root,game+'.html')).href);
+    const homeLink=page.getByRole('link',{name:game==='quarters-please'?'Back to home':'Other Games',exact:true});
+    assert.equal(await homeLink.getAttribute('href'),home);
+    await homeLink.click();assert.equal(page.url(),home);
+    assert.equal(await page.title(),'Tiger’s Arcade');
+    const name=game==='ghost-pop'?'Play Ghost Pop':game==='dad-dug'?'Play Dad Dug':game==='eviction'?'Play Eviction':'Open Quarters Please';
+    const destination=pathToFileURL(path.join(root,game+'.html')).href;
+    assert.equal(await page.getByRole('link',{name,exact:true}).evaluate(el=>el.href),destination);
+    await page.getByRole('link',{name,exact:true}).click();assert.equal(page.url(),destination);
+  }
+  await page.goto(home+'?preview=1#quarters-please');
+  assert.equal(page.url(),home+'?preview=1#quarters-please','direct files retain their real path so refreshing works');
+  await page.reload();assert.equal(await page.locator('.card').count(),6);
+}));
 
 test('shared credits start at 5 and persist across every playable arcade game and the project root',async()=>withPage(async page=>{
   assert.equal(await balance(page),5);

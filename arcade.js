@@ -3,6 +3,20 @@
   'use strict';
   const key = 'tigerArcade.quarters.v1';
   const root = new URL('./', document.currentScript.src);
+  // A file URL opens a directory listing for "./" and cannot resolve extensionless pages.
+  // Keep all HTTP(S) destinations untouched, including GitHub Pages' project root.
+  if (location.protocol === 'file:') {
+    const gameFiles = new Set(['ghost-pop', 'dad-dug', 'eviction']);
+    for (const link of document.querySelectorAll('a[href]')) {
+      const target = new URL(link.getAttribute('href'), location.href);
+      if (target.protocol !== 'file:' || !target.pathname.startsWith(root.pathname)) continue;
+      const page = target.pathname.slice(root.pathname.length);
+      if (page === '') target.pathname += 'index.html';
+      else if (gameFiles.has(page)) target.pathname += '.html';
+      else continue;
+      link.href = target.href;
+    }
+  }
   const lockName = `arcade-quarters:${root.pathname}`;
   let storage, fallback = 5, busy = false;
   for (const name of ['localStorage', 'sessionStorage']) {
