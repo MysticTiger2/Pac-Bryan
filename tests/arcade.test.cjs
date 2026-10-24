@@ -230,16 +230,16 @@ test('exceeding (not reaching) the heat limit shatters the coin; repair survives
 
 test('upgrades spend shared quarters at successive rounded prices and persist',async()=>withPage(async page=>{
   await seed(page,1000);await page.goto(base+'quarters-please.html');
-  for(const [name,spent,next] of [['alloy',10,20],['alloy',20,40],['ac',10,20],['ear',25,45],['ear',45,81],['ear',81,146]]){
+  for(const [name,spent,next] of [['alloy',10,20],['alloy',20,40],['ac',10,20],['ear',25,28],['ear',28,31],['ear',31,34]]){
     const before=await balance(page);await page.locator('#buy-'+name).click();
     await page.waitForFunction(expected=>Arcade.balance()===expected,before-spent);
     assert.equal(await page.locator('#buy-'+name).textContent(),`Buy · ${next} quarters`);
   }
-  assert.equal(await balance(page),809);await page.reload();
+  assert.equal(await balance(page),876);await page.reload();
   const state=await clickerState(page);assert.equal(state.alloy,2);assert.equal(state.ac,1);assert.equal(state.ear,3);
   assert.equal(await page.locator('#temperature').textContent(),'0° / 100°');assert.equal(await page.locator('#cooling').textContent(),'−3°');
-  await earn(page);assert.equal(await balance(page),813);
-  await page.goto(base+'dad-dug');await start(page);assert.equal(await balance(page),812);
+  await earn(page);assert.equal(await balance(page),880);
+  await page.goto(base+'dad-dug');await start(page);assert.equal(await balance(page),879);
 }));
 
 test('alloy and AC stop at their caps; ear keeps granting earnings past the 10-coin visual cap',async()=>withPage(async page=>{

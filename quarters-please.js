@@ -54,7 +54,7 @@
     let cost = 25;
     // Round each successive purchase price, rather than the final exponential.
     for (let i = 0; i < level; i++) {
-      cost = Math.round(cost * 1.8);
+      cost = Math.round(cost * 1.1);
       if (!Number.isSafeInteger(cost)) return Infinity;
     }
     return cost;
