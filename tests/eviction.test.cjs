@@ -26,8 +26,10 @@ let server, browser, origin;
 before(async () => {
   assert(instrumented.includes('globalThis.evictionTest='));
   server = http.createServer((req,res) => {
+    const asset = req.url.slice(1);
+    if (['arcade.js','arcade.css'].includes(asset)) { res.setHeader('Content-Type', asset.endsWith('.js') ? 'text/javascript' : 'text/css'); res.end(fs.readFileSync(path.join(root,asset))); return; }
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
-    if(req.url==='/index.html')res.end(fs.readFileSync(path.join(root,'index.html')));
+    if(['/','/index','/index.html'].includes(req.url))res.end(fs.readFileSync(path.join(root,'index.html')));
     else if(req.url==='/actual')res.end(html);
     else res.end(instrumented);
   });
@@ -37,9 +39,9 @@ before(async () => {
     ?{executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH}:process.platform==='win32'?{channel:'msedge'}:{})});
 });
 after(async()=>{await browser?.close();await new Promise(resolve=>server?.close(resolve))});
-async function withPage(fn,options={}){const context=await browser.newContext({viewport:{width:1440,height:1000},...options}),page=await context.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));try{await page.goto(origin);await fn(page,context);assert.deepEqual(errors,[])}finally{await context.close()}}
-const start=page=>page.locator('#play').click();
-const state=page=>page.evaluate(()=>evictionTest.state());
+async function withPage(fn,options={}){const context=await browser.newContext({viewport:{width:1440,height:1000},...options}),page=await context.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));await context.addInitScript(()=>{try{if(localStorage.getItem('tigerArcade.quarters.v1')===null)localStorage.setItem('tigerArcade.quarters.v1','1000')}catch{}});try{await page.goto(origin+'/fixture');await fn(page,context);assert.deepEqual(errors,[])}finally{await context.close()}}
+const start=async page=>{await page.locator('#play').click();await page.waitForFunction(()=>!Arcade.busy)};
+const state=async page=>{await page.waitForFunction(()=>!Arcade.busy);return page.evaluate(()=>evictionTest.state())};
 const fixture=(page,s)=>page.evaluate(s=>evictionTest.fixture(s),s);
 const advance=(page,n)=>page.evaluate(n=>evictionTest.advance(n),n);
 async function move(page,key,seconds){await page.keyboard.down(key);await advance(page,seconds);await page.keyboard.up(key);await advance(page,.22)}
@@ -54,9 +56,9 @@ function onFrontier(g,grid){
 }
 
 test('arcade filters show three playable games and launch Eviction',async()=>withPage(async page=>{
-  await page.goto(origin+'/index.html');assert.equal(await page.locator('#game-count').textContent(),'4 games · 3 ready');
+  await page.goto(origin+'/index');assert.equal(await page.locator('#game-count').textContent(),'6 games · 3 ready');
   await page.getByRole('button',{name:'Ready to play'}).click();assert.equal(await page.locator('[data-status=ready]:visible').count(),3);
-  await page.getByRole('button',{name:'Coming soon'}).click();assert.equal(await page.locator('[data-status=soon]:visible').count(),1);assert.equal(await page.locator('#game-count').textContent(),'1 game coming soon');
+  await page.getByRole('button',{name:'Coming soon'}).click();assert.equal(await page.locator('[data-status=soon]:visible').count(),3);assert.equal(await page.locator('#game-count').textContent(),'3 games coming soon');
   await page.getByRole('button',{name:'Ready to play'}).click();await page.getByRole('link',{name:'Play Eviction'}).click();assert.equal(await page.title(),'Eviction · Tiger’s Arcade');
   await start(page);const s=await state(page);assert.equal(s.state,'playing');assert.deepEqual(s.world.ghosts.map(g=>g.kind),['roamer']);assert.equal(s.world.ghosts[0].color,'#ed8ead');assert.equal(s.world.lives,3);assert.equal(s.world.claimed,0);assert.equal(s.world.charges,0);assert.equal(s.world.nextFreeze,45);
   assert.equal(s.world.grid.filter(v=>v===1).length,40*28-interior);
@@ -159,6 +161,7 @@ test('pause preserves timers and position, clears inputs, and resumes safely aft
 test('level completion awards one bonus and Next starts a harder level',async()=>withPage(async page=>{
   await start(page);await fixture(page,{trail:rowTrail(23),player:{c:39,r:23},ghosts:[{x:30.5,y:25.5}]});await page.evaluate(()=>evictionTest.capture());const s=await state(page);assert.equal(s.state,'cleared');assert.equal(s.world.claimed,38*23);assert.equal(s.world.score,38*23*10+800);assert.equal(await page.locator('#overlay').isVisible(),true);
   await advance(page,2);assert.equal((await state(page)).world.score,s.world.score);await start(page);const next=await state(page);assert.equal(next.state,'playing');assert.equal(next.world.level,2);assert.equal(next.world.score,s.world.score);assert.equal(next.world.lives,3);assert.deepEqual(next.world.ghosts.map(g=>g.kind),['roamer','edge']);assert.equal(next.world.charges,0);assert.equal(next.world.claimed,0);assert.equal(await page.locator('#goal').textContent(),'/ 81% TO WIN');
+  assert.equal(await page.evaluate(()=>Arcade.balance()),999,'advancing a wave does not spend another quarter');
 }));
 
 test('last life opens game over; restart resets the game and retains browser best',async()=>withPage(async page=>{

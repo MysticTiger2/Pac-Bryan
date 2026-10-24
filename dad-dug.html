@@ -10,10 +10,11 @@
  @media(max-width:600px) and (orientation:portrait){.layout{display:block;padding:15px 0 0}.rail{margin:10px 0;display:flex;flex-direction:column}.rail h1,.rail>.eyebrow,.rail>.tagline{display:none}.guide{order:3;display:grid;grid-template-columns:1fr 1fr;gap:10px;padding-top:15px}.guide-row{gap:8px}.guide-row:last-child{grid-column:1/-1}.badge{flex-basis:27px;height:27px;font-size:15px}.mobile-title{display:block;font-size:17px;letter-spacing:-.04em;color:#e8ecce}.brand{font-size:0}.brand:after{content:'DAD DUG';font-size:16px;letter-spacing:-.03em}.top-actions .button{padding:8px 9px;font-size:10px}.cabinet{max-width:min(100%,calc((100dvh - 285px)*.833333))}.hud{padding:9px 8px}.hud small{font-size:8px}.hud b{font-size:15px}.touch-controls{order:1;margin:8px auto}.panel{padding:18px 14px}.panel p{font-size:12px;margin:9px 0 15px}.panel h2{font-size:28px;margin:9px 0}.panel .eyebrow{font-size:9px}.footer{margin-top:20px}.status{order:2;margin:8px 0}.keys{order:4;font-size:11px}.storage{order:5}}
  @media(orientation:landscape) and (max-height:600px){.topbar{height:46px}.layout{padding:10px 0;grid-template-columns:minmax(0,1fr) 270px;gap:25px}.cabinet{max-width:calc((100dvh - 140px)*.833333)}.hud{padding:8px}.hud small{font-size:8px}.hud b{font-size:14px}.rail h1{font-size:38px;margin-bottom:10px}.rail>.eyebrow,.tagline,.guide,.footer{display:none}.touch-controls{width:100%}.status{font-size:10px;margin-top:8px}.panel{padding:12px}.panel p{font-size:11px;margin:7px 0 12px}.panel h2{font-size:24px;margin:7px 0}.panel .button{padding:8px 12px;font-size:12px}}
 </style>
+<link rel="stylesheet" href="arcade.css">
 </head>
 <body>
 <main class="shell">
- <header class="topbar"><a class="brand" href="index.html">↖ TIGER’S ARCADE</a><div class="top-actions"><button class="button sound" id="sound" aria-pressed="false">Sound off</button><button class="button" id="pause" disabled>Pause</button><a class="button" href="index.html">Other Games</a></div></header>
+ <header class="topbar"><div class="arcade-brand-group"><a class="brand" href="./">↖ TIGER’S ARCADE</a><span data-arcade-wallet></span></div><div class="top-actions"><button class="button sound" id="sound" aria-pressed="false">Sound off</button><button class="button" id="pause" disabled>Pause</button><a class="button" href="./">Other Games</a></div></header>
  <div class="layout">
   <section class="cabinet" aria-label="Dad Dug game">
    <div class="hud"><div><small>SCORE</small><b id="score">000000</b></div><div><small>BEST</small><b id="best">000000</b></div><div><small>ROUND</small><b id="round">01</b></div><div><small>LIVES</small><b id="lives">3</b></div></div>
@@ -25,11 +26,12 @@
    <div class="guide"><div class="guide-row"><span class="badge" aria-hidden="true">↳</span><div><strong>Make your own tunnels.</strong><p>Dig through dirt. Inky and Blinky follow your tunnels, then drift through the earth.</p></div></div><div class="guide-row"><span class="badge" aria-hidden="true">◎</span><div><strong>A little air. A big pop.</strong><p>Face a ghost and hold Pump. Blue, white, bigger… pop! Let go and they shrink.</p></div></div><div class="guide-row"><span class="badge" aria-hidden="true">◆</span><div><strong>Let gravity do the work.</strong><p>Dig beneath rocks, then step aside. Watch out for Inky’s icy breath. Clear every ghost to keep digging.</p></div></div></div>
    <div class="keys"><b>MOVE</b> Arrows / WASD &nbsp; <b>PUMP</b> Hold Space / X<br><b>PAUSE</b> P / Esc &nbsp; <b>CONTROLLER</b> Stick / D-pad + A<br>Rocks: 1,000+ · Pump: deeper pays better · 10,000 earns a life.</div>
    <div class="touch-controls" aria-label="Touch controls"><div class="dpad"><button class="touch" data-control="up" aria-label="Move up">↑</button><button class="touch" data-control="left" aria-label="Move left">←</button><button class="touch" data-control="down" aria-label="Move down">↓</button><button class="touch" data-control="right" aria-label="Move right">→</button></div><button class="touch pump" data-control="pump" aria-label="Hold to pump">PUMP</button></div>
-   <p class="status" id="status" role="status" aria-live="polite">No coins. Just a little elbow grease.</p><p class="storage" id="storageNote" hidden>Browser storage is unavailable. Your best score will last for this session.</p>
+   <p class="status" id="status" role="status" aria-live="polite">One quarter per new game. A little elbow grease goes a long way.</p><p class="storage" id="storageNote" hidden>Browser storage is unavailable. Your best score will last for this session.</p>
   </aside>
  </div>
  <footer class="footer"><span>HOMEMADE / FAMILY ARCADE</span><span>Dig deep. Get home for dinner.</span></footer>
 </main>
+<script src="arcade.js"></script>
 <script>
 (()=>{'use strict';
 const $=id=>document.getElementById(id),canvas=$('canvas'),ctx=canvas.getContext('2d');
@@ -60,7 +62,7 @@ function loadRound(){
  [[4,4],[15,6],[8,11],[12,15],[3,17]].forEach(([c,r],id)=>{openCell(c,r);w.rocks.push({id,c,r,...center(c,r),state:'rest',timer:0,distance:0,kills:0})});
  clearInput();setStatus('Round '+w.round+' · Clear the ghosts. Mind the rocks.');sync();
 }
-function start(){world={round:1,score:0,lives:3,nextLife:10000};state='playing';loadRound();$('overlay').hidden=true;canvas.focus({preventScroll:true});tone(480,.12)}
+function start(){return Arcade.play(()=>{world={round:1,score:0,lives:3,nextLife:10000};state='playing';loadRound();$('overlay').hidden=true;canvas.focus({preventScroll:true});tone(480,.12)})}
 function pause(){if(state==='paused'){state=resumeState;$('overlay').hidden=true;canvas.focus({preventScroll:true})}else if(['playing','dying','clearing'].includes(state)){resumeState=state;state='paused';clearInput();overlay('TAKE A BREATHER','Tools down.', 'Your tunnels will be right here when you get back.','Keep digging',true)}sync()}
 function addScore(points,x,y,label){world.score+=points;if(world.score>best){best=world.score;persist()}while(world.score>=world.nextLife){world.nextLife+=10000;world.lives++;setStatus('Another hard hat! Extra life earned.');tone(900,.25,'triangle')}world.labels.push({x,y,text:label||'+'+points,life:1.4});sync()}
 function rockAt(c,r,except=null){return world.rocks.some(a=>a!==except&&a.state!=='gone'&&a.c===c&&Math.abs((a.y-TOP-16)/TILE-r)<.85)}
@@ -119,7 +121,7 @@ function updateGhosts(dt){const w=world,p=w.player;for(const g of w.ghosts){if(g
  move(g,((g.phase>0?47:52)+Math.min(32,(w.round-1)*3))*GHOST_SPEED_FACTOR,dt);
  if(Math.hypot(g.x-p.x,g.y-p.y)<23)hurt();
 }}
-function update(dt){if(state==='paused'||state==='menu'||state==='over')return;time+=dt;const w=world;
+function update(dt){if(Arcade.dialogOpen)return;if(state==='paused'||state==='menu'||state==='over')return;time+=dt;const w=world;
  w.labels=w.labels.filter(a=>(a.life-=dt)>0);w.particles=w.particles.filter(a=>{a.life-=dt;a.x+=a.vx*dt;a.y+=a.vy*dt;a.vy+=140*dt;return a.life>0});
  if(state==='dying'){w.transition-=dt;if(w.transition<=0)respawn();return}
  if(state==='clearing'){w.transition-=dt;if(w.transition<=0){w.round++;state='playing';loadRound()}return}
@@ -157,7 +159,7 @@ function draw(){const w=world;ctx.clearRect(0,0,W,H);rect(0,0,W,TOP,'#263e3c');r
  ctx.textAlign='center';ctx.font='bold 16px Consolas,monospace';for(const a of w.labels){ctx.fillStyle='#111b15';ctx.fillText(a.text,a.x+1,a.y-(1.4-a.life)*25+1);ctx.fillStyle='#f1f5c6';ctx.fillText(a.text,a.x,a.y-(1.4-a.life)*25)}
  if(state==='clearing'){rect(130,350,380,62,'#19241fee');ctx.fillStyle='#d4f578';ctx.font='bold 28px Consolas,monospace';ctx.fillText('ROUND CLEAR!',320,390)}
 }
-function pollGamepad(){let pads=[];try{pads=navigator.getGamepads?.()||[]}catch{}const pad=[...pads].find(p=>p?.connected&&p.mapping==='standard');
+function pollGamepad(){if(Arcade.dialogOpen){Arcade.pollDialogGamepad();return}let pads=[];try{pads=navigator.getGamepads?.()||[]}catch{}const pad=[...pads].find(p=>p?.connected&&p.mapping==='standard');
  for(const k of [...input.keys()])if(k.startsWith('pad:'))input.delete(k);if(!pad||!focused){gamepadPause=false;gamepadSelect=false;return}
  const pressed=i=>pad.buttons[i]?.pressed||pad.buttons[i]?.value>.5,select=!!pressed(0),menu=!!pressed(9);
  if(padNeedsRelease){if(pad.buttons.some(b=>b.pressed||b.value>.5)||pad.axes.some(a=>Math.abs(a)>.25))return;padNeedsRelease=false;gamepadPause=false;gamepadSelect=false}
@@ -169,14 +171,14 @@ function pollGamepad(){let pads=[];try{pads=navigator.getGamepads?.()||[]}catch{
  gamepadPause=menu;gamepadSelect=select;
 }
 const KEY_DIR={ArrowUp:'up',KeyW:'up',ArrowDown:'down',KeyS:'down',ArrowLeft:'left',KeyA:'left',ArrowRight:'right',KeyD:'right',Space:'pump',KeyX:'pump'};
-window.addEventListener('keydown',e=>{if(e.ctrlKey||e.altKey||e.metaKey||e.target.closest('input,select,textarea'))return;if(e.code==='KeyP'||e.code==='Escape'){if(!e.repeat){e.preventDefault();pause()}return}const control=KEY_DIR[e.code];if(!control||state!=='playing'||e.target.closest('button,a'))return;e.preventDefault();if(!input.has(e.code))input.set(e.code,control)});
+window.addEventListener('keydown',e=>{if(Arcade.dialogOpen)return;if(e.ctrlKey||e.altKey||e.metaKey||e.target.closest('input,select,textarea'))return;if(e.code==='KeyP'||e.code==='Escape'){if(!e.repeat){e.preventDefault();pause()}return}const control=KEY_DIR[e.code];if(!control||state!=='playing'||e.target.closest('button,a'))return;e.preventDefault();if(!input.has(e.code))input.set(e.code,control)});
 window.addEventListener('keyup',e=>input.delete(e.code));
 for(const b of document.querySelectorAll('[data-control]')){b.addEventListener('pointerdown',e=>{if(e.button!==0||state!=='playing')return;e.preventDefault();canvas.focus({preventScroll:true});b.setPointerCapture(e.pointerId);touches.set(e.pointerId,b);input.set('touch:'+e.pointerId,b.dataset.control);b.classList.add('active')});const release=e=>{input.delete('touch:'+e.pointerId);touches.delete(e.pointerId);if(![...touches.values()].includes(b))b.classList.remove('active')};b.addEventListener('pointerup',release);b.addEventListener('pointercancel',release);b.addEventListener('lostpointercapture',release);b.addEventListener('contextmenu',e=>e.preventDefault())}
 window.addEventListener('blur',()=>{focused=false;padNeedsRelease=true;clearInput();if(['playing','dying','clearing'].includes(state))pause()});window.addEventListener('focus',()=>{focused=true;clearInput()});document.addEventListener('visibilitychange',()=>{if(document.hidden){padNeedsRelease=true;clearInput();if(['playing','dying','clearing'].includes(state))pause()}});
 window.addEventListener('gamepaddisconnected',()=>{for(const k of [...input.keys()])if(k.startsWith('pad:'))input.delete(k)});
 $('play').addEventListener('click',()=>state==='paused'?pause():start());$('restart').addEventListener('click',start);$('pause').addEventListener('click',pause);$('sound').addEventListener('click',()=>{sound=!sound;$('sound').textContent=sound?'Sound on':'Sound off';$('sound').setAttribute('aria-pressed',String(sound));tone(520);if(state==='playing')canvas.focus({preventScroll:true})});
 function frame(now){pollGamepad();accumulator+=Math.min(.1,(now-last)/1000);last=now;while(accumulator>=STEP){update(STEP);accumulator-=STEP}draw();requestAnimationFrame(frame)}
-world={round:1,score:0,lives:3,nextLife:10000};loadRound();world.player.invulnerable=0;setStatus('No coins. Just a little elbow grease.');sync();requestAnimationFrame(frame);
+world={round:1,score:0,lives:3,nextLife:10000};loadRound();world.player.invulnerable=0;setStatus('One quarter per new game. A little elbow grease goes a long way.');sync();requestAnimationFrame(frame);
 })();
 </script>
 </body>

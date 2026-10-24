@@ -20,10 +20,11 @@
   @media(max-width:350px) and (orientation:portrait){.brand:after{font-size:11px}.top-actions .button{padding:8px 6px;font-size:9px}.territory-label{font-size:8px;max-width:90px}.territory-value{font-size:21px}.territory-value small{font-size:9px;margin-left:5px}.panel{padding:12px}.panel h2{font-size:22px;margin:8px 0}.panel p{font-size:10px;margin-bottom:10px}.panel .primary{padding:8px 15px;font-size:11px}.panel-hint{display:none}.board-bottom{letter-spacing:0;font-size:7px}}
   @media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important}}
 </style>
+<link rel="stylesheet" href="arcade.css">
 </head>
 <body>
 <main class="shell">
-  <header class="topbar"><a class="brand" href="index.html">↖ TIGER’S ARCADE</a><div class="top-actions"><button class="button sound" id="sound" aria-pressed="false">Sound off</button><button class="button" id="pause" disabled>Pause</button><a class="button" href="index.html">Other Games</a></div></header>
+  <header class="topbar"><div class="arcade-brand-group"><a class="brand" href="./">↖ TIGER’S ARCADE</a><span data-arcade-wallet></span></div><div class="top-actions"><button class="button sound" id="sound" aria-pressed="false">Sound off</button><button class="button" id="pause" disabled>Pause</button><a class="button" href="./">Other Games</a></div></header>
   <div class="layout">
     <section class="cabinet" aria-label="Eviction game">
       <div class="territory"><div class="territory-heading"><span class="territory-label mono">YOUR SIDE OF THE FENCE</span><div class="territory-value"><span id="percent">0.0%</span><small id="goal">/ 80% TO WIN</small></div></div><div class="progress" id="progress" role="progressbar" aria-label="Territory claimed" aria-valuemin="0" aria-valuemax="80" aria-valuenow="0"><span id="progressFill"></span></div></div>
@@ -73,6 +74,7 @@
   </div>
   <footer class="footer"><span>HOMEMADE / FAMILY ARCADE</span><span>Your lawn. Your rules.</span></footer>
 </main>
+<script src="arcade.js"></script>
 <script>
 (()=>{'use strict';
 const $=id=>document.getElementById(id),canvas=$('canvas'),ctx=canvas.getContext('2d');
@@ -106,12 +108,13 @@ function loadLevel(){const w=world;w.grid=new Uint8Array(COLS*ROWS);for(let r=0;
   }rebuildBoundary();
   terrainDirty=true;clearInput();status('Wave '+w.level+' · '+w.ghosts.length+' ghost'+(w.ghosts.length===1?'':'s')+'. Claim '+targetPercent()+'%. Freeze at 45%.');sync();
 }
-function start(){world={level:1,score:0,lives:3,testing:false,infiniteLives:false};cheatKeys.length=0;state='playing';loadLevel();$('overlay').hidden=true;canvas.focus({preventScroll:true});padNeedsRelease=true;tone(620,.15)}
+function start(after){return Arcade.play(()=>{world={level:1,score:0,lives:3,testing:false,infiniteLives:false};cheatKeys.length=0;state='playing';loadLevel();$('overlay').hidden=true;canvas.focus({preventScroll:true});padNeedsRelease=true;tone(620,.15);if(typeof after==='function')after()})}
 function testSequence(e){if(e.repeat)return false;if(e.ctrlKey||e.altKey||e.metaKey||e.shiftKey||e.isComposing){cheatKeys.length=0;return false}cheatKeys.push(/^(Digit|Numpad)\d$/.test(e.code)?'Digit'+e.code.at(-1):e.code);if(cheatKeys.length>TEST_SEQUENCE.length+2)cheatKeys.shift();const matches=sequence=>cheatKeys.length>=sequence.length&&sequence.every((key,i)=>key===cheatKeys[cheatKeys.length-sequence.length+i]),waveKeys=cheatKeys.slice(-TEST_SEQUENCE.length-2),skip=waveKeys.length===TEST_SEQUENCE.length+2&&TEST_SEQUENCE.every((key,i)=>key===waveKeys[i])&&waveKeys.slice(-2).every(key=>/^Digit\d$/.test(key)),lives=matches(LIVES_SEQUENCE);if(!skip&&!lives)return false;const wave=skip?Number(waveKeys.slice(-2).map(key=>key.at(-1)).join('')):0;cheatKeys.length=0;if(skip&&wave===0)return true;
-  if(skip){world={level:wave,score:0,lives:3,testing:true,infiniteLives:!!world.infiniteLives};state='playing';loadLevel()}
-  else{if(state==='menu'||state==='over')start();world.testing=true;world.infiniteLives=true;world.score=0;clearInput();if(state==='paused')state=resumeState;sync()}
+  const apply=()=>{if(skip){world={level:wave,score:0,lives:3,testing:true,infiniteLives:!!world.infiniteLives};state='playing';loadLevel()}
+  else{world.testing=true;world.infiniteLives=true;world.score=0;clearInput();if(state==='paused')state=resumeState;sync()}
   if(state==='cleared')$('panelText').textContent=percentage().toFixed(1)+'% claimed. Testing run: score stays zero. More neighbors are moving in.';
-  else{$('overlay').hidden=true;canvas.focus({preventScroll:true})}padNeedsRelease=true;status('Testing wave '+world.level+'. '+(world.infiniteLives?'Infinite lives. ':'')+'Score locked at zero for this run.');tone(880,.2);return true}
+  else{$('overlay').hidden=true;canvas.focus({preventScroll:true})}padNeedsRelease=true;status('Testing wave '+world.level+'. '+(world.infiniteLives?'Infinite lives. ':'')+'Score locked at zero for this run.');tone(880,.2)};
+  if(state==='menu'||state==='over')start(apply);else apply();return true}
 function nextLevel(){world.level++;state='playing';loadLevel();$('overlay').hidden=true;canvas.focus({preventScroll:true});padNeedsRelease=true;tone(800,.15)}
 let resumeState='playing';
 function pause(){if(state==='paused'){state=resumeState;$('overlay').hidden=true;clearInput();padNeedsRelease=true;canvas.focus({preventScroll:true})}else if(['playing','dying'].includes(state)){resumeState=state;state='paused';panel('NO RUSH / YOUR TURF IS SAFE','On the fence?','Take your time. Your territory, line, and Freeze will be right here.','Back to the lawn',true)}sync()}
@@ -249,7 +252,7 @@ function moveGhosts(dt){if(world.freeze>0)return;for(const g of world.ghosts){if
 function respawn(){const w=world;if(!w.infiniteLives&&w.lives<=0){state='over';persist();panel('NOTICE / RETURN TO SENDER','The neighbors won.',w.score.toLocaleString()+' points. '+percentage().toFixed(1)+'% claimed on level '+w.level+'. There’s always another patch of lawn.','Take it back ↗');status('Your best: '+best.toLocaleString()+'. Room for one more?');sync();return}
   const p=w.player,a=cell(p.anchor.c,p.anchor.r)===SAFE?p.anchor:findGreen(p.anchor.c+.5,p.anchor.r+.5);Object.assign(p,{c:a.c,r:a.r,x:a.c+.5,y:a.r+.5,fromX:a.c+.5,fromY:a.r+.5,anchor:{c:a.c,r:a.r},target:null,invulnerable:1.5});state='playing';clearInput();status('Back on green. 1.5 seconds of protection. '+(w.infiniteLives?'Infinite lives.':w.lives+' lives left.'));sync();
 }
-function update(dt){if(!['playing','dying'].includes(state))return;time+=dt;const w=world;w.captureFlash=Math.max(0,w.captureFlash-dt);w.particles=w.particles.filter(a=>{a.life-=dt;a.x+=a.vx*dt;a.y+=a.vy*dt;return a.life>0});w.labels=w.labels.filter(a=>(a.life-=dt)>0);
+function update(dt){if(Arcade.dialogOpen)return;if(!['playing','dying'].includes(state))return;time+=dt;const w=world;w.captureFlash=Math.max(0,w.captureFlash-dt);w.particles=w.particles.filter(a=>{a.life-=dt;a.x+=a.vx*dt;a.y+=a.vy*dt;return a.life>0});w.labels=w.labels.filter(a=>(a.life-=dt)>0);
   if(state==='dying'){w.transition-=dt;if(w.transition<=0)respawn();return}w.elapsed+=dt;w.player.invulnerable=Math.max(0,(w.player.invulnerable||0)-dt);for(const g of w.ghosts){if(g.grace>0)g.grace=Math.max(0,g.grace-dt);if(g.chipCooldown>0)g.chipCooldown=Math.max(0,g.chipCooldown-dt)}
   if(w.freeze>0){w.freeze=Math.max(0,w.freeze-dt);if(w.freeze===0){status('The neighbors are on the move again.');sync()}}
   moveGhosts(dt);if(state!=='playing')return;movePlayer(dt);if(state==='playing')updateBurns(dt);
@@ -269,13 +272,13 @@ function draw(){const w=world;if(terrainDirty)paintTerrain();ctx.drawImage(terra
   if(w.freeze>0){ctx.strokeStyle='#b3f2ed';ctx.lineWidth=4;ctx.strokeRect(2,2,W-4,H-4);ctx.fillStyle='#c6f5ef';ctx.font='bold 12px Consolas,monospace';ctx.textAlign='center';ctx.fillText('❄ '+w.freeze.toFixed(1)+'s',W/2,36)}
 }
 function activate(){if(state==='paused')pause();else if(state==='cleared')nextLevel();else if(state==='menu'||state==='over')start()}
-function pollGamepad(){for(const k of [...input.keys()])if(k.startsWith('pad:'))input.delete(k);let pads=[];try{pads=navigator.getGamepads?.()||[]}catch{}const pad=[...pads].find(p=>p?.connected&&p.mapping==='standard');if(!pad||!focused){padDirection=null;padSelect=false;padPause=false;padNeedsRelease=true;return}
+function pollGamepad(){if(Arcade.dialogOpen){Arcade.pollDialogGamepad();return}for(const k of [...input.keys()])if(k.startsWith('pad:'))input.delete(k);let pads=[];try{pads=navigator.getGamepads?.()||[]}catch{}const pad=[...pads].find(p=>p?.connected&&p.mapping==='standard');if(!pad||!focused){padDirection=null;padSelect=false;padPause=false;padNeedsRelease=true;return}
   const pressed=i=>!!(pad.buttons[i]?.pressed||pad.buttons[i]?.value>.5),select=pressed(0)||pressed(7),menu=pressed(9);
   if(padNeedsRelease){if(pad.buttons.some(b=>b.pressed||b.value>.5)||pad.axes.some(a=>Math.abs(a)>.25))return;padNeedsRelease=false;padSelect=false;padPause=false;padDirection=null}
   const previous=state;if(menu&&!padPause)pause();else if(select&&!padSelect){if(state==='playing')freeze();else activate()}padSelect=select;padPause=menu;if(state!==previous){padNeedsRelease=true;return}
   if(state!=='playing')return;const x=pad.axes[0]||0,y=pad.axes[1]||0;let dir=null;if(Math.max(Math.abs(x),Math.abs(y))>.25)dir=Math.abs(x)>Math.abs(y)?(x<0?'left':'right'):(y<0?'up':'down');for(const [i,d] of [[12,'up'],[13,'down'],[14,'left'],[15,'right']])if(pressed(i))dir=d;if(dir){input.set('pad:dir',dir);if(dir!==padDirection)buffered=dir}padDirection=dir;
 }
-window.addEventListener('keydown',e=>{if(testSequence(e)){e.preventDefault();return}if(e.ctrlKey||e.altKey||e.metaKey||e.target.closest('input,select,textarea'))return;if(['KeyP','Escape'].includes(e.code)){if(!e.repeat){e.preventDefault();pause()}return}if(e.target.closest('button,a'))return;if(state!=='playing')return;if(KEYS[e.code]){e.preventDefault();if(!e.repeat)setDirection(e.code,KEYS[e.code])}else if(['Space','KeyX'].includes(e.code)){e.preventDefault();if(!e.repeat)freeze()}});
+window.addEventListener('keydown',e=>{if(Arcade.dialogOpen)return;if(testSequence(e)){e.preventDefault();return}if(e.ctrlKey||e.altKey||e.metaKey||e.target.closest('input,select,textarea'))return;if(['KeyP','Escape'].includes(e.code)){if(!e.repeat){e.preventDefault();pause()}return}if(e.target.closest('button,a'))return;if(state!=='playing')return;if(KEYS[e.code]){e.preventDefault();if(!e.repeat)setDirection(e.code,KEYS[e.code])}else if(['Space','KeyX'].includes(e.code)){e.preventDefault();if(!e.repeat)freeze()}});
 window.addEventListener('keyup',e=>input.delete(e.code));
 for(const b of document.querySelectorAll('[data-control]')){b.addEventListener('pointerdown',e=>{if(e.button!==0||state!=='playing')return;e.preventDefault();canvas.focus({preventScroll:true});b.setPointerCapture(e.pointerId);touches.set(e.pointerId,b);setDirection('touch:'+e.pointerId,b.dataset.control);b.classList.add('active')});const release=e=>{input.delete('touch:'+e.pointerId);touches.delete(e.pointerId);if(![...touches.values()].includes(b))b.classList.remove('active')};b.addEventListener('pointerup',release);b.addEventListener('pointercancel',release);b.addEventListener('lostpointercapture',release);b.addEventListener('contextmenu',e=>e.preventDefault())}
 let drag=null;

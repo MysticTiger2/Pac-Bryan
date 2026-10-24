@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#101719">
-  <meta name="description" content="A little arcade with a lot of personality. Play Ghost Pop, Dad Dug, and Eviction, and meet Pac-Bryan.">
+  <meta name="description" content="Good games. Questionable infringement. Play Ghost Pop, Dad Dug, and Eviction, and meet Pac-Bryan, Quarters Please, and Power Struggle.">
   <title>Tiger’s Arcade</title>
   <style>
     :root{color-scheme:dark;--bg:#101719;--panel:#182124;--line:#334044;--text:#f3f0df;--muted:#a7b4b4;--lime:#d4f578;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text)}
@@ -12,61 +12,72 @@
     .wrap{width:min(1120px,calc(100% - 64px));margin:auto}.topbar{height:100px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);gap:20px}.brand{display:flex;align-items:center;gap:12px;font-size:17px;font-weight:800;letter-spacing:.045em}.brand-icon{width:30px;height:30px;color:var(--lime)}.mono{font-family:Consolas,'Courier New',monospace}.top-note{font-size:11px;color:var(--muted);letter-spacing:.08em;display:flex;align-items:center;gap:9px}.light{width:6px;height:6px;border-radius:50%;background:var(--lime);box-shadow:0 0 10px #d4f540}
     .intro{padding:56px 0 38px;display:flex;justify-content:space-between;align-items:flex-end;gap:30px}.eyebrow{font-size:11px;color:var(--lime);letter-spacing:.16em;margin:0 0 16px;text-transform:uppercase}h1{font-size:clamp(38px,5.2vw,65px);line-height:1.04;letter-spacing:-.055em;margin:0;font-weight:800}h1 span{color:var(--lime)}.intro-copy{max-width:265px;margin:0 0 4px;color:var(--muted);font-size:14px;line-height:1.7}.intro-copy strong{color:var(--text);font-weight:400}
     .library-bar{display:flex;justify-content:space-between;align-items:center;gap:18px;margin-bottom:22px}.filters{display:flex;gap:7px;flex-wrap:wrap}.filter{border:1px solid transparent;color:var(--muted);background:transparent;border-radius:6px;padding:9px 13px;cursor:pointer;font-size:12px;line-height:1.3}.filter:hover{color:var(--text);background:#222d30}.filter[aria-pressed=true]{color:var(--text);border-color:#485456;background:#263134}.filter .count{margin-left:6px;color:var(--lime);font-size:11px}.game-count{font-size:11px;color:var(--muted);white-space:nowrap}
-    .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px}.card{background:var(--panel);border:1px solid var(--line);border-radius:11px;overflow:hidden;position:relative;transition:border-color .2s,transform .2s}.card.playable:hover{transform:translateY(-3px);border-color:var(--lime)}.card-link{display:block;text-decoration:none;height:100%}.card-link:focus-visible{outline-offset:-4px;border-radius:10px}.scene{position:relative;overflow:hidden;aspect-ratio:2.08;background:#0b1219;border-bottom:1px solid var(--line)}canvas{display:block;width:100%;height:100%;image-rendering:pixelated}.scene::after{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(transparent 0 3px,#0000000c 3px 4px)}.scene-label{position:absolute;top:15px;left:16px;font-size:9px;letter-spacing:.12em;color:#dde7dfad}.scene-corner{position:absolute;bottom:13px;right:16px;font-size:9px;letter-spacing:.08em;color:#e9eddd88}.card-body{padding:21px 24px 22px}.card-heading{display:flex;align-items:center;justify-content:space-between;gap:12px}h2{margin:0;font-size:25px;letter-spacing:-.04em}.status{display:inline-flex;align-items:center;gap:6px;font-size:9px;letter-spacing:.07em;text-transform:uppercase;white-space:nowrap;color:#bec9c9;border:1px solid #465052;border-radius:4px;padding:5px 7px}.status.ready{color:var(--lime);border-color:#758d434d;background:#c7ed6f09}.status.ready::before{content:"";width:5px;height:5px;border-radius:50%;background:currentColor}.description{font-size:13px;color:var(--muted);line-height:1.65;margin:10px 0 18px}.card-bottom{display:flex;align-items:center;justify-content:space-between;gap:15px}.genre{color:#9dadad;font-size:10px;letter-spacing:.03em}.play-cta{font-size:12px;font-weight:700;color:var(--lime);display:flex;align-items:center;gap:12px}.arrow{font-size:20px;font-weight:400;line-height:1;transition:transform .2s}.card-link:hover .arrow{transform:translateX(4px)}.soon-note{font-size:10px;color:#8a9b9d}.working-title{font-size:10px;line-height:1.5;color:#a7b4b4;margin:0 0 12px}.footer{display:flex;align-items:center;justify-content:space-between;gap:20px;border-top:1px solid var(--line);margin-top:44px;padding:23px 0 28px;color:#93a3a5;font-size:10px;line-height:1.6;letter-spacing:.02em}.footer span:last-child{color:#bfc9ba}.footer .coin{color:var(--lime);margin-right:6px}
+    .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px}.card{background:var(--panel);border:1px solid var(--line);border-radius:11px;overflow:hidden;position:relative;transition:border-color .2s,transform .2s}.card.playable:hover{transform:translateY(-3px);border-color:var(--lime)}.card-link{display:block;text-decoration:none;height:100%}.card-link:focus-visible{outline-offset:-4px;border-radius:10px}.scene{position:relative;overflow:hidden;aspect-ratio:2.08;background:#0b1219;border-bottom:1px solid var(--line)}canvas{display:block;width:100%;height:100%;image-rendering:pixelated}.scene::after{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(transparent 0 3px,#0000000c 3px 4px)}.scene-label{position:absolute;top:15px;left:16px;font-size:9px;letter-spacing:.12em;color:#dde7dfad}.scene-corner{position:absolute;bottom:13px;right:16px;font-size:9px;letter-spacing:.08em;color:#e9eddd88}.card-body{padding:21px 24px 22px}.card-heading{display:flex;align-items:center;justify-content:space-between;gap:12px}h2{margin:0;font-size:25px;letter-spacing:-.04em}.status{display:inline-flex;align-items:center;gap:6px;font-size:9px;letter-spacing:.07em;text-transform:uppercase;white-space:nowrap;color:#bec9c9;border:1px solid #465052;border-radius:4px;padding:5px 7px}.status.ready{color:var(--lime);border-color:#758d434d;background:#c7ed6f09}.status.ready::before{content:"";width:5px;height:5px;border-radius:50%;background:currentColor}.description{font-size:13px;color:var(--muted);line-height:1.65;margin:10px 0 18px}.card-bottom{display:flex;align-items:center;justify-content:space-between;gap:15px}.genre{color:#9dadad;font-size:10px;letter-spacing:.03em}.play-cta{font-size:12px;font-weight:700;color:var(--lime);display:flex;align-items:center;gap:12px}.arrow{font-size:20px;font-weight:400;line-height:1;transition:transform .2s}.card-link:hover .arrow{transform:translateX(4px)}.soon-note{font-size:10px;color:#8a9b9d}.working-title{font-size:10px;line-height:1.5;color:#a7b4b4;margin:0 0 12px}.footer{display:flex;align-items:center;justify-content:space-between;gap:20px;border-top:1px solid var(--line);margin-top:44px;padding:23px 0 28px;color:#93a3a5;font-size:10px;line-height:1.6;letter-spacing:.02em}.footer .coin{color:var(--lime);margin-right:6px}
     @media(min-width:1500px){.wrap{width:min(1240px,calc(100% - 100px))}}
-    @media(max-width:700px){.wrap{width:calc(100% - 36px)}.topbar{height:78px}.brand{font-size:14px;gap:8px}.brand-icon{width:25px;height:25px}.top-note{font-size:9px;letter-spacing:0}.intro{padding:36px 0 28px;display:block}.intro-copy{max-width:330px;margin:20px 0 0;font-size:13px}.grid{grid-template-columns:1fr;gap:20px}.library-bar{align-items:flex-start;gap:8px}.filter{padding:8px 9px;font-size:11px}.game-count{padding-top:9px;font-size:10px}.filters{gap:2px}.card-body{padding:19px 20px}.footer{margin-top:30px;align-items:flex-start}.footer span:last-child{text-align:right;max-width:130px}h2{font-size:24px}}
+    @media(max-width:700px){.wrap{width:calc(100% - 36px)}.topbar{height:78px}.brand{font-size:14px;gap:8px}.brand-icon{width:25px;height:25px}.top-note{font-size:9px;letter-spacing:0}.intro{padding:36px 0 28px;display:block}.intro-copy{max-width:330px;margin:20px 0 0;font-size:13px}.grid{grid-template-columns:1fr;gap:20px}.library-bar{align-items:flex-start;gap:8px}.filter{padding:8px 9px;font-size:11px}.game-count{padding-top:9px;font-size:10px}.filters{gap:2px}.card-body{padding:19px 20px}.footer{margin-top:30px;align-items:flex-start}h2{font-size:24px}}
     @media(max-width:370px){.top-note{display:none}.game-count{display:none}.card-heading{gap:6px}.status{font-size:8px}}
     @media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;scroll-behavior:auto!important}}
   </style>
+<link rel="stylesheet" href="arcade.css">
 </head>
 <body>
   <div class="wrap">
     <header class="topbar">
       <div class="brand"><svg class="brand-icon" viewBox="0 0 30 30" fill="none" aria-hidden="true"><path d="M8 5h14v3h4v17h-6v-5H10v5H4V8h4V5Z" fill="currentColor"/><path d="M10 9v8M6 13h8" stroke="#101719" stroke-width="3"/><path d="M20 10h3v3h-3zM17 14h3v3h-3z" fill="#101719"/></svg> TIGER’S ARCADE</div>
-      <div class="top-note mono"><span class="light"></span> NO COINS REQUIRED</div>
+      <span data-arcade-wallet></span>
     </header>
     <main>
       <section class="intro" aria-labelledby="page-title">
-        <div><p class="eyebrow mono">Small arcade. Big dad energy.</p><h1 id="page-title">Good games.<br><span>Questionable names.</span></h1></div>
-        <p class="intro-copy">A few familiar ideas. A little family flair.<br><strong>Pick a game. Make yourself at home.</strong></p>
+        <h1 id="page-title">Good games.<br><span>Questionable infringement.</span></h1>
       </section>
       <div class="library-bar">
         <div class="filters" role="group" aria-label="Filter games">
-          <button class="filter" data-filter="all" aria-pressed="true">All games <span class="count mono">04</span></button>
+          <button class="filter" data-filter="all" aria-pressed="true">All games <span class="count mono">06</span></button>
           <button class="filter" data-filter="ready" aria-pressed="false">Ready to play</button>
           <button class="filter" data-filter="soon" aria-pressed="false">Coming soon</button>
         </div>
-        <span class="game-count mono" id="game-count" role="status">4 games · 3 ready</span>
+        <span class="game-count mono" id="game-count" role="status">6 games · 3 ready</span>
       </div>
       <section class="grid" aria-label="Games">
         <article class="card playable" data-status="ready">
-          <a class="card-link" href="ghost-pop.html" aria-label="Play Ghost Pop">
+          <a class="card-link" href="ghost-pop" aria-label="Play Ghost Pop">
             <div class="scene"><canvas id="ghost-scene" width="640" height="308" role="img" aria-label="Colorful rows of ghosts above a yellow launcher aiming a shot"></canvas><span class="scene-label mono" aria-hidden="true">01 / MATCH. AIM. POP.</span><span class="scene-corner mono" aria-hidden="true">HIGH SCORE MATERIAL</span></div>
-            <div class="card-body"><div class="card-heading"><h2>Ghost Pop</h2><span class="status ready mono">Ready to play</span></div><p class="description">A little aim. A big chain reaction. Give these ghosts a pop.</p><div class="card-bottom"><span class="genre mono">PUZZLE / BUBBLE SHOOTER</span><span class="play-cta">Let’s play <span class="arrow" aria-hidden="true">↗</span></span></div></div>
+            <div class="card-body"><div class="card-heading"><h2>Ghost Pop</h2><span class="status ready mono">Ready to play</span></div><p class="description">A little aim. A big chain reaction. Give these ghosts a pop.</p><div class="card-bottom"><span class="genre mono">ARCADE / BUBBLE SHOOTER</span><span class="play-cta">Let’s play <span class="arrow" aria-hidden="true">↗</span></span></div></div>
           </a>
         </article>
         <article class="card playable" data-status="ready">
-          <a class="card-link" href="dad-dug.html" aria-label="Play Dad Dug">
+          <a class="card-link" href="dad-dug" aria-label="Play Dad Dug">
           <div class="scene"><canvas id="dad-scene" width="640" height="308" role="img" aria-label="A helmeted dad digs tunnels through layers of earth, surrounded by rocks, Inky, and Blinky"></canvas><span class="scene-label mono" aria-hidden="true">02 / CAN YOU DIG IT?</span><span class="scene-corner mono" aria-hidden="true">WATCH YOUR HARD HAT</span></div>
-          <div class="card-body"><div class="card-heading"><h2>Dad Dug</h2><span class="status ready mono">Ready to play</span></div><p class="description">Dig deep. Pump up Inky and Blinky. Dad’s got some underground business.</p><div class="card-bottom"><span class="genre mono">ACTION / DIGGING</span><span class="play-cta">Let’s dig <span class="arrow" aria-hidden="true">↗</span></span></div></div>
+          <div class="card-body"><div class="card-heading"><h2>Dad Dug</h2><span class="status ready mono">Ready to play</span></div><p class="description">Dig deep. Pump up Inky and Blinky. Dad’s got some underground business.</p><div class="card-bottom"><span class="genre mono">ARCADE / DIGGING</span><span class="play-cta">Let’s dig <span class="arrow" aria-hidden="true">↗</span></span></div></div>
           </a>
         </article>
         <article class="card playable" data-status="ready">
-          <a class="card-link" href="eviction.html" aria-label="Play Eviction">
+          <a class="card-link" href="eviction" aria-label="Play Eviction">
           <div class="scene"><canvas id="turf-scene" width="640" height="308" role="img" aria-label="A glowing green trail claims territory on a blue grid while ghosts roam the open area"></canvas><span class="scene-label mono" aria-hidden="true">03 / A LITTLE SPACE, PLEASE.</span><span class="scene-corner mono" aria-hidden="true">CLAIM YOUR CORNER</span></div>
           <div class="card-body"><div class="card-heading"><h2>Eviction</h2><span class="status ready mono">Ready to play</span></div><p class="description">Draw the line. Claim the board. Keep the ghosts off your lawn.</p><div class="card-bottom"><span class="genre mono">ARCADE / TERRITORY</span><span class="play-cta">Claim your corner <span class="arrow" aria-hidden="true">↗</span></span></div></div>
           </a>
         </article>
         <article class="card" data-status="soon">
           <div class="scene"><canvas id="pac-scene" width="640" height="308" role="img" aria-label="Yellow Pac-Bryan munches pellets in a blue neon maze with colorful ghosts in pursuit"></canvas><span class="scene-label mono" aria-hidden="true">04 / ONE MORE PELLET.</span><span class="scene-corner mono" aria-hidden="true">AN APPETITE FOR ARCADE</span></div>
-          <div class="card-body"><div class="card-heading"><h2>Pac-Bryan</h2><span class="status mono">Coming soon</span></div><p class="description">You know the drill. Eat the dots. Avoid the ghosts. Be Bryan.</p><div class="card-bottom"><span class="genre mono">CLASSIC / MAZE CHASE</span><span class="soon-note mono">In the works</span></div></div>
+          <div class="card-body"><div class="card-heading"><h2>Pac-Bryan</h2><span class="status mono">Coming soon</span></div><p class="description">You know the drill. Eat the dots. Avoid the ghosts. Be Bryan.</p><div class="card-bottom"><span class="genre mono">ARCADE / MAZE CHASE</span><span class="soon-note mono">In the works</span></div></div>
+        </article>
+        <article class="card" data-status="soon" id="quarters-please">
+          <a class="card-link" href="quarters-please.html" aria-label="Open Quarters Please">
+          <div class="scene"><canvas id="quarters-scene" width="640" height="308" role="img" aria-label="A silver quarter entering the tall vertical slot of a narrow red and gray 25-cent arcade coin mechanism"></canvas><span class="scene-label mono" aria-hidden="true">05 / INSERT A LITTLE NOSTALGIA.</span><span class="scene-corner mono" aria-hidden="true">EXACT CHANGE, PLEASE</span></div>
+          <div class="card-body"><div class="card-heading"><h2>Quarters Please</h2><span class="status mono">Coming soon</span></div><p class="description">One quarter. One more go. You know where this is headed.</p><div class="card-bottom"><span class="genre mono">ARCADE / META / CLICKER</span><span class="soon-note mono">In the works</span></div></div>
+          </a>
+        </article>
+        <article class="card" data-status="soon">
+          <div class="scene"><canvas id="power-scene" width="640" height="308" role="img" aria-label="A two-barrel laser turret wired to the positive and negative terminals of a 12-volt car battery fires two laser pulses, with the earlier upper pulse farther ahead than the lower one"></canvas><span class="scene-label mono" aria-hidden="true">06 / A SHOCKING ADVENTURE</span><span class="scene-corner mono" aria-hidden="true">BATTERY VERY MUCH INCLUDED</span></div>
+          <div class="card-body"><div class="card-heading"><h2>Power Struggle</h2><span class="status mono">Coming soon</span></div><p class="description">A questionable use of jumper cables.</p><div class="card-bottom"><span class="genre mono">IDLER / TOWER DEFENSE</span><span class="soon-note mono">In the works</span></div></div>
         </article>
       </section>
     </main>
-    <footer class="footer mono"><span><span class="coin" aria-hidden="true">✦</span> Made for the love of the game.</span><span>Free plays. Unlimited “one more.”</span></footer>
+    <footer class="footer mono"><span><span class="coin" aria-hidden="true">✦</span> Completely vibe coded by someone who could have done it without LLMs but that would take like $30 in caffeine.</span></footer>
   </div>
-  <script>
-    // All artwork is drawn locally; the arcade also works directly from disk.
+  <script src="arcade.js"></script>
+<script>
+    // All artwork is drawn locally. Navigation uses extensionless hosting routes.
     const colors={yellow:'#f6dc6b',pink:'#ec83a5',blue:'#72bbec',mint:'#7ecdb0',purple:'#b39be8',orange:'#eda66a'};
     function setup(id,bg){const c=document.getElementById(id).getContext('2d');c.fillStyle=bg;c.fillRect(0,0,640,308);return c}
     function rect(c,x,y,w,h,color){c.fillStyle=color;c.fillRect(x,y,w,h)}
@@ -116,6 +127,55 @@
       rect(c,278,146,128,39,'#242d50');c.strokeRect(278,146,128,39);rect(c,326,143,30,6,'#d48eb5');ghost(c,306,168,colors.blue,.53);ghost(c,337,168,colors.pink,.53);ghost(c,368,168,colors.orange,.53);
       pac(c,327,108,21);ghost(c,228,108,colors.pink,.78);ghost(c,186,108,colors.mint,.78);
       c.fillStyle='#ffe7aa';c.beginPath();c.arc(529,108,7,0,Math.PI*2);c.fill();
+    }
+    {
+      const c=setup('quarters-scene','#28202b');
+      grid(c,0,0,640,308,32,'#322936');
+      // A tall, narrow arcade coin mechanism.
+      c.save();c.translate(-87,-8);c.scale(.72,1.08);c.translate(130,0);
+      // Arcade cabinet, metal coin-door surround, and illuminated reject button.
+      rect(c,321,36,231,272,'#181c24');rect(c,333,46,204,237,'#626b78');rect(c,339,52,192,225,'#2b333f');
+      rect(c,351,64,168,201,'#a4a6a3');rect(c,357,70,156,189,'#454d58');
+      rect(c,364,77,142,145,'#802f3c');rect(c,371,84,128,131,'#c45154');rect(c,375,88,120,123,'#db6e60');
+      rect(c,402,96,35,86,'#72323a');rect(c,408,101,23,76,'#171c26');rect(c,430,101,3,76,'#f39c83');
+      c.textAlign='center';c.font='bold 27px Consolas,monospace';c.fillStyle='#ffe1ae';c.fillText('25¢',435,205);
+      c.font='8px Consolas,monospace';c.fillStyle='#d1d7d5';c.fillText('PUSH TO REJECT',435,242);
+      [[346,59],[522,59],[346,269],[522,269]].forEach(([x,y])=>{rect(c,x-3,y-3,6,6,'#a7afb2');rect(c,x-2,y,4,1,'#3e4753')});
+      c.restore();
+      c.save();c.translate(-87,-8);c.scale(.72,1.08);c.translate(130,0);
+      c.save();c.translate(396,137);c.fillStyle='#7e8998';c.beginPath();c.ellipse(0,0,29,40,0,0,Math.PI*2);c.fill();
+      c.fillStyle='#d2d8dc';c.beginPath();c.ellipse(3,-1,22,38,0,0,Math.PI*2);c.fill();c.strokeStyle='#86919d';c.lineWidth=2;c.beginPath();c.ellipse(3,-1,17,32,0,0,Math.PI*2);c.stroke();
+      // The broad, ridged left edge faces the viewer as the right edge enters the slot.
+      for(let y=-29;y<=29;y+=6)rect(c,-29*Math.sqrt(1-(y/40)**2),y,8,2,'#5d697a');
+      // A small profile and denomination make the coin recognizable as a quarter.
+      c.fillStyle='#8a97a5';c.beginPath();c.moveTo(-10,20);c.lineTo(-6,10);c.lineTo(-9,0);c.lineTo(-7,-15);c.lineTo(1,-22);c.lineTo(9,-16);c.lineTo(9,-7);c.lineTo(14,-2);c.lineTo(8,2);c.lineTo(7,10);c.lineTo(1,12);c.lineTo(4,20);c.closePath();c.fill();
+      c.fillStyle='#647486';c.font='bold 8px Consolas,monospace';c.fillText('25',3,29);c.restore();
+      // This lip occludes the coin's leading edge inside the mechanism.
+      rect(c,419,100,9,77,'#151b25');rect(c,428,100,3,77,'#f39c83');
+      c.restore();
+    }
+    {
+      const c=setup('power-scene','#202737');grid(c,0,0,640,308,32,'#2a3344');
+      rect(c,55,254,531,3,'#435060');
+      // Red and black leads run all the way from the car battery to the turret.
+      function cable(color,points){c.strokeStyle=color;c.lineWidth=7;c.lineCap='round';c.beginPath();c.moveTo(...points[0]);c.bezierCurveTo(...points[1],...points[2],...points[3]);c.stroke()}
+      cable('#0b111d',[[182,166],[212,286],[279,259],[286,195]]);
+      cable('#e67a6a',[[109,166],[124,105],[240,271],[298,190]]);
+      rect(c,77,177,126,74,'#677775');rect(c,77,177,126,13,'#96a29a');rect(c,86,190,108,60,'#465953');
+      rect(c,72,169,136,14,'#28343b');rect(c,101,158,17,13,'#d86f5f');rect(c,174,158,17,13,'#a9b1aa');
+      rect(c,104,162,11,3,'#ffcab0');rect(c,108,158,3,11,'#ffcab0');rect(c,177,162,11,3,'#27313a');
+      c.textAlign='center';c.font='bold 21px Consolas,monospace';c.fillStyle='#e5dca6';c.fillText('12V',140,219);c.font='8px Consolas,monospace';c.fillStyle='#b1c0b3';c.fillText('CAR BATTERY',140,237);
+      // Swivel mount, armored housing, and two separate laser barrels.
+      rect(c,248,242,125,11,'#536572');rect(c,264,231,94,11,'#92a6a8');rect(c,286,182,48,49,'#687e89');rect(c,299,182,12,49,'#b2c2bf');
+      c.fillStyle='#91a8aa';c.beginPath();c.moveTo(254,121);c.lineTo(287,96);c.lineTo(347,96);c.lineTo(371,121);c.lineTo(371,185);c.lineTo(254,185);c.closePath();c.fill();
+      rect(c,262,127,97,49,'#526d7a');rect(c,270,133,14,32,'#2c414e');rect(c,291,133,14,32,'#2c414e');
+      [[112,colors.pink],[151,colors.blue]].forEach(([y,color])=>{rect(c,330,y-10,89,20,'#273f50');rect(c,334,y-10,79,4,'#bdceca');rect(c,354,y-7,6,14,'#718c94');rect(c,378,y-7,6,14,'#718c94');rect(c,413,y-12,13,24,'#78949a');rect(c,421,y-6,5,12,color)});
+      rect(c,318,107,8,6,'#d4f578');rect(c,279,176,10,10,'#e67a6a');rect(c,293,176,10,10,'#151c28');
+      // Upper shot fired first: it has traveled farther than the lower shot.
+      [[550,112,colors.pink],[476,151,colors.blue]].forEach(([x,y,color])=>{
+        c.save();c.shadowColor=color;c.shadowBlur=13;rect(c,x-17,y-5,34,10,color);rect(c,x-12,y-2,28,4,'#f7f7e7');c.restore();
+        rect(c,x-34,y-1,10,2,color);rect(c,x-46,y,5,1,color);
+      });
     }
     const filterButtons=document.querySelectorAll('[data-filter]');
     filterButtons.forEach(button=>button.addEventListener('click',()=>{

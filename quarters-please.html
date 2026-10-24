@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101719">
+  <title>Quarters Please · Tiger’s Arcade</title>
+  <link rel="stylesheet" href="arcade.css">
+  <style>
+    :root{color-scheme:dark;font-family:Arial,Helvetica,sans-serif;background:#101719;color:#f3f0df}
+    *{box-sizing:border-box}body{margin:0;min-height:100dvh}.controls{width:min(1120px,calc(100% - 36px));margin:auto;padding:24px 0;display:flex;justify-content:space-between;gap:16px}
+    .home,.reset{font:700 13px Arial,sans-serif;border:1px solid #536153;border-radius:6px;padding:11px 17px;text-decoration:none;cursor:pointer;background:#233029;color:#f3f0df}
+    .home:hover{background:#344331}.reset,.reset-dialog button.danger{border-color:#d56969;background:#ad363e;color:#fff4eb}.reset:hover,.reset-dialog button.danger:hover{background:#c2464e}
+    .home:focus-visible,.reset:focus-visible{outline:3px solid #d4f578;outline-offset:4px}.reset-dialog .actions{display:flex;justify-content:center;gap:12px}.reset-dialog .actions button{margin:0;padding:11px 19px}.reset-dialog button:disabled{opacity:.6;cursor:wait}
+  </style>
+</head>
+<body>
+  <main class="controls" aria-label="Quarters Please controls">
+    <a class="home" href="./">Back to home</a>
+    <button class="reset" id="reset" type="button">reset</button>
+  </main>
+  <dialog class="arcade-dialog reset-dialog" id="reset-dialog" aria-labelledby="reset-title" aria-describedby="reset-description">
+    <h2 id="reset-title">Are you sure?</h2>
+    <p id="reset-description">Reset keeps at most 5 quarters. Any extra quarters will be lost.</p>
+    <div class="actions"><button type="button" id="cancel-reset" autofocus>Cancel</button><button type="button" class="danger" id="confirm-reset">reset</button></div>
+  </dialog>
+  <script src="arcade.js"></script>
+  <script>
+    const resetDialog=document.getElementById('reset-dialog'),resetButton=document.getElementById('reset'),confirmReset=document.getElementById('confirm-reset');
+    resetButton.addEventListener('click',()=>{resetDialog.showModal();document.getElementById('cancel-reset').focus()});
+    document.getElementById('cancel-reset').addEventListener('click',()=>resetDialog.close());
+    confirmReset.addEventListener('click',async()=>{
+      confirmReset.disabled=true;
+      try{await Arcade.resetQuarters();resetDialog.close()}finally{confirmReset.disabled=false}
+    });
+    resetDialog.addEventListener('close',()=>resetButton.focus());
+  </script>
+</body>
+</html>

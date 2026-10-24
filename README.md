@@ -1,6 +1,16 @@
 # Bryan’s Arcade
 
-Open `index.html` in a browser for the game-selection grid. Each game has an illustrated scene. Ghost Pop, Dad Dug, and Eviction are playable; Pac-Bryan is marked Coming soon. Filter the grid by availability. The pages are self-contained; no build, server, or downloaded assets are required.
+The homepage lists six games with illustrated scenes. Ghost Pop, Dad Dug, and Eviction are playable; Pac-Bryan, Quarters Please, and Power Struggle are marked Coming soon. Filter the grid by availability. All artwork is drawn locally; no build or downloaded assets are required.
+
+Game links use extensionless routes (`ghost-pop`, `dad-dug`, and `eviction`). Home links use `./`, resolving to the GitHub Pages project root, `https://mystictiger2.github.io/Pac-Bryan/`. Serve game routes as the matching `.html` files with `Content-Type: text/html`. Keep `arcade.js` and `arcade.css` alongside the pages, including when opening a game directly from disk.
+
+## Quarters
+
+The homepage and paid arcade games display a shared browser-local balance, starting at 5 quarters. Each new Ghost Pop game (including Custom), Dad Dug game, or Eviction game costs one quarter and plays a short coin-slot animation. Restart and Play again begin paid games; resuming, respawning, and advancing rounds or waves do not spend quarters. Eviction testing codes spend a quarter when launching from the menu or game-over screen, but modifying a current run is free. Duplicate starts are ignored during the coin animation. Web Locks serialize balance updates across tabs when available.
+
+Balances persist under `tigerArcade.quarters.v1` in localStorage. Existing saved balances are preserved; a missing key starts at 5. Reloading or returning to the homepage does not reset an empty balance. Malformed balances are treated as zero. Unavailable localStorage falls back to sessionStorage, then page-local memory. With no storage at all, navigation/reloading cannot retain that page-local balance. Credits are local game data, not real currency or an account balance.
+
+At zero, new paid games are blocked by an Out of quarters dialog with a “get more quarters” link directly to `quarters-please.html`. The homepage card also links to that file for now. Quarters Please is Arcade / Meta / Clicker and never charges admission or starts new runs. Its current page contains only a Home link and a red reset button. Reset opens a custom confirmation dialog; Cancel or Escape makes no changes, and confirming sets quarters to `min(5, current balance)` under the same cross-tab lock used for spending. Reset cannot add quarters. The clicker itself and its progress reset are not implemented yet, so the homepage retains Coming soon. Power Struggle is categorized as Idler / Tower Defense and does not use arcade credits.
 
 ## Eviction
 
@@ -43,7 +53,7 @@ Dig underneath a rock to release it after a short wobble, then step aside. Rock 
 
 ## Ghost Pop
 
-Open `ghost-pop.html` in a browser, or choose Ghost Pop from the arcade. The game is self-contained; no build or server is required. The Other Games link returns to `index.html`.
+Open `ghost-pop.html` in a browser, or choose Ghost Pop from the arcade. No build is required; keep the shared arcade assets beside it. The Other Games link returns to the project root.
 
 Classic uses 6 colors, 18 columns, 20 rows, and 7 starting rows. Every 5 non-popping shots adds 2 rows. Popping ghosts preserves that counter. At the last chance, the next-color preview becomes a row warning; eliminated colors cannot return through the queue or row waves.
 
@@ -74,6 +84,8 @@ Every Randomize colors button samples each color independently from the full RGB
 LocalStorage keys are `pacGhostPop.custom.v1`, `pacGhostPop.palettes.v1`, `pacGhostPop.scores.v1`, and `pacGhostPop.settings.v1`. They persist across browser restarts under the same origin/browser profile. Clearing browser data removes them. Browser restrictions on local files/private sessions may prevent persistence; the game displays a notice and remains playable. Keep the file at the same path when playing directly from disk.
 
 ## Verification
+
+Run `node --test tests/arcade.test.cjs` for the shared quarter system. Its nine tests cover the five-quarter starting balance, cross-page persistence, project-root home links, last-quarter starts, zero-credit blocking and recovery links, paid restarts, free pause/resume, duplicate starts, simultaneous spending across tabs, invalid Custom settings, malformed balances, unavailable storage, phone/landscape layouts, free Quarters Please access, and custom reset confirmation with balances above, equal to, and below five. Game-mechanics suites seed ample test-only credits so stress scenarios can run independently of the starting allowance.
 
 The browser tests require Node.js and Playwright (`npm install --no-save --package-lock=false playwright`). They use installed Microsoft Edge on Windows; elsewhere, install Playwright's Chromium with `npx playwright install chromium`. A custom browser executable can be supplied through `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH`.
 

@@ -25,8 +25,10 @@ let server, browser, origin;
 before(async () => {
   assert(instrumented.includes('globalThis.dadTest='));
   server = http.createServer((req,res) => {
+    const asset = req.url.slice(1);
+    if (['arcade.js','arcade.css'].includes(asset)) { res.setHeader('Content-Type', asset.endsWith('.js') ? 'text/javascript' : 'text/css'); res.end(fs.readFileSync(path.join(root,asset))); return; }
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
-    res.end(req.url === '/index.html' ? fs.readFileSync(path.join(root,'index.html')) : req.url === '/actual' ? html : instrumented);
+    res.end(['/','/index','/index.html'].includes(req.url) ? fs.readFileSync(path.join(root,'index.html')) : req.url === '/actual' ? html : instrumented);
   });
   await new Promise(resolve => server.listen(0,'127.0.0.1',resolve));
   origin = `http://127.0.0.1:${server.address().port}`;
@@ -38,25 +40,34 @@ after(async()=>{await browser?.close();await new Promise(resolve=>server?.close(
 async function withPage(fn, options={}) {
   const context=await browser.newContext({viewport:{width:1365,height:1000},...options});
   const page=await context.newPage(),errors=[];
+  await context.addInitScript(()=>{try{if(localStorage.getItem('tigerArcade.quarters.v1')===null)localStorage.setItem('tigerArcade.quarters.v1','1000')}catch{}});
   page.on('pageerror',e=>errors.push(e.message));
-  try {await page.goto(origin);await fn(page,context);assert.deepEqual(errors,[])}finally{await context.close()}
+  try {await page.goto(origin+'/fixture');await fn(page,context);assert.deepEqual(errors,[])}finally{await context.close()}
 }
-const start=page=>page.locator('#play').click();
-const state=page=>page.evaluate(()=>dadTest.state());
+const start=async page=>{await page.locator('#play').click();await page.waitForFunction(()=>!Arcade.busy)};
+const state=async page=>{await page.waitForFunction(()=>!Arcade.busy);return page.evaluate(()=>dadTest.state())};
 const fixture=(page,s)=>page.evaluate(s=>dadTest.fixture(s),s);
 const advance=(page,n)=>page.evaluate(n=>dadTest.advance(n),n);
 
 test('arcade lists three ready games and opens Dad Dug',async()=>withPage(async page=>{
-  await page.goto(origin+'/index.html');
+  await page.goto(origin+'/index');
+  assert.equal(await page.locator('.card').count(),6);
+  assert.equal(await page.getByRole('heading',{name:'Quarters Please',exact:true}).count(),1);
+  assert.equal(await page.getByRole('heading',{name:'Power Struggle',exact:true}).count(),1);
+  assert.deepEqual(await page.locator('.card-link').evaluateAll(links=>links.map(link=>link.getAttribute('href'))),['ghost-pop','dad-dug','eviction','quarters-please.html']);
   await page.getByRole('button',{name:'Ready to play'}).click();
   assert.equal(await page.locator('[data-status=ready]:visible').count(),3);
   assert.equal(await page.locator('[data-status=soon]:visible').count(),0);
   assert.equal(await page.locator('#game-count').textContent(),'3 games ready');
   await page.getByRole('link',{name:'Play Dad Dug'}).click();
+  assert.equal(new URL(page.url()).pathname,'/dad-dug');
   assert.equal(await page.title(),'Dad Dug · Tiger’s Arcade');
   await start(page);const s=await state(page);
   assert.equal(s.state,'playing');assert.equal(s.world.ghosts.length,4);assert.equal(s.world.rocks.length,5);
   assert.deepEqual([...new Set(s.world.ghosts.map(g=>g.kind))],['blinky','inky']);
+  await page.getByRole('link',{name:'Other Games',exact:true}).click();
+  assert.equal(new URL(page.url()).pathname,'/');
+  assert.equal(await page.locator('.card').count(),6);
 }));
 
 test('keyboard digs new tunnels, turns, respects bounds and rocks, and keyup stops movement',async()=>withPage(async page=>{
@@ -183,6 +194,7 @@ test('contact costs one life, respawns safely, and clearing ghosts advances the 
   assert.equal(s.state,'playing');assert(s.world.player.invulnerable>0);assert(s.world.ghosts.every(g=>Math.hypot(g.x-s.world.player.x,g.y-s.world.player.y)>100));
   await fixture(page,{ghosts:[{c:1,r:1,dead:true}]});await advance(page,.01);assert.equal((await state(page)).state,'clearing');
   await advance(page,2.1);s=await state(page);assert.equal(s.world.round,2);assert(s.world.score>=500);assert(s.world.ghosts.every(g=>!g.dead));
+  assert.equal(await page.evaluate(()=>Arcade.balance()),999,'respawning and advancing a round do not spend another quarter');
 }));
 
 test('pause freezes simulation and clears keyboard/pointer input; focus loss auto pauses',async()=>withPage(async page=>{

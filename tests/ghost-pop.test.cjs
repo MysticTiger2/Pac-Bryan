@@ -30,6 +30,8 @@ const instrumented = html.replace('buildFields();selectMode', expose + 'buildFie
 let server, browser, origin;
 before(async () => {
   server = http.createServer((req, res) => {
+    const asset = req.url.slice(1);
+    if (['arcade.js','arcade.css'].includes(asset)) { res.setHeader('Content-Type', asset.endsWith('.js') ? 'text/javascript' : 'text/css'); res.end(fs.readFileSync(path.join(path.join(__dirname, '..'),asset))); return; }
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
     res.end(req.url === '/actual' ? html : instrumented);
   });
@@ -45,13 +47,14 @@ after(async () => { await browser?.close(); await new Promise(resolve => server?
 async function withPage(fn, options = {}) {
   const context = await browser.newContext({ viewport: { width: 1365, height: 900 }, ...options });
   const page = await context.newPage(), errors = [];
+  await context.addInitScript(()=>{try{if(localStorage.getItem('tigerArcade.quarters.v1')===null)localStorage.setItem('tigerArcade.quarters.v1','1000')}catch{}});
   page.on('pageerror', e => errors.push(e.message));
   try { await page.goto(origin); await fn(page, context); assert.deepEqual(errors, []); }
   finally { await context.close(); }
 }
-const start = page => page.locator('#play').click();
+const start = async page => { await page.locator('#play').click(); await page.waitForFunction(()=>!Arcade.busy); };
 const fixture = (page, data) => page.evaluate(data => gameTest.fixture(data), data);
-const state = page => page.evaluate(() => gameTest.state());
+const state = async page => { await page.waitForFunction(()=>!Arcade.busy); return page.evaluate(() => gameTest.state()); };
 
 test('Classic opens from menu with the expanded board and expected rules', async () => withPage(async page => {
   assert.equal(await page.locator('#gameScreen').isVisible(), false);
@@ -63,7 +66,7 @@ test('Classic opens from menu with the expanded board and expected rules', async
   assert.equal(s.W, 774); assert.equal(s.H, 828);
   assert(s.grid.every(g => g.r < 7 && g.c < 18));
   assert.equal(s.palette[4], '#19864b');
-  assert.equal(await page.locator('a').getAttribute('href'), 'index.html');
+  assert.equal(await page.getByRole('link',{name:'Other Games',exact:true}).getAttribute('href'), './');
 }));
 
 test('pointer hold and drag aim without shooting; release fires once; cancel never fires', async () => withPage(async (page, context) => {
@@ -212,11 +215,13 @@ test('keyboard works immediately after Play and from the page; settings controls
   await page.keyboard.press('Space');
   assert.equal((await state(page)).shots,1);
   await page.locator('#restart').click();
+  await page.waitForFunction(()=>!Arcade.busy);
   await page.evaluate(()=>document.activeElement.blur());
   await page.keyboard.press('ArrowLeft');
   await page.keyboard.press('Space');
   assert.equal((await state(page)).shots,1);
   await page.locator('#restart').click();
+  await page.waitForFunction(()=>!Arcade.busy);
   await page.locator('#gameSettings').click();
   await page.locator('#colorblind').focus();
   await page.keyboard.press('Space');
@@ -427,6 +432,7 @@ async function padButton(page,index,pressed,value=pressed?1:0) {
   await page.evaluate(({index,pressed,value})=>{
     window.testPad.buttons[index]={pressed,value};gameTest.pollGamepads(.016);
   },{index,pressed,value});
+  await page.waitForFunction(()=>!Arcade.busy);
 }
 
 test('both gamepad sticks aim with a deadzone; south and either analog trigger fire once per press', async () => withPage(async page => {

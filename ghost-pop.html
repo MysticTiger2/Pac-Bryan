@@ -21,10 +21,11 @@
   dialog{width:min(92vw,440px);max-height:90dvh;overflow:auto;border:1px solid #7386d3;border-radius:16px;padding:22px;background:#18234b;color:#e9edff;box-shadow:0 20px 80px #000b}dialog::backdrop{background:#030719bd}.setting{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:18px 0}.setting input{width:22px;height:22px;accent-color:#ffe36e}.setting select,.name-entry input{background:#0a1330;color:#fff;border:1px solid #6377a8;border-radius:8px;padding:9px;font:inherit}.setting select{min-width:100px}.name-entry{margin-top:16px;text-align:left}.name-entry label{display:block;font-size:13px;margin-bottom:7px}.name-entry .name-controls{display:flex;gap:7px}.name-entry input{min-width:0;width:100%;font-size:16px}.name-entry button{font-size:13px;white-space:nowrap}.assist-legend{padding:12px;border:1px solid #53699d;border-radius:8px;font-size:12px;line-height:1.6;color:#d2def8}.scores-wrap td:nth-child(2){max-width:180px;overflow-wrap:anywhere;text-align:left}
   @media(max-width:760px) and (orientation:portrait){.panel{padding:16px 12px}.panel h2{font-size:24px}.panel p{margin:8px 0;line-height:1.4}.panel .result{font-size:23px;margin:8px 0}.panel .actions{margin:12px 0 0}.name-entry{margin-top:10px}}
 </style>
+<link rel="stylesheet" href="arcade.css">
 </head>
 <body>
 <main class="shell">
-  <header><div><h1>ᗧ GHOST POP</h1><p class="sub" id="subtitle" hidden></p></div><a class="button secondary small" href="index.html">Other Games</a></header>
+  <header><div><h1>ᗧ GHOST POP</h1><p class="sub" id="subtitle" hidden></p><span data-arcade-wallet></span></div><a class="button secondary small" href="./">Other Games</a></header>
   <section class="screen" id="menuScreen">
     <div class="intro"><h2>Choose a mode</h2><p>Match ghosts of the same color and clear the board.</p></div>
     <div class="modes" aria-label="Game modes">
@@ -59,6 +60,7 @@
   <label class="setting" for="gameSpeed"><span>Game speed</span><select id="gameSpeed"><option value="fast">Fast</option><option value="slow">Slow</option></select></label><p class="hint">Fast: quicker shots, normal mouth animation. Slow: slower shots, half-speed mouth animation.</p>
   <div class="actions"><button class="secondary small" id="settingsRandomize">Randomize colors</button><button class="small" id="closeSettings">Done</button></div>
 </dialog>
+<script src="arcade.js"></script>
 <script>
 (()=>{'use strict';
 const $=id=>document.getElementById(id),cv=$('canvas'),ctx=cv.getContext('2d'),nextCtx=$('nextCanvas').getContext('2d');
@@ -151,7 +153,8 @@ function fitBoard(){
   wrap.style.height=height+'px';$('game').style.width=width+'px';$('game').style.height=height+'px';$('game').style.setProperty('--unit',width/W+'px');
   $('shotQueue').style.left=(SHOOT.x+Math.min(95,W/4))/W*100+'%';$('shotQueue').style.top=(SHOOT.y-5)/H*100+'%';
 }
-function start(){if(selectedMode==='custom'){const values=readCustom(true);if(!values)return;customRules=values;save(STORAGE.custom,values)}activeMode=selectedMode;rules={...(activeMode==='custom'?customRules:MODES[activeMode].rules)};palette=getPalette(rules.colors);palettes[rules.colors]=palette;save(STORAGE.palettes,palettes);
+function start(){const mode=selectedMode,custom=mode==='custom'?readCustom(true):null;if(mode==='custom'&&!custom)return;return Arcade.play(()=>beginGame(mode,custom))}
+function beginGame(mode,custom){if(mode==='custom'){customRules=custom;save(STORAGE.custom,custom)}activeMode=mode;rules={...(activeMode==='custom'?customRules:MODES[activeMode].rules)};palette=getPalette(rules.colors);palettes[rules.colors]=palette;save(STORAGE.palettes,palettes);
   W=2*R+(rules.columns-1)*DX+DX/2;DANGER=TOP+(rules.maxRows-1)*DY+R;SHOOT={x:W/2,y:DANGER+70};H=SHOOT.y+35;cv.width=W;cv.height=H;
   grid=new Map();parity=0;points=0;shots=0;misses=0;ended=false;projectile=null;reaction=null;particles=[];popText=[];aim=-Math.PI/2;dragPointer=null;assistTime=0;pendingScore=null;$('nameForm').hidden=true;
   for(let r=0;r<rules.initialRows;r++)for(let c=0;c<rules.columns;c++)if(Math.random()<.92)set(r,c,Math.floor(Math.random()*rules.colors));
@@ -278,6 +281,7 @@ function activateGamepad(scope){
   fallback.click();
 }
 function pollGamepads(dt){
+  if(Arcade.dialogOpen){Arcade.pollDialogGamepad();return}
   let pads;
   try{pads=typeof navigator.getGamepads==='function'?Array.from(navigator.getGamepads()).filter(p=>p?.connected):[]}catch{pads=[]}
   const connected=new Set(pads.map(p=>p.index)),interactive=!document.hidden&&document.hasFocus(),inputs=[];
@@ -320,7 +324,7 @@ function pollGamepads(dt){
   if(edges[0]||edges[6]||edges[7])fire();
 }
 function suspendGamepads(){for(const state of gamepadStates.values()){state.blocked=true;state.nav=null}}
-function update(dt){
+function update(dt){if(Arcade.dialogOpen)return;
   assistTime+=dt;updateAim(dt);
   for(const p of particles){p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=140*dt;p.life-=dt}particles=particles.filter(p=>p.life>0);
   for(const t of popText){t.y-=32*dt;t.life-=dt}popText=popText.filter(t=>t.life>0);
