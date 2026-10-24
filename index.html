@@ -36,7 +36,7 @@
           <button class="filter" data-filter="ready" aria-pressed="false">Ready to play</button>
           <button class="filter" data-filter="soon" aria-pressed="false">Coming soon</button>
         </div>
-        <span class="game-count mono" id="game-count" role="status">4 games · 1 ready</span>
+        <span class="game-count mono" id="game-count" role="status">4 games · 2 ready</span>
       </div>
       <section class="grid" aria-label="Games">
         <article class="card playable" data-status="ready">
@@ -45,9 +45,11 @@
             <div class="card-body"><div class="card-heading"><h2>Ghost Pop</h2><span class="status ready mono">Ready to play</span></div><p class="description">A little aim. A big chain reaction. Give these ghosts a pop.</p><div class="card-bottom"><span class="genre mono">PUZZLE / BUBBLE SHOOTER</span><span class="play-cta">Let’s play <span class="arrow" aria-hidden="true">↗</span></span></div></div>
           </a>
         </article>
-        <article class="card" data-status="soon">
-          <div class="scene"><canvas id="dad-scene" width="640" height="308" role="img" aria-label="A helmeted dad digs tunnels through layers of earth, surrounded by rocks and monsters"></canvas><span class="scene-label mono" aria-hidden="true">02 / CAN YOU DIG IT?</span><span class="scene-corner mono" aria-hidden="true">WATCH YOUR HARD HAT</span></div>
-          <div class="card-body"><div class="card-heading"><h2>Dad Dug</h2><span class="status mono">Coming soon</span></div><p class="description">Dig deep. Dodge trouble. Dad’s got some underground business.</p><div class="card-bottom"><span class="genre mono">ACTION / DIGGING</span><span class="soon-note mono">In the works</span></div></div>
+        <article class="card playable" data-status="ready">
+          <a class="card-link" href="dad-dug.html" aria-label="Play Dad Dug">
+          <div class="scene"><canvas id="dad-scene" width="640" height="308" role="img" aria-label="A helmeted dad digs tunnels through layers of earth, surrounded by rocks, Inky, and Blinky"></canvas><span class="scene-label mono" aria-hidden="true">02 / CAN YOU DIG IT?</span><span class="scene-corner mono" aria-hidden="true">WATCH YOUR HARD HAT</span></div>
+          <div class="card-body"><div class="card-heading"><h2>Dad Dug</h2><span class="status ready mono">Ready to play</span></div><p class="description">Dig deep. Pump up Inky and Blinky. Dad’s got some underground business.</p><div class="card-bottom"><span class="genre mono">ACTION / DIGGING</span><span class="play-cta">Let’s dig <span class="arrow" aria-hidden="true">↗</span></span></div></div>
+          </a>
         </article>
         <article class="card" data-status="soon">
           <div class="scene"><canvas id="turf-scene" width="640" height="308" role="img" aria-label="A glowing green trail claims territory on a blue grid while ghosts roam the open area"></canvas><span class="scene-label mono" aria-hidden="true">03 / A LITTLE SPACE, PLEASE.</span><span class="scene-corner mono" aria-hidden="true">CLAIM YOUR CORNER</span></div>
@@ -85,7 +87,7 @@
       for(let y=64;y<308;y+=16)for(let x=0;x<640;x+=23){const n=(x*7+y*11)%13;rect(c,x+(y%3)*3,y,n%3+2,2,n<6?'#b17a454b':'#30251f5c')}
       c.strokeStyle='#211f21';c.lineWidth=34;c.lineJoin='round';c.lineCap='round';c.beginPath();c.moveTo(190,43);c.lineTo(190,92);c.lineTo(420,92);c.lineTo(420,171);c.lineTo(269,171);c.lineTo(269,245);c.lineTo(480,245);c.moveTo(318,92);c.lineTo(318,171);c.moveTo(190,92);c.lineTo(190,225);c.lineTo(124,225);c.stroke();
       function rock(x,y){c.fillStyle='#929386';c.beginPath();c.moveTo(x-20,y+9);c.lineTo(x-17,y-10);c.lineTo(x-4,y-20);c.lineTo(x+14,y-16);c.lineTo(x+23,y+9);c.lineTo(x+9,y+17);c.closePath();c.fill();rect(c,x-10,y-12,14,5,'#bab9a4');rect(c,x+10,y,7,9,'#6b7068')}
-      rock(111,116);rock(371,211);rock(486,149);ghost(c,420,92,colors.orange,.7);ghost(c,175,224,colors.pink,.7);
+      rock(111,116);rock(371,211);rock(486,149);ghost(c,420,92,'#63dce8',.7);ghost(c,175,224,'#f16657',.7);
       // Hard hat, face, overalls, boots, and a hose.
       rect(c,266,150,17,11,'#f3c39b');rect(c,262,144,22,8,'#f1d56b');rect(c,258,151,30,4,'#ffe38b');rect(c,265,162,18,17,'#79b6bb');rect(c,259,165,6,9,'#f3c39b');rect(c,282,165,12,5,'#f3c39b');rect(c,265,179,7,7,'#e7e6ce');rect(c,279,179,8,7,'#e7e6ce');rect(c,277,155,3,3,'#292827');rect(c,273,161,10,3,'#6a4933');
       c.strokeStyle='#afbdad';c.lineWidth=3;c.beginPath();c.moveTo(294,167);c.lineTo(339,167);c.lineTo(339,155);c.stroke();rect(c,333,150,13,5,'#d1dfc1');
@@ -118,7 +120,7 @@
       const filter=button.dataset.filter;
       filterButtons.forEach(item=>item.setAttribute('aria-pressed',String(item===button)));
       document.querySelectorAll('[data-status]').forEach(card=>{card.hidden=filter!=='all'&&card.dataset.status!==filter});
-      document.getElementById('game-count').textContent=filter==='all'?'4 games · 1 ready':filter==='ready'?'1 game ready':'3 games coming soon';
+      document.getElementById('game-count').textContent=filter==='all'?'4 games · 2 ready':filter==='ready'?'2 games ready':'2 games coming soon';
     }));
   </script>
 </body>
