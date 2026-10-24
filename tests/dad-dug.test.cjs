@@ -46,12 +46,12 @@ const state=page=>page.evaluate(()=>dadTest.state());
 const fixture=(page,s)=>page.evaluate(s=>dadTest.fixture(s),s);
 const advance=(page,n)=>page.evaluate(n=>dadTest.advance(n),n);
 
-test('arcade lists two ready games and opens Dad Dug',async()=>withPage(async page=>{
+test('arcade lists three ready games and opens Dad Dug',async()=>withPage(async page=>{
   await page.goto(origin+'/index.html');
   await page.getByRole('button',{name:'Ready to play'}).click();
-  assert.equal(await page.locator('[data-status=ready]:visible').count(),2);
+  assert.equal(await page.locator('[data-status=ready]:visible').count(),3);
   assert.equal(await page.locator('[data-status=soon]:visible').count(),0);
-  assert.equal(await page.locator('#game-count').textContent(),'2 games ready');
+  assert.equal(await page.locator('#game-count').textContent(),'3 games ready');
   await page.getByRole('link',{name:'Play Dad Dug'}).click();
   assert.equal(await page.title(),'Dad Dug · Tiger’s Arcade');
   await start(page);const s=await state(page);

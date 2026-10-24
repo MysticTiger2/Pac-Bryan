@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#101719">
+<meta name="description" content="Draw the line. Claim the board. Keep the ghosts off your lawn. A modern territory-capture game at Tiger’s Arcade.">
+<title>Eviction · Tiger’s Arcade</title>
+<style>
+  :root{color-scheme:dark;--bg:#101719;--panel:#182427;--line:#364849;--text:#f3f0df;--muted:#a8bcba;--lime:#d4f578;--mint:#80cfb2;font-family:Arial,Helvetica,sans-serif;color:var(--text);background:var(--bg)}
+  *{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 25% 10%,#203c36,transparent 65%),var(--bg)}button,a{-webkit-tap-highlight-color:transparent;touch-action:manipulation}button{font:inherit;cursor:pointer}a{color:inherit}button:focus-visible,a:focus-visible,canvas:focus-visible{outline:3px solid var(--lime);outline-offset:4px}button:disabled{opacity:.4;cursor:default}[hidden]{display:none!important}.mono{font-family:Consolas,'Courier New',monospace}.shell{width:min(1180px,calc(100% - 48px));margin:auto}.topbar{height:84px;display:flex;justify-content:space-between;align-items:center;gap:15px;border-bottom:1px solid var(--line)}.brand{color:var(--lime);text-decoration:none;font-size:12px;font-weight:bold;letter-spacing:.1em}.top-actions{display:flex;gap:8px}.button{border:1px solid #50655f;background:#23332e;border-radius:6px;color:var(--text);padding:10px 14px;font-size:12px;font-weight:bold;text-decoration:none}.button:hover:enabled,a.button:hover{background:#344a3e}.button.primary{background:var(--lime);border-color:var(--lime);color:#18231c}.button.primary:hover:enabled{background:#e2ff99}.sound[aria-pressed=true]{color:var(--lime)}
+  .layout{display:grid;grid-template-columns:minmax(0,800px) minmax(245px,1fr);gap:36px;align-items:center;padding:32px 0}.cabinet{background:#13262b;border:1px solid #57766c;border-radius:10px;overflow:hidden;box-shadow:0 18px 80px #0004}.territory{padding:18px 20px 15px;background:#1c302c;border-bottom:1px solid #456052}.territory-heading{display:flex;align-items:center;justify-content:space-between;gap:15px}.territory-label{font-size:10px;letter-spacing:.12em;color:#bed2bd}.territory-value{font:700 29px Consolas,monospace;color:var(--lime);letter-spacing:-.06em}.territory-value small{font-size:12px;font-weight:400;letter-spacing:0;color:#a5bca8;margin-left:10px}.progress{height:5px;background:#0e201c;border-radius:4px;margin-top:12px;overflow:hidden}.progress span{display:block;width:0;height:100%;background:var(--lime);box-shadow:0 0 12px #d4f575;transition:width .25s}.hud{display:grid;grid-template-columns:1.3fr 1.3fr .8fr 1fr;gap:8px;padding:13px 20px;border-bottom:1px solid #304c47;background:#162824}.hud small{display:block;font:9px Consolas,monospace;letter-spacing:.12em;color:#a8beb0;margin-bottom:5px}.hud b{font:700 18px Consolas,monospace;font-variant-numeric:tabular-nums}.hud>div:first-child b{color:var(--lime)}.hud .hearts{color:#edaf9c;letter-spacing:.12em;font-size:17px}.stage{position:relative;aspect-ratio:10/7}canvas{display:block;width:100%;height:100%;touch-action:none}.board-bottom{display:flex;justify-content:space-between;gap:8px;padding:11px 16px;border-top:1px solid #39554c;background:#172b26;font:9px/1.5 Consolas,monospace;color:#b6c7b7;letter-spacing:.045em}.legend{display:flex;gap:13px}.legend span{display:flex;align-items:center;gap:5px}.dot{width:6px;height:6px;border-radius:1px;background:var(--mint)}.dot.trail{background:var(--lime)}.dot.ghost{background:#ec89a8}
+  .overlay{position:absolute;inset:0;background:#0c191bb8;backdrop-filter:blur(3px);display:grid;place-items:center;padding:18px}.panel{width:min(370px,100%);padding:29px 26px;text-align:center;background:#182c27f5;border:1px solid #74936a;border-radius:9px;box-shadow:0 16px 50px #0005}.panel .eyebrow{font:10px Consolas,monospace;letter-spacing:.14em;color:var(--lime)}.panel h2{font-size:clamp(25px,3.2vw,37px);line-height:1.07;letter-spacing:-.055em;margin:17px 0 12px}.panel p{font-size:13px;line-height:1.7;color:#c3d1c3;margin:0 0 22px}.panel .primary{font-size:14px;padding:12px 25px;min-width:160px}.panel .secondary-action{display:block;margin:12px auto 0;font-size:11px}.panel-hint{font:9px/1.6 Consolas,monospace;color:#9eb4a1;margin-top:16px}
+  .rail .eyebrow{font:10px/1.5 Consolas,monospace;letter-spacing:.14em;color:var(--mint);margin:0 0 14px}h1{font-size:clamp(44px,5.5vw,72px);line-height:.93;letter-spacing:-.065em;margin:0 0 20px}h1 span{color:var(--lime)}.tagline{font-size:14px;line-height:1.75;color:#bed0bf;margin:0 0 25px}.guide{padding-top:21px;border-top:1px solid var(--line)}.guide-row{display:flex;gap:11px;margin-bottom:19px}.badge{flex:0 0 30px;height:30px;border:1px solid #526b58;background:#263e30;border-radius:5px;display:grid;place-items:center;font:15px Consolas,monospace;color:var(--lime)}.guide-row strong{font-size:12px;display:block;margin:0 0 5px}.guide-row p{font-size:12px;color:var(--muted);line-height:1.6;margin:0}.keys{padding:12px 14px;border:1px solid var(--line);border-radius:6px;color:var(--muted);font-size:10px;line-height:1.9}.keys b{color:#e0e6cd;font-size:9px}.touch-controls{display:flex;align-items:center;justify-content:space-between;gap:18px;margin:17px auto;width:min(100%,330px);user-select:none;-webkit-user-select:none}.dpad{display:grid;grid-template-columns:repeat(3,42px);grid-template-rows:repeat(2,40px);gap:4px}.touch{touch-action:none;border:1px solid #5b7561;background:#233c31;color:#e6f1ca;border-radius:6px;font-size:20px;font-weight:bold;user-select:none;-webkit-user-select:none}.touch.active,.touch:active{color:#13251b;background:var(--lime)}.touch[data-control=up]{grid-column:2}.touch[data-control=left]{grid-column:1;grid-row:2}.touch[data-control=down]{grid-column:2;grid-row:2}.touch[data-control=right]{grid-column:3;grid-row:2}.freeze{width:84px;height:84px;border:1px solid #7dbab7;border-radius:50%;background:#244c49;position:relative;color:#b0e5e3;font-size:11px;letter-spacing:.08em}.freeze small{display:block;font:9px Consolas,monospace;margin-top:6px;letter-spacing:0}.freeze.active{background:#b0e5e3;color:#143634}.status{font:11px/1.6 Consolas,monospace;color:#d2e5b8;min-height:35px;margin:0 0 10px}.storage{font-size:11px;line-height:1.6;color:#efc18e}.footer{display:flex;justify-content:space-between;gap:20px;border-top:1px solid var(--line);padding:18px 0 23px;font:10px/1.5 Consolas,monospace;color:#95aaa1}
+  @media(max-width:1000px){.layout{gap:24px;grid-template-columns:minmax(0,1fr) 245px}.shell{width:calc(100% - 32px)}h1{font-size:52px}.territory{padding:14px 16px}.hud{padding:11px 16px}.hud b{font-size:16px}.guide-row{margin-bottom:14px}.tagline{font-size:13px;margin-bottom:18px}.panel{padding:20px}.panel p{font-size:12px;margin-bottom:16px}.panel h2{font-size:28px;margin:12px 0}.panel-hint{margin-top:12px}}
+  @media(max-width:700px) and (orientation:portrait){.shell{width:calc(100% - 24px)}.topbar{height:64px}.brand{font-size:0}.brand:after{content:'↖ EVICTION';font-size:13px;letter-spacing:.04em}.top-actions{gap:5px}.top-actions .button{padding:8px;font-size:10px}.layout{display:flex;flex-direction:column;gap:0;padding:17px 0}.cabinet{width:100%}.rail{width:100%;display:flex;flex-direction:column}.rail>h1,.rail>.eyebrow,.tagline{display:none}.touch-controls{order:0;margin:14px auto;max-width:340px}.status{order:1;text-align:center;min-height:18px;margin-bottom:12px}.keys{order:2;text-align:center;font-size:10px}.guide{order:3;display:grid;grid-template-columns:1fr 1fr;gap:13px;margin-top:20px;padding-top:18px}.guide-row{margin:0}.guide-row:last-child{grid-column:1/-1}.storage{order:4}.territory{padding:12px 13px 10px}.territory-value{font-size:24px}.territory-value small{font-size:10px}.territory-label{font-size:9px}.hud{padding:10px 13px}.hud small{font-size:8px}.hud b{font-size:15px}.hud .hearts{font-size:14px}.board-bottom{padding:8px 10px;font-size:8px}.legend{gap:8px}.panel{padding:16px 18px;max-width:300px}.panel h2{font-size:25px;margin:10px 0}.panel p{font-size:11px;line-height:1.55;margin-bottom:13px}.panel .eyebrow{font-size:8px}.panel .primary{font-size:12px;padding:9px 18px;min-width:140px}.panel-hint{font-size:8px;margin-top:9px}.footer{font-size:9px;padding:16px 0}.overlay{padding:11px}}
+  @media(orientation:landscape) and (max-height:600px){.topbar{height:47px}.layout{grid-template-columns:minmax(0,1fr) 240px;gap:24px;padding:12px 0}.cabinet{width:100%;max-width:calc((100dvh - 167px)*1.42857);margin:auto}.rail h1,.rail>.eyebrow,.tagline,.guide,.footer{display:none}.territory{padding:7px 12px}.territory-value{font-size:20px}.progress{margin-top:6px;height:3px}.hud{padding:7px 12px}.hud b,.hud .hearts{font-size:13px}.hud small{font-size:7px;margin-bottom:3px}.board-bottom{font-size:7px;padding:5px 8px}.panel{padding:13px;max-width:300px}.panel h2{font-size:22px;margin:8px 0}.panel p{font-size:10px;margin-bottom:10px}.panel .eyebrow{font-size:8px}.panel .primary{font-size:11px;padding:8px 18px}.panel-hint{display:none}.panel .secondary-action{margin-top:8px;padding:7px 10px}.touch-controls{margin:12px auto}.status{font-size:10px}.keys{font-size:9px}}
+  @media(orientation:landscape) and (max-height:600px){.cabinet{max-width:calc((100dvh - 180px)*1.42857)}.territory-heading{gap:8px}.territory-label{font-size:8px;max-width:110px}.territory-value{white-space:nowrap;flex-shrink:0}.territory-value small{font-size:9px;margin-left:5px}}
+  @media(max-width:700px) and (orientation:portrait){.brand,.top-actions .button,.territory-value{white-space:nowrap}.territory-label{max-width:115px}.territory-value{flex-shrink:0}.territory-heading{gap:8px}}
+  @media(max-width:350px) and (orientation:portrait){.brand:after{font-size:11px}.top-actions .button{padding:8px 6px;font-size:9px}.territory-label{font-size:8px;max-width:90px}.territory-value{font-size:21px}.territory-value small{font-size:9px;margin-left:5px}.panel{padding:12px}.panel h2{font-size:22px;margin:8px 0}.panel p{font-size:10px;margin-bottom:10px}.panel .primary{padding:8px 15px;font-size:11px}.panel-hint{display:none}.board-bottom{letter-spacing:0;font-size:7px}}
+  @media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important}}
+</style>
+</head>
+<body>
+<main class="shell">
+  <header class="topbar"><a class="brand" href="index.html">↖ TIGER’S ARCADE</a><div class="top-actions"><button class="button sound" id="sound" aria-pressed="false">Sound off</button><button class="button" id="pause" disabled>Pause</button><a class="button" href="index.html">Other Games</a></div></header>
+  <div class="layout">
+    <section class="cabinet" aria-label="Eviction game">
+      <div class="territory"><div class="territory-heading"><span class="territory-label mono">YOUR SIDE OF THE FENCE</span><div class="territory-value"><span id="percent">0.0%</span><small id="goal">/ 80% TO WIN</small></div></div><div class="progress" id="progress" role="progressbar" aria-label="Territory claimed" aria-valuemin="0" aria-valuemax="80" aria-valuenow="0"><span id="progressFill"></span></div></div>
+      <div class="hud"><div><small>SCORE</small><b id="score">000000</b></div><div><small>BEST</small><b id="best">000000</b></div><div><small>LEVEL</small><b id="level">01</b></div><div><small>LIVES</small><b class="hearts" id="lives" aria-label="3 lives">♥ ♥ ♥</b></div></div>
+      <div class="stage"><canvas id="canvas" width="800" height="560" tabindex="0" aria-label="Eviction playfield. Move with arrows or WASD. Leave the green territory and reconnect to claim an area. Space freezes ghosts. P pauses."></canvas>
+        <div class="overlay" id="overlay"><div class="panel"><div class="eyebrow" id="panelEyebrow">NOTICE 001 / MAKE YOURSELF AT HOME</div><h2 id="panelTitle">A little space,<br>please.</h2><p id="panelText">Draw a line and return to green to claim your turf. Reach 80% to win. Watch the orange edge ghost: it can catch you on green, too.</p><button class="button primary" id="play">Claim your corner ↗</button><button class="button secondary-action" id="restart" hidden>New game</button><div class="panel-hint" id="panelHint">ARROWS / WASD TO MOVE · SPACE TO FREEZE</div></div></div>
+      </div>
+      <div class="board-bottom"><div class="legend"><span><i class="dot"></i>YOUR TURF</span><span><i class="dot trail"></i>YOUR LINE</span><span><i class="dot ghost"></i>UNINVITED</span></div><span id="boardLabel">NO RENT. ALL TERRITORY.</span></div>
+    </section>
+    <aside class="rail"><p class="eyebrow">03 / A LITTLE SPACE, PLEASE.</p><h1>EVICT<span>ION.</span></h1><p class="tagline">Draw the line. Claim the board.<br>Keep the ghosts off your lawn.</p>
+      <div class="guide"><div class="guide-row"><span class="badge" aria-hidden="true">↳</span><div><strong>Close the loop.</strong><p>Draw a line and return to green. Claim <span id="guideGoal">80%</span> to win. The target rises 1% per level, up to 95%.</p></div></div><div class="guide-row"><span class="badge" aria-hidden="true" style="color:#ffad6b">◇</span><div><strong>Mind the edge ghost.</strong><p>Orange ghosts ride the line between green and empty, following new edges as you capture. They can catch you on green.</p></div></div><div class="guide-row"><span class="badge" aria-hidden="true">❄</span><div><strong>Give them the cold shoulder.</strong><p>Freeze all ghosts for 2.5 seconds. Every 15% claimed recharges a Freeze. Backtrack to undo your line; crossing it costs a life.</p></div></div></div>
+      <div class="keys"><b>MOVE</b> Arrows / WASD / drag the board<br><b>FREEZE</b> Space / X &nbsp; <b>PAUSE</b> P / Esc<br><b>CONTROLLER</b> Stick / D-pad · A to freeze</div>
+      <div class="touch-controls" aria-label="Touch controls"><div class="dpad"><button class="touch" data-control="up" aria-label="Move up">↑</button><button class="touch" data-control="left" aria-label="Move left">←</button><button class="touch" data-control="down" aria-label="Move down">↓</button><button class="touch" data-control="right" aria-label="Move right">→</button></div><button class="touch freeze" id="freeze" aria-label="Freeze ghosts"><span>❄ FREEZE</span><small id="freezeLabel">1 READY</small></button></div>
+      <p class="status" id="status" role="status" aria-live="polite">Good fences. Questionable neighbors.</p><p class="storage" id="storageNote" hidden>Browser storage is unavailable. Your best score will last for this session.</p>
+    </aside>
+  </div>
+  <footer class="footer"><span>HOMEMADE / FAMILY ARCADE</span><span>Your lawn. Your rules.</span></footer>
+</main>
+<script>
+(()=>{'use strict';
+const $=id=>document.getElementById(id),canvas=$('canvas'),ctx=canvas.getContext('2d');
+const COLS=40,ROWS=28,TILE=20,W=800,H=560,OPEN=0,SAFE=1,TRAIL=2,STEP=1/120,PLAYER_SPEED=5.5,RADIUS=.34;
+const DIRS={up:[0,-1],down:[0,1],left:[-1,0],right:[1,0]},KEYS={ArrowUp:'up',KeyW:'up',ArrowDown:'down',KeyS:'down',ArrowLeft:'left',KeyA:'left',ArrowRight:'right',KeyD:'right'};
+const input=new Map(),touches=new Map(),terrain=document.createElement('canvas'),terrainCtx=terrain.getContext('2d');terrain.width=W;terrain.height=H;
+const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+let boundary=[],boundaryByKey=new Map();
+let world,state='menu',time=0,last=performance.now(),accumulator=0,buffered=null,best=0,sound=false,audio=null,focused=document.hasFocus(),padNeedsRelease=true,padSelect=false,padPause=false,padDirection=null,terrainDirty=true;
+const index=(c,r)=>r*COLS+c,valid=(c,r)=>c>=0&&r>=0&&c<COLS&&r<ROWS,cell=(c,r)=>valid(c,r)?world.grid[index(c,r)]:SAFE;
+try{best=Math.max(0,Math.floor(Number(localStorage.getItem('eviction.best.v1'))||0));if(!Number.isFinite(best))best=0}catch{$('storageNote').hidden=false}
+function persist(){if(world.score<=best)return;best=world.score;try{localStorage.setItem('eviction.best.v1',String(best))}catch{$('storageNote').hidden=false}}
+function status(message){$('status').textContent=message}
+function tone(freq=500,duration=.1,type='triangle'){if(!sound)return;try{audio??=new (window.AudioContext||window.webkitAudioContext)();if(audio.state==='suspended')audio.resume().catch(()=>{});const o=audio.createOscillator(),g=audio.createGain();o.type=type;o.frequency.setValueAtTime(freq,audio.currentTime);o.frequency.exponentialRampToValueAtTime(Math.max(50,freq*.55),audio.currentTime+duration);g.gain.setValueAtTime(.035,audio.currentTime);g.gain.exponentialRampToValueAtTime(.001,audio.currentTime+duration);o.connect(g);g.connect(audio.destination);o.start();o.stop(audio.currentTime+duration)}catch{}}
+function clearInput(){input.clear();touches.clear();buffered=null;padDirection=null;drag=null;for(const b of document.querySelectorAll('[data-control]'))b.classList.remove('active')}
+function setDirection(key,dir){if(input.get(key)!==dir){input.delete(key);input.set(key,dir);buffered=dir}}
+function targetPercent(){return Math.min(95,80+world.level-1)}
+function sync(){const w=world,pct=percentage(),goal=targetPercent();$('percent').textContent=pct.toFixed(1)+'%';$('goal').textContent='/ '+goal+'% TO WIN';$('guideGoal').textContent=goal+'%';$('progress').setAttribute('aria-valuemax',String(goal));$('progress').setAttribute('aria-valuenow',String(Math.min(goal,pct).toFixed(1)));$('progress').setAttribute('aria-valuetext',pct.toFixed(1)+'% claimed; '+goal+'% to win');$('progressFill').style.width=Math.min(100,pct/goal*100)+'%';$('score').textContent=String(w.score).padStart(6,'0');$('best').textContent=String(best).padStart(6,'0');$('level').textContent=String(w.level).padStart(2,'0');$('lives').textContent=Array(w.lives).fill('♥').join(' ')||'—';$('lives').setAttribute('aria-label',w.lives+' lives');$('pause').disabled=!['playing','paused','dying'].includes(state);$('pause').textContent=state==='paused'?'Resume':'Pause';$('freeze').disabled=state!=='playing'||!w.charges||w.freeze>0;$('freeze').classList.toggle('active',w.freeze>0);$('freezeLabel').textContent=w.freeze>0?'FROZEN':w.charges?w.charges+' READY':Math.max(1,Math.ceil(w.nextFreeze-pct))+'% TO CHARGE';$('boardLabel').textContent=state==='playing'?'LEVEL '+String(w.level).padStart(2,'0')+' / '+w.ghosts.length+' UNINVITED':'NO RENT. ALL TERRITORY.'}
+function percentage(){return world.claimed/((COLS-2)*(ROWS-2))*100}
+function panel(eyebrow,title,text,button,restart=false){clearInput();padNeedsRelease=true;$('panelEyebrow').textContent=eyebrow;$('panelTitle').textContent=title;$('panelText').textContent=text;$('play').textContent=button;$('restart').hidden=!restart;$('panelHint').hidden=true;$('overlay').hidden=false;$('play').focus({preventScroll:true})}
+function loadLevel(){const w=world;w.grid=new Uint8Array(COLS*ROWS);for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++)if(c===0||r===0||c===COLS-1||r===ROWS-1)w.grid[index(c,r)]=SAFE;
+  w.player={c:0,r:14,x:.5,y:14.5,fromX:.5,fromY:14.5,target:null,dir:'right',anchor:{c:0,r:14},invulnerable:0};w.trail=[];w.claimed=0;w.freeze=0;w.charges=1;w.nextFreeze=15;w.elapsed=0;w.transition=0;w.particles=[];w.labels=[];w.captureFlash=0;
+  const spots=[[28,7],[21,20],[33,17],[12,9],[9,21],[19,5],[31,23],[7,5]],palette=['#ed8ead','#84c9ed','#bbabea','#edb276','#94cfad','#ed8ead','#84c9ed','#bbabea'];
+  w.ghosts=spots.slice(0,Math.min(2+w.level-1,8)).map(([c,r],i)=>{const a=(.22+i*.47)*Math.PI,speed=2.65+Math.min(2.1,(w.level-1)*.23)+i*.12;return{kind:'roamer',x:c+.5,y:r+.5,vx:Math.cos(a)*speed,vy:Math.sin(a)*speed,color:palette[i],id:i}});
+  const edge={kind:'edge',x:COLS-1,y:1,vx:0,vy:1,distance:0,speed:3.8+Math.min(1.4,(w.level-1)*.09),color:'#ffad6b',id:8};w.ghosts.push(edge);rebuildBoundary();
+  terrainDirty=true;clearInput();status('Level '+w.level+' · Claim '+targetPercent()+'%. Watch the orange ghost on the territory edge.');sync();
+}
+function start(){world={level:1,score:0,lives:3};state='playing';loadLevel();$('overlay').hidden=true;canvas.focus({preventScroll:true});padNeedsRelease=true;tone(620,.15)}
+function nextLevel(){world.level++;state='playing';loadLevel();$('overlay').hidden=true;canvas.focus({preventScroll:true});padNeedsRelease=true;tone(800,.15)}
+let resumeState='playing';
+function pause(){if(state==='paused'){state=resumeState;$('overlay').hidden=true;clearInput();padNeedsRelease=true;canvas.focus({preventScroll:true})}else if(['playing','dying'].includes(state)){resumeState=state;state='paused';panel('NO RUSH / YOUR TURF IS SAFE','On the fence?','Take your time. Your territory, line, and Freeze will be right here.','Back to the lawn',true)}sync()}
+function freeze(){const w=world;if(state!=='playing'||w.charges<1||w.freeze>0)return;w.charges--;w.freeze=2.5;status('Cold shoulder! Ghosts frozen for 2.5 seconds.');tone(1050,.22);sync()}
+function circleTouches(x,y,c,r,radius=RADIUS){const dx=x-Math.max(c,Math.min(x,c+1)),dy=y-Math.max(r,Math.min(y,r+1));return dx*dx+dy*dy<radius*radius-1e-9}
+function touchesCellType(x,y,type){for(let r=Math.floor(y-RADIUS);r<=Math.floor(y+RADIUS);r++)for(let c=Math.floor(x-RADIUS);c<=Math.floor(x+RADIUS);c++)if(cell(c,r)===type&&circleTouches(x,y,c,r))return true;return false}
+function canOccupy(x,y){return !touchesCellType(x,y,SAFE)}
+function burst(x,y,color,count=18){if(reduced)return;for(let i=0;i<count;i++){const a=i/count*Math.PI*2,s=20+Math.random()*65;world.particles.push({x:x*TILE,y:y*TILE,vx:Math.cos(a)*s,vy:Math.sin(a)*s,life:.65,color})}}
+function hurt(message='A ghost cut your line.'){if(state!=='playing')return;const w=world;w.lives--;state='dying';w.transition=.8;w.player.target=null;for(const i of w.trail)w.grid[i]=OPEN;w.trail=[];w.freeze=0;terrainDirty=true;clearInput();burst(w.player.x,w.player.y,'#f2d878',24);status(message+' Territory kept. Try a shorter line.');tone(160,.35,'sawtooth');sync()}
+function exposed(){const p=world.player;return world.trail.length>0||cell(p.c,p.r)!==SAFE||!!(p.target&&cell(p.target.c,p.target.r)!==SAFE)}
+function checkDanger(){if(state!=='playing')return false;const w=world,p=w.player;for(const g of w.ghosts){const contact=!(p.invulnerable>0)&&Math.hypot(g.x-p.x,g.y-p.y)<RADIUS+.31;if(g.kind==='edge'){if(g.active!==false&&!(g.grace>0)&&contact){hurt('The edge ghost caught you.');return true}}else if(touchesCellType(g.x,g.y,TRAIL)||(exposed()&&contact)){hurt();return true}}return false}
+// Every roaming ghost seeds the flood fill. Edge ghosts follow the territory boundary.
+// The entire pass is synchronous, so a capture never leaves a half-updated board.
+function capture(){const w=world;if(!w.trail.length)return;if(checkDanger())return;const reachable=new Uint8Array(COLS*ROWS),queue=[];
+  for(const g of w.ghosts.filter(g=>g.kind!=='edge'))for(let r=Math.floor(g.y-RADIUS);r<=Math.floor(g.y+RADIUS);r++)for(let c=Math.floor(g.x-RADIUS);c<=Math.floor(g.x+RADIUS);c++){const i=index(c,r);if(valid(c,r)&&cell(c,r)===OPEN&&!reachable[i]&&circleTouches(g.x,g.y,c,r)){reachable[i]=1;queue.push(i)}}
+  for(let head=0;head<queue.length;head++){const i=queue[head],c=i%COLS,r=Math.floor(i/COLS);for(const [dc,dr] of Object.values(DIRS)){const nc=c+dc,nr=r+dr,ni=index(nc,nr);if(valid(nc,nr)&&w.grid[ni]===OPEN&&!reachable[ni]){reachable[ni]=1;queue.push(ni)}}}
+  let gained=0;for(let i=0;i<w.grid.length;i++)if(w.grid[i]===TRAIL||(w.grid[i]===OPEN&&!reachable[i])){w.grid[i]=SAFE;gained++}
+  w.claimed+=gained;w.score+=gained*10;w.trail=[];rebuildBoundary();w.captureFlash=reduced?0:.38;terrainDirty=true;const pct=percentage();let recharged=false;while(pct+1e-8>=w.nextFreeze){w.charges=Math.min(3,w.charges+1);w.nextFreeze+=15;recharged=true}
+  w.labels.push({x:w.player.x*TILE,y:w.player.y*TILE,text:'+'+(gained/((COLS-2)*(ROWS-2))*100).toFixed(1)+'%',life:1.5});burst(w.player.x,w.player.y,'#d4f578');tone(730,.16);status('Claimed '+gained+' tiles. '+(recharged?'Freeze recharged!':pct.toFixed(1)+'% yours. Keep drawing.'));
+  if(pct+1e-8>=targetPercent()){w.score+=500*w.level+100*w.lives;state='cleared';tone(1100,.3);panel('NOTICE '+String(w.level).padStart(3,'0')+' / DELIVERED','Consider them evicted.',pct.toFixed(1)+'% claimed. Level bonus: '+(500*w.level+100*w.lives).toLocaleString()+' points. More neighbors are moving in.','Next neighborhood ↗',true);status('Level '+w.level+' clear. Your lawn is getting bigger.')}
+  persist();sync();
+}
+function finishMove(){const w=world,p=w.player,t=p.target,old=index(p.c,p.r),ni=index(t.c,t.r);p.x=t.c+.5;p.y=t.r+.5;p.target=null;
+  const retreat=w.trail.length>0&&((w.trail.length>1&&ni===w.trail[w.trail.length-2])||(w.trail.length===1&&t.c===p.anchor.c&&t.r===p.anchor.r));
+  if(retreat){w.grid[old]=OPEN;w.trail.pop();terrainDirty=true;p.c=t.c;p.r=t.r;return}
+  if(w.grid[ni]===TRAIL){hurt('You crossed your own line.');return}
+  p.c=t.c;p.r=t.r;
+  if(w.grid[ni]===OPEN){w.grid[ni]=TRAIL;w.trail.push(ni);terrainDirty=true;checkDanger()}
+  else{if(w.trail.length)capture();p.anchor={c:p.c,r:p.r}}
+}
+function movePlayer(dt){const p=world.player;if(!p.target){const dir=buffered||[...input.values()].at(-1);buffered=null;if(!dir)return;const [dc,dr]=DIRS[dir],c=p.c+dc,r=p.r+dr;p.dir=dir;if(!valid(c,r))return;p.fromX=p.x;p.fromY=p.y;p.target={c,r,progress:0}}
+  const t=p.target;t.progress=Math.min(1,t.progress+PLAYER_SPEED*dt);p.x=p.fromX+(t.c+.5-p.fromX)*t.progress;p.y=p.fromY+(t.r+.5-p.fromY)*t.progress;if(checkDanger())return;if(t.progress>=1)finishMove();
+}
+// Directed unit segments keep empty space on the ghost's right. At a diagonal
+// meeting, a right turn keeps the ghost on its current empty region's contour.
+function rebuildBoundary(){
+  boundary=[];boundaryByKey=new Map();const outgoing=new Map();
+  const add=(x,y,dx,dy,dir)=>{const edge={key:x+','+y+','+dir,x,y,dx,dy,dir,next:null};boundary.push(edge);boundaryByKey.set(edge.key,edge);const vertex=x+','+y;if(!outgoing.has(vertex))outgoing.set(vertex,[]);outgoing.get(vertex).push(edge)};
+  for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++)if(cell(c,r)!==SAFE){
+    if(cell(c,r-1)===SAFE)add(c,r,1,0,0);
+    if(cell(c+1,r)===SAFE)add(c+1,r,0,1,1);
+    if(cell(c,r+1)===SAFE)add(c+1,r+1,-1,0,2);
+    if(cell(c-1,r)===SAFE)add(c,r+1,0,-1,3);
+  }
+  for(const edge of boundary){const choices=outgoing.get((edge.x+edge.dx)+','+(edge.y+edge.dy))||[];for(const turn of [1,0,3,2]){const next=choices.find(e=>e.dir===(edge.dir+turn)%4);if(next){edge.next=next.key;break}}}
+  for(const g of world.ghosts)if(g.kind==='edge'){
+    if(boundaryByKey.has(g.edge)){g.active=true;positionEdge(g)}
+    else attachEdge(g);
+  }
+}
+function attachEdge(g){
+  if(!boundary.length){g.active=false;g.edge=null;return}
+  let nearest=null,progress=0,bestDistance=Infinity,bestHeading=-Infinity;
+  for(const e of boundary){const t=Math.max(0,Math.min(1,(g.x-e.x)*e.dx+(g.y-e.y)*e.dy)),x=e.x+e.dx*t,y=e.y+e.dy*t,d=(x-g.x)**2+(y-g.y)**2,heading=e.dx*(g.vx||0)+e.dy*(g.vy||0);
+    if(d<bestDistance-1e-9||(Math.abs(d-bestDistance)<1e-9&&heading>bestHeading)){nearest=e;progress=t;bestDistance=d;bestHeading=heading}
+  }
+  // A removed edge can move the ghost onto a new frontier. Briefly suppress
+  // contact damage so that this reassignment cannot cause an instant death.
+  if(g.edge&&bestDistance>1e-9)g.grace=.35;
+  g.edge=nearest.key;g.progress=progress;g.active=true;g.distance??=0;positionEdge(g);
+}
+function positionEdge(g){const e=boundaryByKey.get(g.edge);if(!e)return;const t=g.progress||0;g.x=e.x+e.dx*t;g.y=e.y+e.dy*t;g.vx=e.dx*g.speed;g.vy=e.dy*g.speed}
+function advanceEdge(g,distance){
+  if(g.active===false)return;g.distance+=distance;
+  while(distance>0){const e=boundaryByKey.get(g.edge);if(!e){attachEdge(g);return}const remaining=1-(g.progress||0);
+    if(distance<remaining){g.progress=(g.progress||0)+distance;break}
+    distance-=remaining;g.edge=e.next;g.progress=0;
+  }
+  positionEdge(g);
+}
+function moveGhosts(dt){if(world.freeze>0)return;for(const g of world.ghosts){const speed=g.kind==='edge'?g.speed:Math.hypot(g.vx,g.vy),steps=Math.max(1,Math.ceil(speed*dt/.12)),slice=dt/steps;for(let s=0;s<steps;s++){
+  if(g.kind==='edge'){advanceEdge(g,g.speed*slice);if(checkDanger())return;continue}
+  const nx=g.x+g.vx*slice;if(canOccupy(nx,g.y))g.x=nx;else g.vx=-g.vx;
+  const ny=g.y+g.vy*slice;if(canOccupy(g.x,ny))g.y=ny;else g.vy=-g.vy;
+  if(checkDanger())return;
+}}}
+function respawn(){const w=world;if(w.lives<=0){state='over';persist();panel('NOTICE / RETURN TO SENDER','The neighbors won.',w.score.toLocaleString()+' points. '+percentage().toFixed(1)+'% claimed on level '+w.level+'. There’s always another patch of lawn.','Take it back ↗');status('Your best: '+best.toLocaleString()+'. Room for one more?');sync();return}
+  const p=w.player,a=p.anchor;Object.assign(p,{c:a.c,r:a.r,x:a.c+.5,y:a.r+.5,fromX:a.c+.5,fromY:a.r+.5,target:null,invulnerable:1.5});state='playing';clearInput();status('Back on green. 1.5 seconds of protection. '+w.lives+' lives left.');sync();
+}
+function update(dt){if(!['playing','dying'].includes(state))return;time+=dt;const w=world;w.captureFlash=Math.max(0,w.captureFlash-dt);w.particles=w.particles.filter(a=>{a.life-=dt;a.x+=a.vx*dt;a.y+=a.vy*dt;return a.life>0});w.labels=w.labels.filter(a=>(a.life-=dt)>0);
+  if(state==='dying'){w.transition-=dt;if(w.transition<=0)respawn();return}w.elapsed+=dt;w.player.invulnerable=Math.max(0,(w.player.invulnerable||0)-dt);for(const g of w.ghosts)if(g.grace>0)g.grace=Math.max(0,g.grace-dt);
+  if(w.freeze>0){w.freeze=Math.max(0,w.freeze-dt);if(w.freeze===0){status('The neighbors are on the move again.');sync()}}
+  moveGhosts(dt);if(state!=='playing')return;movePlayer(dt);
+}
+function paintTerrain(){terrainDirty=false;const c=terrainCtx;c.fillStyle='#11282f';c.fillRect(0,0,W,H);
+  for(let r=0;r<ROWS;r++)for(let col=0;col<COLS;col++){const type=cell(col,r),x=col*TILE,y=r*TILE;if(type===SAFE){c.fillStyle=(col+r)%2?'#3c7565':'#3a7162';c.fillRect(x,y,TILE,TILE);c.fillStyle='#c2eab310';c.fillRect(x+3,y+3,2,2);c.strokeStyle='#8acba0';c.lineWidth=1.3;c.beginPath();if(cell(col-1,r)!==SAFE){c.moveTo(x+.5,y);c.lineTo(x+.5,y+TILE)}if(cell(col+1,r)!==SAFE){c.moveTo(x+TILE-.5,y);c.lineTo(x+TILE-.5,y+TILE)}if(cell(col,r-1)!==SAFE){c.moveTo(x,y+.5);c.lineTo(x+TILE,y+.5)}if(cell(col,r+1)!==SAFE){c.moveTo(x,y+TILE-.5);c.lineTo(x+TILE,y+TILE-.5)}c.stroke()}else{c.strokeStyle='#264049';c.lineWidth=.6;c.strokeRect(x+.5,y+.5,TILE,TILE);if(type===TRAIL){c.fillStyle='#d4f57826';c.fillRect(x+1,y+1,TILE-2,TILE-2)}}}
+}
+function drawGhost(g){ctx.save();const frozen=world.freeze>0;ctx.translate(g.x*TILE,g.y*TILE);const bob=reduced||g.kind==='edge'?0:Math.sin(time*4+g.id)*1;ctx.translate(0,bob);ctx.shadowColor=frozen?'#acf0ed':g.color;ctx.shadowBlur=9;ctx.fillStyle=frozen?'#b4e9e5':g.color;ctx.beginPath();ctx.moveTo(-7,7);ctx.lineTo(-7,-1);ctx.quadraticCurveTo(-7,-9,0,-9);ctx.quadraticCurveTo(7,-9,7,-1);ctx.lineTo(7,7);ctx.lineTo(3,4);ctx.lineTo(0,7);ctx.lineTo(-3,4);ctx.closePath();ctx.fill();ctx.shadowBlur=0;ctx.fillStyle='#f8f7e5';ctx.fillRect(-5,-4,4,5);ctx.fillRect(2,-4,4,5);ctx.fillStyle='#1a3346';const ex=Math.sign(g.vx),ey=Math.sign(g.vy);ctx.fillRect(-4+ex,-3+ey,2,3);ctx.fillRect(3+ex,-3+ey,2,3);if(g.kind==='edge'){ctx.strokeStyle=frozen?'#e4ffff':'#ffcf98';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(-9,-7);ctx.lineTo(0,-13);ctx.lineTo(9,-7);ctx.stroke()}if(frozen){ctx.strokeStyle='#e4ffff';ctx.lineWidth=1;ctx.strokeRect(-10,-12,20,23)}ctx.restore()}
+function draw(){const w=world;if(terrainDirty)paintTerrain();ctx.drawImage(terrain,0,0);const p=w.player;
+  if(w.trail.length){ctx.strokeStyle='#d4f578';ctx.lineWidth=3;ctx.lineCap='round';ctx.lineJoin='round';ctx.shadowColor='#d4f578';ctx.shadowBlur=reduced?0:7;ctx.beginPath();ctx.moveTo((p.anchor.c+.5)*TILE,(p.anchor.r+.5)*TILE);for(const i of w.trail)ctx.lineTo((i%COLS+.5)*TILE,(Math.floor(i/COLS)+.5)*TILE);ctx.lineTo(p.x*TILE,p.y*TILE);ctx.stroke();ctx.shadowBlur=0}
+  for(const g of w.ghosts)if(g.active!==false){ctx.globalAlpha=g.grace>0?.5:1;drawGhost(g)}ctx.globalAlpha=1;
+  if(state!=='dying'){ctx.save();ctx.translate(p.x*TILE,p.y*TILE);ctx.shadowColor='#f6dd7b';ctx.shadowBlur=reduced?0:12;ctx.fillStyle='#f6dd7b';ctx.fillRect(-7,-7,14,14);ctx.shadowBlur=0;ctx.fillStyle='#fff3bd';ctx.fillRect(-4,-4,8,4);ctx.fillStyle='#314a34';const [dx,dy]=DIRS[p.dir];ctx.fillRect(dx*3-1,dy*3-1,3,3);ctx.strokeStyle='#f3e7b6';ctx.lineWidth=1;ctx.strokeRect(-10,-10,20,20);if(p.invulnerable>0){ctx.strokeStyle='#b3f2ed';ctx.setLineDash([3,3]);ctx.strokeRect(-13,-13,26,26)}ctx.restore()}
+  for(const a of w.particles){ctx.globalAlpha=Math.min(1,a.life*2);ctx.fillStyle=a.color;ctx.fillRect(a.x,a.y,3,3)}ctx.globalAlpha=1;
+  for(const a of w.labels){ctx.font='bold 20px Consolas,monospace';ctx.textAlign='center';const x=Math.max(55,Math.min(W-55,a.x)),y=Math.max(35,a.y-(1.5-a.life)*25);ctx.fillStyle='#10241c';ctx.fillText(a.text,x+1,y+1);ctx.fillStyle='#e7ffa6';ctx.fillText(a.text,x,y)}
+  if(w.captureFlash>0){ctx.fillStyle='#d4f578';ctx.globalAlpha=w.captureFlash*.18;ctx.fillRect(0,0,W,H);ctx.globalAlpha=1}
+  if(w.freeze>0){ctx.strokeStyle='#b3f2ed';ctx.lineWidth=4;ctx.strokeRect(2,2,W-4,H-4);ctx.fillStyle='#c6f5ef';ctx.font='bold 12px Consolas,monospace';ctx.textAlign='center';ctx.fillText('❄ '+w.freeze.toFixed(1)+'s',W/2,36)}
+}
+function activate(){if(state==='paused')pause();else if(state==='cleared')nextLevel();else if(state==='menu'||state==='over')start()}
+function pollGamepad(){for(const k of [...input.keys()])if(k.startsWith('pad:'))input.delete(k);let pads=[];try{pads=navigator.getGamepads?.()||[]}catch{}const pad=[...pads].find(p=>p?.connected&&p.mapping==='standard');if(!pad||!focused){padDirection=null;padSelect=false;padPause=false;padNeedsRelease=true;return}
+  const pressed=i=>!!(pad.buttons[i]?.pressed||pad.buttons[i]?.value>.5),select=pressed(0)||pressed(7),menu=pressed(9);
+  if(padNeedsRelease){if(pad.buttons.some(b=>b.pressed||b.value>.5)||pad.axes.some(a=>Math.abs(a)>.25))return;padNeedsRelease=false;padSelect=false;padPause=false;padDirection=null}
+  const previous=state;if(menu&&!padPause)pause();else if(select&&!padSelect){if(state==='playing')freeze();else activate()}padSelect=select;padPause=menu;if(state!==previous){padNeedsRelease=true;return}
+  if(state!=='playing')return;const x=pad.axes[0]||0,y=pad.axes[1]||0;let dir=null;if(Math.max(Math.abs(x),Math.abs(y))>.25)dir=Math.abs(x)>Math.abs(y)?(x<0?'left':'right'):(y<0?'up':'down');for(const [i,d] of [[12,'up'],[13,'down'],[14,'left'],[15,'right']])if(pressed(i))dir=d;if(dir){input.set('pad:dir',dir);if(dir!==padDirection)buffered=dir}padDirection=dir;
+}
+window.addEventListener('keydown',e=>{if(e.ctrlKey||e.altKey||e.metaKey||e.target.closest('input,select,textarea'))return;if(['KeyP','Escape'].includes(e.code)){if(!e.repeat){e.preventDefault();pause()}return}if(e.target.closest('button,a'))return;if(state!=='playing')return;if(KEYS[e.code]){e.preventDefault();if(!e.repeat)setDirection(e.code,KEYS[e.code])}else if(['Space','KeyX'].includes(e.code)){e.preventDefault();if(!e.repeat)freeze()}});
+window.addEventListener('keyup',e=>input.delete(e.code));
+for(const b of document.querySelectorAll('[data-control]')){b.addEventListener('pointerdown',e=>{if(e.button!==0||state!=='playing')return;e.preventDefault();canvas.focus({preventScroll:true});b.setPointerCapture(e.pointerId);touches.set(e.pointerId,b);setDirection('touch:'+e.pointerId,b.dataset.control);b.classList.add('active')});const release=e=>{input.delete('touch:'+e.pointerId);touches.delete(e.pointerId);if(![...touches.values()].includes(b))b.classList.remove('active')};b.addEventListener('pointerup',release);b.addEventListener('pointercancel',release);b.addEventListener('lostpointercapture',release);b.addEventListener('contextmenu',e=>e.preventDefault())}
+let drag=null;
+canvas.addEventListener('pointerdown',e=>{if(e.button!==0||state!=='playing'||drag)return;e.preventDefault();canvas.focus({preventScroll:true});canvas.setPointerCapture(e.pointerId);drag={id:e.pointerId,x:e.clientX,y:e.clientY}});
+canvas.addEventListener('pointermove',e=>{if(!drag||drag.id!==e.pointerId||state!=='playing')return;const dx=e.clientX-drag.x,dy=e.clientY-drag.y;if(Math.hypot(dx,dy)<8)return;setDirection('drag',Math.abs(dx)>Math.abs(dy)?(dx<0?'left':'right'):(dy<0?'up':'down'));drag.x=e.clientX;drag.y=e.clientY});
+for(const name of ['pointerup','pointercancel','lostpointercapture'])canvas.addEventListener(name,e=>{if(drag?.id===e.pointerId){drag=null;input.delete('drag')}});
+function focusLost(){focused=false;padNeedsRelease=true;drag=null;clearInput();if(['playing','dying'].includes(state))pause()}
+window.addEventListener('blur',focusLost);window.addEventListener('focus',()=>{focused=true;clearInput();padNeedsRelease=true});document.addEventListener('visibilitychange',()=>{if(document.hidden)focusLost();else focused=document.hasFocus()});window.addEventListener('gamepaddisconnected',()=>{for(const k of [...input.keys()])if(k.startsWith('pad:'))input.delete(k);padNeedsRelease=true;padDirection=null;buffered=null});
+function touchFreeze(){freeze();if(state==='playing')canvas.focus({preventScroll:true})}
+$('freeze').addEventListener('pointerdown',e=>{if(e.button!==0)return;e.preventDefault();touchFreeze()});$('freeze').addEventListener('click',e=>{if(e.detail===0)touchFreeze()});
+$('play').addEventListener('click',activate);$('restart').addEventListener('click',start);$('pause').addEventListener('click',pause);$('sound').addEventListener('click',()=>{sound=!sound;$('sound').textContent=sound?'Sound on':'Sound off';$('sound').setAttribute('aria-pressed',String(sound));tone();if(state==='playing')canvas.focus({preventScroll:true})});
+function frame(now){pollGamepad();accumulator+=Math.min(.1,Math.max(0,(now-last)/1000));last=now;while(accumulator>=STEP){update(STEP);accumulator-=STEP}draw();requestAnimationFrame(frame)}
+world={level:1,score:0,lives:3};loadLevel();status('Good fences. Questionable neighbors.');sync();requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
