@@ -58,14 +58,15 @@ test('arcade filters show three playable games and launch Eviction',async()=>wit
   await page.getByRole('button',{name:'Ready to play'}).click();assert.equal(await page.locator('[data-status=ready]:visible').count(),3);
   await page.getByRole('button',{name:'Coming soon'}).click();assert.equal(await page.locator('[data-status=soon]:visible').count(),1);assert.equal(await page.locator('#game-count').textContent(),'1 game coming soon');
   await page.getByRole('button',{name:'Ready to play'}).click();await page.getByRole('link',{name:'Play Eviction'}).click();assert.equal(await page.title(),'Eviction · Tiger’s Arcade');
-  await start(page);const s=await state(page);assert.equal(s.state,'playing');assert.deepEqual(s.world.ghosts.map(g=>g.kind),['roamer']);assert.equal(s.world.ghosts[0].color,'#ed8ead');assert.equal(s.world.lives,3);assert.equal(s.world.claimed,0);assert.equal(s.world.charges,0);assert.equal(s.world.nextFreeze,30);
+  await start(page);const s=await state(page);assert.equal(s.state,'playing');assert.deepEqual(s.world.ghosts.map(g=>g.kind),['roamer']);assert.equal(s.world.ghosts[0].color,'#ed8ead');assert.equal(s.world.lives,3);assert.equal(s.world.claimed,0);assert.equal(s.world.charges,0);assert.equal(s.world.nextFreeze,45);
   assert.equal(s.world.grid.filter(v=>v===1).length,40*28-interior);
 }));
 
 test('keyboard holds, buffered turns, release and boundaries stay aligned to cell centers',async()=>withPage(async page=>{
   await start(page);await fixture(page,{ghosts:[]});await move(page,'ArrowLeft',.3);assert.equal((await state(page)).world.player.c,0);
+  await fixture(page,{player:{c:4,r:0}});
   await page.keyboard.down('ArrowRight');await advance(page,.12);await page.keyboard.down('ArrowUp');await advance(page,.15);await page.keyboard.up('ArrowUp');await page.keyboard.up('ArrowRight');await advance(page,.2);
-  let s=await state(page);assert(s.world.player.c>=1);assert(s.world.player.r<14);assert.equal(s.world.player.target,null);assert.equal(s.world.player.x,s.world.player.c+.5);assert.equal(s.world.player.y,s.world.player.r+.5);
+  let s=await state(page);assert(s.world.player.c>=5);assert.equal(s.world.player.r,0);assert.equal(s.world.player.target,null);assert.equal(s.world.player.x,s.world.player.c+.5);assert.equal(s.world.player.y,s.world.player.r+.5);
   const pos=[s.world.player.c,s.world.player.r];await advance(page,.5);s=await state(page);assert.deepEqual([s.world.player.c,s.world.player.r],pos);
   await page.locator('#sound').click();await move(page,'KeyD',.2);assert.equal((await state(page)).world.player.dir,'right');assert.equal(await page.locator('#sound').getAttribute('aria-pressed'),'true');
 }));
@@ -74,6 +75,21 @@ test('a real keyboard crossing closes the line and captures the ghost-free side'
   await start(page);await fixture(page,{ghosts:[{x:30.5,y:21.5}]});await move(page,'ArrowRight',7.4);const s=await state(page);
   assert.equal(s.state,'playing');assert.equal(s.world.claimed,38*14);assert.equal(s.world.score,38*14*10);assert.equal(s.world.trail.length,0);assert.equal(s.world.player.c,39);
   assert.equal(s.world.grid[7*40+20],1);assert.equal(s.world.grid[21*40+20],0);assert.equal(s.world.charges,1);assert.equal(s.best,s.world.score);
+}));
+
+test('a released direction keeps drawing, accepts turns, and stops after reconnecting to green',async()=>withPage(async page=>{
+  await start(page);await fixture(page,{ghosts:[{x:30.5,y:21.5}]});
+  await page.keyboard.down('ArrowRight');await advance(page,.08);await page.keyboard.up('ArrowRight');await advance(page,.8);
+  let s=await state(page);assert(s.world.player.c>=4);assert(s.world.trail.length>=4);assert.equal(s.input.length,0);
+  await page.keyboard.press('ArrowUp');await advance(page,.7);s=await state(page);assert(s.world.player.r<14);assert.equal(s.world.player.dir,'up');
+  await page.keyboard.press('ArrowLeft');await advance(page,1.3);s=await state(page);assert.equal(s.state,'playing');assert.equal(s.world.player.c,0);assert.equal(s.world.trail.length,0);assert(s.world.claimed>0);assert.equal(s.world.player.target,null);
+  const stopped=s.world.player;await advance(page,1);assert.deepEqual((await state(page)).world.player,stopped);
+}));
+
+test('the sidebar teaches loop capture, self-crossing, safe backtracking, and the Freeze milestone',async()=>withPage(async page=>{
+  assert.equal(await page.locator('.guide svg').count(),4);assert.equal(await page.locator('.loop-demo figure').count(),2);
+  assert.match(await page.locator('#loopBefore').textContent(),/one step from reconnecting/);assert.match(await page.locator('#loopAfter').textContent(),/become green/);assert.match(await page.locator('#lineCross').textContent(),/costs a life/);assert.match(await page.locator('#lineBacktrack').textContent(),/Safely backtrack.*disappears without costing a life/);
+  assert.equal(await page.locator('.freeze-note').textContent(),'❄ Earn a Freeze every 45% claimed.');assert.doesNotMatch(await page.locator('.guide').innerText(),/Close the loop|One more neighbor|Beat the red surge|Pink|Orange|Purple|surges/i);
 }));
 
 test('ghosts on both sides protect both regions; only the dividing line is claimed',async()=>withPage(async page=>{
@@ -115,7 +131,7 @@ test('crossing your own line loses exactly one life and removes unfinished trail
 test('swept ghost contact ignites the line without instant death, then the surge catches the player',async()=>withPage(async page=>{
   await start(page);await fixture(page,{safe:[[15,3]],trail:Array.from({length:20},(_,i)=>[15,i+4]),player:{c:15,r:23,anchor:{c:15,r:3}},ghosts:[{x:10.5,y:14.5,vx:30,vy:0}]});
   await page.evaluate(()=>evictionTest.moveGhosts(.4));let s=await state(page);assert.equal(s.state,'playing');assert.equal(s.world.lives,3);assert(s.world.burns.length>0);assert.equal(s.world.trail.length,20);
-  await fixture(page,{world:{freeze:10}});await advance(page,1);s=await state(page);assert.equal(s.state,'dying');assert.equal(s.world.lives,2);assert.equal(s.world.grid.filter(v=>v===2).length,0);
+  await fixture(page,{world:{freeze:10}});await advance(page,1.8);s=await state(page);assert.equal(s.state,'dying');assert.equal(s.world.lives,2);assert.equal(s.world.grid.filter(v=>v===2).length,0);
 }));
 
 test('ghosts bounce off captured walls and corners without clipping or escaping',async()=>withPage(async page=>{
@@ -125,13 +141,13 @@ test('ghosts bounce off captured walls and corners without clipping or escaping'
 
 test('contact is harmless on green but costs one life in the open; claimed turf survives',async()=>withPage(async page=>{
   await start(page);await fixture(page,{ghosts:[{x:1.35,y:14.5}]});await advance(page,.1);assert.equal((await state(page)).world.lives,3);
-  await fixture(page,{safe:[[3,3]],world:{claimed:1},player:{c:2,r:14},trail:[[1,14],[2,14]],ghosts:[{x:2.5,y:14.5}]});await advance(page,.2);assert.equal((await state(page)).world.lives,2);await advance(page,1);const s=await state(page);assert.equal(s.world.grid[3*40+3],1);assert.equal(s.world.claimed,1);assert.equal(s.world.player.c,0);
+  await fixture(page,{safe:[[3,3]],world:{claimed:1},player:{c:2,r:14},trail:[[1,14],[2,14]],ghosts:[{x:2.5,y:14.5}]});await advance(page,.45);assert.equal((await state(page)).world.lives,2);await advance(page,1);const s=await state(page);assert.equal(s.world.grid[3*40+3],1);assert.equal(s.world.claimed,1);assert.equal(s.world.player.c,0);
 }));
 
 test('Freeze is limited, lasts 2.5 simulation seconds, and recharges on capture',async()=>withPage(async page=>{
   await start(page);await fixture(page,{world:{charges:1}});await page.keyboard.press('Space');let s=await state(page);assert.equal(s.world.charges,0);const pos=s.world.ghosts.map(g=>[g.x,g.y]);await page.keyboard.press('Space');await advance(page,2);s=await state(page);assert.deepEqual(s.world.ghosts.map(g=>[g.x,g.y]),pos);assert(s.world.freeze>.49);
   await advance(page,.65);s=await state(page);assert.equal(s.world.freeze,0);assert.notDeepEqual(s.world.ghosts.map(g=>[g.x,g.y]),pos);
-  await fixture(page,{trail:rowTrail(10),player:{c:39,r:10},ghosts:[{x:25.5,y:22.5}]});await page.evaluate(()=>evictionTest.capture());assert.equal((await state(page)).world.charges,1);
+  await fixture(page,{trail:rowTrail(12),player:{c:39,r:12},ghosts:[{x:25.5,y:22.5}]});await page.evaluate(()=>evictionTest.capture());assert.equal((await state(page)).world.charges,1);
   await page.locator('#freeze').click();assert.equal((await state(page)).world.charges,0);
 }));
 
@@ -166,11 +182,11 @@ test('controller select, stick, D-pad, Freeze and pause require release after ch
   await page.evaluate(()=>window.dispatchEvent(new Event('gamepaddisconnected')));assert.equal((await state(page)).input.length,0);
 }));
 
-test('touch directions, pointer cancellation and board dragging release without stuck movement',async()=>withPage(async page=>{
+test('touch cancellation releases the input while the drawn line keeps moving',async()=>withPage(async page=>{
   await start(page);await fixture(page,{ghosts:[{x:30.5,y:21.5}]});
   const send=(selector,type,id,extra={})=>page.evaluate(({selector,type,id,extra})=>{const b=document.querySelector(selector);b.setPointerCapture=()=>{};b.dispatchEvent(new PointerEvent(type,{pointerId:id,button:0,bubbles:true,...extra}))},{selector,type,id,extra});
   await send('[data-control=right]','pointerdown',1);await advance(page,.8);assert((await state(page)).world.player.c>=4);
-  await send('[data-control=right]','pointercancel',1);await advance(page,.2);const p=(await state(page)).world.player;await advance(page,.4);assert.equal((await state(page)).world.player.c,p.c);assert.equal(await page.locator('.touch.active').count(),0);
+  await send('[data-control=right]','pointercancel',1);await advance(page,.2);const p=(await state(page)).world.player;await advance(page,.4);assert((await state(page)).world.player.c>p.c);assert.equal((await state(page)).input.length,0);assert.equal(await page.locator('.touch.active').count(),0);
   await send('#canvas','pointerdown',2,{clientX:100,clientY:100});await send('#canvas','pointermove',2,{clientX:130,clientY:100});await advance(page,.2);assert.equal((await state(page)).world.player.dir,'right');await send('#canvas','lostpointercapture',2);assert.equal((await state(page)).input.length,0);
 }));
 
@@ -232,7 +248,7 @@ test('capture routes orange around its protected region, including new interior 
 test('targets rise 1% each level through 95%, including the HUD and accessible progress',async()=>withPage(async page=>{
   await start(page);
   for(let level=1;level<=20;level++){
-    await fixture(page,{world:{level,claimed:380}});const expected=Math.min(95,79+level);assert.equal(await page.evaluate(()=>evictionTest.targetPercent()),expected);assert.equal(await page.locator('#goal').textContent(),'/ '+expected+'% TO WIN');assert.equal(await page.locator('#guideGoal').textContent(),expected+'%');assert.equal(await page.locator('#progress').getAttribute('aria-valuemax'),String(expected));assert.match(await page.locator('#progress').getAttribute('aria-valuetext'),new RegExp(expected+'% to win'));
+    await fixture(page,{world:{level,claimed:380}});const expected=Math.min(95,79+level);assert.equal(await page.evaluate(()=>evictionTest.targetPercent()),expected);assert.equal(await page.locator('#goal').textContent(),'/ '+expected+'% TO WIN');assert.equal(await page.locator('#progress').getAttribute('aria-valuemax'),String(expected));assert.match(await page.locator('#progress').getAttribute('aria-valuetext'),new RegExp(expected+'% to win'));
     const width=await page.locator('#progressFill').evaluate(el=>parseFloat(el.style.width));assert(Math.abs(width-(380/interior*100)/expected*100)<.001);
   }
 }));
@@ -248,7 +264,7 @@ test('an orange ghost at a diagonal meeting protects every empty region it overl
 }));
 
 test('orange contact ignites a distant trail even while frozen or in contact grace',async()=>withPage(async page=>{
-  for(const grace of [0,.35]){await page.evaluate(()=>evictionTest.start());await fixture(page,{world:{freeze:10},trail:rowTrail(14),player:{c:38,r:14,invulnerable:99},ghosts:[{kind:'edge',x:1,y:14.5,speed:0,grace}]});await page.evaluate(()=>evictionTest.checkDanger());let s=await state(page);assert.equal(s.state,'playing');assert.equal(s.world.lives,3);assert(s.world.burns.length>0);await advance(page,2.4);s=await state(page);assert.equal(s.state,'dying');assert.equal(s.world.lives,2);assert.equal(s.world.claimed,0);assert.equal(s.world.score,0);assert.equal(s.world.grid.filter(v=>v===2).length,0)}
+  for(const grace of [0,.35]){await page.evaluate(()=>evictionTest.start());await fixture(page,{world:{freeze:10},trail:rowTrail(14).slice(0,20),player:{c:20,r:14,invulnerable:99},ghosts:[{kind:'edge',x:1,y:14.5,speed:0,grace}]});await page.evaluate(()=>evictionTest.checkDanger());let s=await state(page);assert.equal(s.state,'playing');assert.equal(s.world.lives,3);assert(s.world.burns.length>0);await advance(page,2.4);s=await state(page);assert.equal(s.state,'dying');assert.equal(s.world.lives,2);assert.equal(s.world.claimed,0);assert.equal(s.world.score,0);assert.equal(s.world.grid.filter(v=>v===2).length,0)}
 }));
 
 test('red ghosts bounce and remove one claimed tile, updating percentage but keeping earned points',async()=>withPage(async page=>{
@@ -358,26 +374,70 @@ test('all six ghost types move five percent slower at every level',async()=>with
 
 test('each wave adds exactly one ghost, introducing all six kinds in the requested order',async()=>withPage(async page=>{
   const roster=['roamer','edge','breaker','turf','charger','plow'];
-  for(let wave=1;wave<=12;wave++){await page.evaluate(()=>evictionTest.start());await fixture(page,{world:{level:wave-1}});await page.evaluate(()=>evictionTest.nextLevel());const s=await state(page);assert.equal(s.world.level,wave);assert.deepEqual(s.world.ghosts.map(g=>g.kind),Array.from({length:wave},(_,i)=>roster[i%6]));assert.equal(s.world.charges,0);assert.equal(s.world.nextFreeze,30);assert.equal(new Set(s.world.ghosts.map(g=>g.id)).size,wave)}
+  for(let wave=1;wave<=12;wave++){await page.evaluate(()=>evictionTest.start());await fixture(page,{world:{level:wave-1}});await page.evaluate(()=>evictionTest.nextLevel());const s=await state(page);assert.equal(s.world.level,wave);assert.deepEqual(s.world.ghosts.map(g=>g.kind),Array.from({length:wave},(_,i)=>roster[i%6]));assert.equal(s.world.charges,0);assert.equal(s.world.nextFreeze,45);assert.equal(new Set(s.world.ghosts.map(g=>g.id)).size,wave)}
 }));
 
 test('pink is a casual bouncing ghost that cannot damage claimed blocks',async()=>withPage(async page=>{
   await start(page);await fixture(page,{safe:[[20,14]],world:{claimed:1},ghosts:[{kind:'roamer',x:19.5,y:14.5,vx:4,vy:0}]});await advance(page,.1);const s=await state(page);assert(s.world.ghosts[0].vx<0);assert.equal(s.world.claimed,1);assert.equal(s.world.grid[14*40+20],1);
 }));
 
-test('Freeze starts empty and awards charges at 30, 60, and 90 percent only',async()=>withPage(async page=>{
-  await start(page);assert(await page.locator('#freeze').isDisabled());assert.equal(await page.locator('#freezeLabel').textContent(),'30% TO CHARGE');await page.keyboard.press('Space');assert.equal((await state(page)).world.freeze,0);
-  for(const [cut,charges] of [[7,0],[8,1],[16,2],[24,3]]){await fixture(page,{world:{level:20},trail:rowTrail(cut),player:{c:39,r:cut},ghosts:[{x:30.5,y:25.5}]});await page.evaluate(()=>evictionTest.capture());const s=await state(page);assert.equal(s.state,'playing');assert.equal(s.world.charges,charges);assert.equal(s.world.nextFreeze,(charges+1)*30)}
+test('Freeze starts empty and awards charges at 45 and 90 percent only',async()=>withPage(async page=>{
+  await start(page);assert(await page.locator('#freeze').isDisabled());assert.equal(await page.locator('#freezeLabel').textContent(),'45% TO CHARGE');await page.keyboard.press('Space');assert.equal((await state(page)).world.freeze,0);
+  for(const [cut,charges] of [[11,0],[12,1],[23,1],[24,2]]){await fixture(page,{world:{level:20},trail:rowTrail(cut),player:{c:39,r:cut},ghosts:[{x:30.5,y:25.5}]});await page.evaluate(()=>evictionTest.capture());const s=await state(page);assert.equal(s.state,'playing');assert.equal(s.world.charges,charges);assert.equal(s.world.nextFreeze,(charges+1)*45)}
   await page.evaluate(()=>evictionTest.nextLevel());assert.equal((await state(page)).world.charges,0);
 }));
 
-const testingKeys=['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowRight','ArrowLeft','ArrowRight','KeyB','KeyA'];
+test('Freeze charge text stays bright and its icy ready effect respects reduced motion',async()=>withPage(async page=>{
+  await start(page);const button=page.locator('#freeze');assert(await button.isDisabled());
+  const idle=await page.evaluate(()=>{const b=document.querySelector('#freeze'),label=document.querySelector('#freezeLabel');return {opacity:getComputedStyle(b).opacity,color:getComputedStyle(label).color,background:getComputedStyle(b).backgroundColor,animation:getComputedStyle(b).animationName}});
+  assert.equal(idle.opacity,'1');assert.equal(idle.color,'rgb(237, 253, 249)');assert.equal(idle.background,'rgb(24, 51, 55)');assert.equal(idle.animation,'none');
+  await fixture(page,{world:{claimed:Math.floor(interior*.3)}});assert.equal(await page.locator('#freezeLabel').textContent(),'16% TO CHARGE');
+  await fixture(page,{world:{charges:1}});assert.equal(await button.isDisabled(),false);assert.equal(await page.locator('#freezeLabel').textContent(),'1 READY');
+  assert.equal(await button.evaluate(b=>getComputedStyle(b).animationName),'frost-glow');assert.equal(await button.evaluate(b=>getComputedStyle(b,'::before').animationName),'frost-sweep');
+  fs.mkdirSync(path.join(root,'.test-artifacts'),{recursive:true});await page.screenshot({path:path.join(root,'.test-artifacts','eviction-freeze-ready.png'),fullPage:true});
+  await page.emulateMedia({reducedMotion:'reduce'});assert.equal(await button.evaluate(b=>getComputedStyle(b).animationName),'none');assert.equal(await button.evaluate(b=>getComputedStyle(b,'::before').animationName),'none');assert.equal(await button.evaluate(b=>getComputedStyle(b,'::after').animationName),'none');
+  await page.keyboard.press('Space');assert(await button.isDisabled());assert.equal(await button.evaluate(b=>b.classList.contains('ready')),false);assert.equal(await page.locator('#freezeLabel').textContent(),'FROZEN');
+  await advance(page,2.6);assert.equal(await page.locator('#freezeLabel').textContent(),'16% TO CHARGE');assert.equal(await button.evaluate(b=>getComputedStyle(b).opacity),'1');
+}));
+
+const wavePrefix=['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowRight','ArrowLeft','ArrowRight','KeyB','KeyA'];
+const testingKeys=[...wavePrefix,'Digit1','Digit0'];
+const infiniteKeys=['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','KeyB','KeyA'];
 async function enterTestCode(page,keys=testingKeys){for(const key of keys)await page.keyboard.press(key)}
+
+test('infinite-lives code keeps the current board and respawns without spending lives or scoring',async()=>withPage(async page=>{
+  await start(page);await fixture(page,{world:{score:1234,lives:1,level:6},safe:[[3,3]],ghosts:[]});await page.evaluate(()=>evictionTest.persist());const before=await state(page);
+  await enterTestCode(page,infiniteKeys);let s=await state(page);assert.equal(s.world.infiniteLives,true);assert.equal(s.world.testing,true);assert.equal(s.world.level,6);assert.deepEqual(s.world.grid,before.world.grid);assert.equal(s.world.score,0);assert.equal(await page.locator('#lives').textContent(),'∞');assert.equal(await page.locator('#lives').getAttribute('aria-label'),'Infinite lives');
+  for(let i=0;i<5;i++){await fixture(page,{trail:[[1,14],[2,14]],player:{c:2,r:14}});await page.evaluate(()=>evictionTest.hurt());s=await state(page);assert.equal(s.state,'dying');assert.equal(s.world.lives,1);assert.equal(s.world.trail.length,0);await advance(page,1);assert.equal((await state(page)).state,'playing')}
+  await page.evaluate(()=>{evictionTest.awardScore(1000);evictionTest.persist();evictionTest.nextLevel()});s=await state(page);assert.equal(s.world.level,7);assert.equal(s.world.infiniteLives,true);assert.equal(s.world.score,0);assert.equal(s.best,1234);assert.equal(await page.evaluate(()=>localStorage.getItem('eviction.best.v1')),'1234');
+  await enterTestCode(page);s=await state(page);assert.equal(s.world.level,10);assert.equal(s.world.infiniteLives,true);await page.keyboard.press('KeyP');await page.locator('#restart').click();s=await state(page);assert.equal(s.world.testing,false);assert.equal(s.world.infiniteLives,false);assert.equal(s.world.lives,3);
+}));
+
+test('infinite-lives code works from the menu and after wave ten, and rejects interrupted or repeated input',async()=>withPage(async page=>{
+  for(let split=1;split<infiniteKeys.length;split++){await page.evaluate(()=>evictionTest.start());await enterTestCode(page,[...infiniteKeys.slice(0,split),'KeyQ',...infiniteKeys.slice(split)]);assert.equal((await state(page)).world.infiniteLives,false,'interrupted after '+split)}
+  await page.evaluate(()=>evictionTest.start());await page.keyboard.down('ArrowUp');await page.keyboard.down('ArrowUp');await page.keyboard.up('ArrowUp');await enterTestCode(page,infiniteKeys.slice(2));assert.equal((await state(page)).world.infiniteLives,false);
+  await enterTestCode(page,infiniteKeys.slice(0,-1));await page.keyboard.press('Shift+KeyA');assert.equal((await state(page)).world.infiniteLives,false);
+  await page.reload();await enterTestCode(page,infiniteKeys);let s=await state(page);assert.equal(s.world.level,1);assert.equal(s.world.infiniteLives,true);assert.equal(s.world.score,0);
+  await page.evaluate(()=>evictionTest.start());await enterTestCode(page);await enterTestCode(page,infiniteKeys);s=await state(page);assert.equal(s.world.level,10);assert.equal(s.world.infiniteLives,true);
+}));
 
 test('the exact keyboard sequence starts testing wave ten and keeps all scoring and best records clean',async()=>withPage(async page=>{
   await start(page);await fixture(page,{world:{score:1234}});await page.evaluate(()=>evictionTest.persist());await enterTestCode(page);let s=await state(page);assert.equal(s.state,'playing');assert.equal(s.world.level,10);assert.equal(s.world.ghosts.length,10);assert.equal(s.world.testing,true);assert.equal(s.world.score,0);assert.equal(s.world.charges,0);assert.equal(s.best,1234);assert.equal(await page.locator('#scoreLabel').textContent(),'SCORE · TEST');
   await fixture(page,{trail:rowTrail(24),player:{c:39,r:24},ghosts:[{x:30.5,y:25.5}]});await page.evaluate(()=>evictionTest.capture());s=await state(page);assert.equal(s.state,'cleared');assert.equal(s.world.score,0);assert.equal(s.best,1234);await start(page);s=await state(page);assert.equal(s.world.level,11);assert.equal(s.world.testing,true);await page.evaluate(()=>{evictionTest.awardScore(999999);evictionTest.persist()});assert.equal((await state(page)).world.score,0);assert.equal(await page.evaluate(()=>localStorage.getItem('eviction.best.v1')),'1234');
   await page.keyboard.press('KeyP');await page.locator('#restart').click();s=await state(page);assert.equal(s.world.level,1);assert.equal(s.world.testing,false);await page.evaluate(()=>evictionTest.awardScore(10));assert.equal((await state(page)).world.score,10);
+}));
+
+test('the wave code waits for exactly two digits and selects waves 01 through 99',async()=>withPage(async page=>{
+  await enterTestCode(page,wavePrefix);let s=await state(page);assert.equal(s.state,'menu');assert.equal(s.world.level,1);assert.equal(s.world.testing,undefined);
+  await page.keyboard.press('Digit0');assert.equal((await state(page)).state,'menu');await page.keyboard.press('Digit4');s=await state(page);assert.equal(s.state,'playing');assert.equal(s.world.level,4);assert.equal(s.world.ghosts.length,4);assert.equal(s.world.testing,true);assert.equal(s.world.score,0);
+  for(const digits of ['20','99','01']){await enterTestCode(page,[...wavePrefix,...[...digits].map(d=>'Digit'+d)]);s=await state(page);assert.equal(s.world.level,Number(digits));assert.equal(s.world.ghosts.length,Number(digits));assert.equal(s.world.score,0);assert.equal(s.world.lives,3);assert.equal(s.world.charges,0)}
+  await page.evaluate(()=>evictionTest.start());await enterTestCode(page,[...wavePrefix,'Digit0','Digit0']);s=await state(page);assert.equal(s.world.level,1);assert.equal(s.world.testing,false);
+  await enterTestCode(page,[...wavePrefix,'Numpad0','Numpad4']);s=await state(page);assert.equal(s.world.level,4);assert.equal(s.world.testing,true);
+}));
+
+test('held digits cannot supply both wave digits and focus loss interrupts unfinished wave entry',async()=>withPage(async page=>{
+  await enterTestCode(page,wavePrefix);await page.keyboard.down('Digit2');await page.keyboard.down('Digit2');await page.keyboard.up('Digit2');assert.equal((await state(page)).state,'menu');await page.keyboard.press('Digit0');assert.equal((await state(page)).world.level,20);
+  await page.evaluate(()=>evictionTest.start());await enterTestCode(page,[...wavePrefix,'Digit0']);await page.evaluate(()=>window.dispatchEvent(new Event('blur')));await page.keyboard.press('Digit4');assert.equal((await state(page)).world.level,1);assert.equal((await state(page)).world.testing,false);
 }));
 
 test('any intervening key breaks the testing sequence, which also works from the menu',async()=>withPage(async page=>{
