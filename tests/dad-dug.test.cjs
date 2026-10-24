@@ -49,16 +49,16 @@ const state=async page=>{await page.waitForFunction(()=>!Arcade.busy);return pag
 const fixture=(page,s)=>page.evaluate(s=>dadTest.fixture(s),s);
 const advance=(page,n)=>page.evaluate(n=>dadTest.advance(n),n);
 
-test('arcade lists three ready games and opens Dad Dug',async()=>withPage(async page=>{
+test('arcade lists four ready games and opens Dad Dug',async()=>withPage(async page=>{
   await page.goto(origin+'/index');
   assert.equal(await page.locator('.card').count(),6);
   assert.equal(await page.getByRole('heading',{name:'Quarters Please',exact:true}).count(),1);
   assert.equal(await page.getByRole('heading',{name:'Power Struggle',exact:true}).count(),1);
   assert.deepEqual(await page.locator('.card-link').evaluateAll(links=>links.map(link=>link.getAttribute('href'))),['ghost-pop','dad-dug','eviction','quarters-please.html']);
   await page.getByRole('button',{name:'Ready to play'}).click();
-  assert.equal(await page.locator('[data-status=ready]:visible').count(),3);
+  assert.equal(await page.locator('[data-status=ready]:visible').count(),4);
   assert.equal(await page.locator('[data-status=soon]:visible').count(),0);
-  assert.equal(await page.locator('#game-count').textContent(),'3 games ready');
+  assert.equal(await page.locator('#game-count').textContent(),'4 games ready');
   await page.getByRole('link',{name:'Play Dad Dug'}).click();
   assert.equal(new URL(page.url()).pathname,'/dad-dug');
   assert.equal(await page.title(),'Dad Dug · Tiger’s Arcade');

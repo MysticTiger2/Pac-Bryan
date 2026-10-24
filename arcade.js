@@ -50,7 +50,23 @@
     render();
   }
   function withBalanceLock(update) {
-    return navigator.locks?.request ? navigator.locks.request(lockName, update).catch(update) : Promise.resolve(update());
+    if (!navigator.locks?.request) return Promise.resolve().then(update);
+    let entered = false;
+    return navigator.locks.request(lockName, () => { entered = true; return update(); }).catch(error => {
+      if (entered) throw error;
+      return update();
+    });
+  }
+  // Clicker earnings and purchases use the same lock and fresh balance as paid games.
+  // Returning null declines a transaction without changing the wallet.
+  function updateQuarters(update) {
+    return withBalanceLock(() => {
+      const quarters = update(balance());
+      if (quarters === null) return false;
+      if (!Number.isSafeInteger(quarters) || quarters < 0) throw new RangeError('Invalid quarter balance');
+      saveBalance(quarters);
+      return true;
+    });
   }
   function resetQuarters() {
     return withBalanceLock(() => {
@@ -115,7 +131,7 @@
       busy = false;
     }
   }
-  window.Arcade = Object.freeze({ play, balance, resetQuarters, get busy() { return busy; }, get dialogOpen() { return dialog.open; }, pollDialogGamepad });
+  window.Arcade = Object.freeze({ play, balance, resetQuarters, updateQuarters, get busy() { return busy; }, get dialogOpen() { return dialog.open; }, pollDialogGamepad });
   window.addEventListener('storage', e => { if (e.key === key || e.key === null) render(); });
   window.addEventListener('pageshow', render);
   render();

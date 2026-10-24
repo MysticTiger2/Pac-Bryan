@@ -6,6 +6,7 @@
   <meta name="theme-color" content="#101719">
   <title>Quarters Please · Tiger’s Arcade</title>
   <link rel="stylesheet" href="arcade.css">
+  <link rel="stylesheet" href="quarters-please.css">
   <style>
     :root{color-scheme:dark;font-family:Arial,Helvetica,sans-serif;background:#101719;color:#f3f0df}
     *{box-sizing:border-box}body{margin:0;min-height:100dvh}.controls{width:min(1120px,calc(100% - 36px));margin:auto;padding:24px 0;display:flex;justify-content:space-between;gap:16px}
@@ -15,9 +16,56 @@
   </style>
 </head>
 <body>
-  <main class="controls" aria-label="Quarters Please controls">
+  <main>
+  <nav class="controls" aria-label="Quarters Please controls">
     <a class="home" href="./">Back to home</a>
+    <span data-arcade-wallet id="quarters-wallet"></span>
     <button class="reset" id="reset" type="button">reset</button>
+  </nav>
+  <header class="intro">
+    <p class="eyebrow">Tiger’s Arcade / The quarter workshop</p>
+    <h1>Quarters <span>Please</span></h1>
+    <p>Make a little change. Try to keep your cool.</p>
+  </header>
+  <section class="workshop" aria-label="Quarter clicker">
+    <div class="wind" id="wind" aria-hidden="true"></div>
+    <div class="coin-stage" id="coin-stage">
+      <svg class="coin-definitions" aria-hidden="true" width="0" height="0"><defs>
+        <symbol id="quarter-art" viewBox="0 0 240 240">
+          <circle cx="120" cy="120" r="112" fill="var(--coin-edge)" stroke="var(--coin-light)" stroke-width="3"/>
+          <circle cx="120" cy="120" r="104" fill="none" stroke="var(--coin-ink)" stroke-width="5" stroke-dasharray="2 4"/>
+          <circle cx="120" cy="120" r="96" fill="var(--coin-face)" stroke="var(--coin-light)" stroke-width="2"/>
+          <path d="M51 76 Q120 18 189 76M55 167 Q120 216 185 167" fill="none" stroke="var(--coin-light)" stroke-width="2"/>
+          <text x="120" y="69" text-anchor="middle" font-size="12" font-family="Arial,sans-serif" font-weight="bold" letter-spacing="3" fill="var(--coin-ink)">TIGER’S ARCADE</text>
+          <text x="120" y="147" text-anchor="middle" font-size="72" font-family="Georgia,serif" font-weight="bold" fill="var(--coin-ink)">25¢</text>
+          <path d="M50 112l4 4 6-1-3 5 1 6-6-3-5 2 1-6-3-4zM185 112l4 4 6-1-3 5 1 6-6-3-5 2 1-6-3-4z" fill="var(--coin-ink)"/>
+          <text x="120" y="183" text-anchor="middle" font-size="11" font-family="Arial,sans-serif" font-weight="bold" letter-spacing="2" fill="var(--coin-ink)">ONE QUARTER</text>
+        </symbol>
+      </defs></svg>
+      <div class="coin-halo" aria-hidden="true"></div>
+      <button class="quarter" id="quarter" type="button" aria-label="Click quarter to earn 1 quarter"><svg viewBox="0 0 240 240" aria-hidden="true"><use href="#quarter-art"/></svg></button>
+      <div class="shards" id="shards" aria-hidden="true"></div>
+    </div>
+    <div class="coin-readout">
+      <p class="coin-status" id="coin-status" role="status">Click the quarter. Keep the change.</p>
+      <div class="temperature-label"><span id="temperature">0° / 50°</span><span id="heat-label">NICE &amp; COOL</span></div>
+      <div class="temperature-track" id="temperature-meter" role="meter" aria-label="Quarter temperature" aria-valuemin="0" aria-valuemax="50" aria-valuenow="0"><span id="temperature-fill"></span></div>
+      <p class="repair-note" id="repair-note" hidden>Reassembling <span id="repair-countdown">60s</span><progress id="repair-progress" max="60" value="0" aria-label="Quarter repair progress"></progress></p>
+      <div class="coin-stats"><span><strong id="per-click">+1</strong> quarters / click</span><span><strong>+20°</strong> heat / click</span><span><strong id="cooling">−1°</strong> / second</span></div>
+      <p class="limit-note" id="limit-note">Above 50°? It shatters. Repairs take 60 seconds.</p>
+    </div>
+  </section>
+  <section class="upgrades" aria-labelledby="upgrades-title">
+    <div class="shop-heading"><h2 id="upgrades-title">A little reinvestment.</h2><span>UPGRADES · PAID IN QUARTERS</span></div>
+    <div class="upgrade-grid">
+      <article class="upgrade-card"><span class="upgrade-icon" aria-hidden="true">⬡</span><p class="upgrade-level" id="alloy-level">LEVEL 0 / 10</p><h3>Stronger Alloy</h3><p>A tougher quarter, a new finish.<br>+25° maximum temperature per level.</p><button type="button" id="buy-alloy" data-upgrade="alloy">Buy · 10 quarters</button></article>
+      <article class="upgrade-card"><span class="upgrade-icon" aria-hidden="true">❄</span><p class="upgrade-level" id="ac-level">LEVEL 0 / 20</p><h3>Crank The AC</h3><p>A cooler room. A stronger breeze.<br>+2° cooling per second per level.</p><button type="button" id="buy-ac" data-upgrade="ac">Buy · 10 quarters</button></article>
+      <article class="upgrade-card"><span class="upgrade-icon" aria-hidden="true">✦</span><p class="upgrade-level" id="ear-level">LEVEL 0 · NO LIMIT</p><h3>What’s This Behind Your Ear?</h3><p>A little sleight of hand.<br>+1 quarter per click per level.</p><button type="button" id="buy-ear" data-upgrade="ear">Buy · 25 quarters</button></article>
+      <article class="upgrade-card"><span class="upgrade-icon" aria-hidden="true">⚒</span><p class="upgrade-level" id="repair-level">LEVEL 0 / 5</p><h3>Quick Fix</h3><p>Back in one piece, a little sooner.<br><span id="repair-effect">Repair time: 60 → 45 seconds.</span></p><button type="button" id="buy-repair" data-upgrade="repair">Buy · 10 quarters</button></article>
+    </div>
+    <p class="shop-message" id="shop-message" role="status"></p>
+    <p class="save-notice" id="save-notice" hidden></p>
+  </section>
   </main>
   <dialog class="arcade-dialog reset-dialog" id="reset-dialog" aria-labelledby="reset-title" aria-describedby="reset-description">
     <h2 id="reset-title">Are you sure?</h2>
@@ -25,6 +73,7 @@
     <div class="actions"><button type="button" id="cancel-reset" autofocus>Cancel</button><button type="button" class="danger" id="confirm-reset">reset</button></div>
   </dialog>
   <script src="arcade.js"></script>
+  <script src="quarters-please.js"></script>
   <script>
     const resetDialog=document.getElementById('reset-dialog'),resetButton=document.getElementById('reset'),confirmReset=document.getElementById('confirm-reset');
     resetButton.addEventListener('click',()=>{resetDialog.showModal();document.getElementById('cancel-reset').focus()});

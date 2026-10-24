@@ -55,10 +55,10 @@ function onFrontier(g,grid){
   return false;
 }
 
-test('arcade filters show three playable games and launch Eviction',async()=>withPage(async page=>{
-  await page.goto(origin+'/index');assert.equal(await page.locator('#game-count').textContent(),'6 games · 3 ready');
-  await page.getByRole('button',{name:'Ready to play'}).click();assert.equal(await page.locator('[data-status=ready]:visible').count(),3);
-  await page.getByRole('button',{name:'Coming soon'}).click();assert.equal(await page.locator('[data-status=soon]:visible').count(),3);assert.equal(await page.locator('#game-count').textContent(),'3 games coming soon');
+test('arcade filters show four playable games and launch Eviction',async()=>withPage(async page=>{
+  await page.goto(origin+'/index');assert.equal(await page.locator('#game-count').textContent(),'6 games · 4 ready');
+  await page.getByRole('button',{name:'Ready to play'}).click();assert.equal(await page.locator('[data-status=ready]:visible').count(),4);
+  await page.getByRole('button',{name:'Coming soon'}).click();assert.equal(await page.locator('[data-status=soon]:visible').count(),2);assert.equal(await page.locator('#game-count').textContent(),'2 games coming soon');
   await page.getByRole('button',{name:'Ready to play'}).click();await page.getByRole('link',{name:'Play Eviction'}).click();assert.equal(await page.title(),'Eviction · Tiger’s Arcade');
   await start(page);const s=await state(page);assert.equal(s.state,'playing');assert.deepEqual(s.world.ghosts.map(g=>g.kind),['roamer']);assert.equal(s.world.ghosts[0].color,'#ed8ead');assert.equal(s.world.lives,3);assert.equal(s.world.claimed,0);assert.equal(s.world.charges,0);assert.equal(s.world.nextFreeze,45);
   assert.equal(s.world.grid.filter(v=>v===1).length,40*28-interior);
