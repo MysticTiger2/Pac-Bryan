@@ -27,16 +27,16 @@
   <div class="layout">
     <section class="cabinet" aria-label="Eviction game">
       <div class="territory"><div class="territory-heading"><span class="territory-label mono">YOUR SIDE OF THE FENCE</span><div class="territory-value"><span id="percent">0.0%</span><small id="goal">/ 80% TO WIN</small></div></div><div class="progress" id="progress" role="progressbar" aria-label="Territory claimed" aria-valuemin="0" aria-valuemax="80" aria-valuenow="0"><span id="progressFill"></span></div></div>
-      <div class="hud"><div><small>SCORE</small><b id="score">000000</b></div><div><small>BEST</small><b id="best">000000</b></div><div><small>LEVEL</small><b id="level">01</b></div><div><small>LIVES</small><b class="hearts" id="lives" aria-label="3 lives">♥ ♥ ♥</b></div></div>
+      <div class="hud"><div><small id="scoreLabel">SCORE</small><b id="score">000000</b></div><div><small>BEST</small><b id="best">000000</b></div><div><small>WAVE</small><b id="level">01</b></div><div><small>LIVES</small><b class="hearts" id="lives" aria-label="3 lives">♥ ♥ ♥</b></div></div>
       <div class="stage"><canvas id="canvas" width="800" height="560" tabindex="0" aria-label="Eviction playfield. Move with arrows or WASD. Leave the green territory and reconnect to claim an area. Space freezes ghosts. P pauses."></canvas>
-        <div class="overlay" id="overlay"><div class="panel"><div class="eyebrow" id="panelEyebrow">NOTICE 001 / MAKE YOURSELF AT HOME</div><h2 id="panelTitle">A little space,<br>please.</h2><p id="panelText">Draw a line and return to green to claim your turf. Reach 80% to win. Watch the orange edge ghost: it can catch you on green, too.</p><button class="button primary" id="play">Claim your corner ↗</button><button class="button secondary-action" id="restart" hidden>New game</button><div class="panel-hint" id="panelHint">ARROWS / WASD TO MOVE · SPACE TO FREEZE</div></div></div>
+        <div class="overlay" id="overlay"><div class="panel"><div class="eyebrow" id="panelEyebrow">NOTICE 001 / MAKE YOURSELF AT HOME</div><h2 id="panelTitle">A little space,<br>please.</h2><p id="panelText">Ghosts touching your line start a red surge. Reconnect to green before it reaches you. Claim 80% to win.</p><button class="button primary" id="play">Claim your corner ↗</button><button class="button secondary-action" id="restart" hidden>New game</button><div class="panel-hint" id="panelHint">ARROWS / WASD TO MOVE · SPACE TO FREEZE</div></div></div>
       </div>
       <div class="board-bottom"><div class="legend"><span><i class="dot"></i>YOUR TURF</span><span><i class="dot trail"></i>YOUR LINE</span><span><i class="dot ghost"></i>UNINVITED</span></div><span id="boardLabel">NO RENT. ALL TERRITORY.</span></div>
     </section>
     <aside class="rail"><p class="eyebrow">03 / A LITTLE SPACE, PLEASE.</p><h1>EVICT<span>ION.</span></h1><p class="tagline">Draw the line. Claim the board.<br>Keep the ghosts off your lawn.</p>
-      <div class="guide"><div class="guide-row"><span class="badge" aria-hidden="true">↳</span><div><strong>Close the loop.</strong><p>Draw a line and return to green. Claim <span id="guideGoal">80%</span> to win. The target rises 1% per level, up to 95%.</p></div></div><div class="guide-row"><span class="badge" aria-hidden="true" style="color:#ffad6b">◇</span><div><strong>Mind the edge ghost.</strong><p>Orange ghosts ride the line between green and empty, following new edges as you capture. They can catch you on green.</p></div></div><div class="guide-row"><span class="badge" aria-hidden="true">❄</span><div><strong>Give them the cold shoulder.</strong><p>Freeze all ghosts for 2.5 seconds. Every 15% claimed recharges a Freeze. Backtrack to undo your line; crossing it costs a life.</p></div></div></div>
+      <div class="guide"><div class="guide-row"><span class="badge" aria-hidden="true">↳</span><div><strong>Close the loop.</strong><p>Draw a line and return to green. Claim <span id="guideGoal">80%</span> to win. The target rises 1% per wave, up to 95%.</p></div></div><div class="guide-row"><span class="badge" aria-hidden="true" style="color:#bc94ed">!</span><div><strong>One more neighbor every wave.</strong><p><span style="color:#ed8ead">1 Pink: roams.</span> <span style="color:#ffad6b">2 Orange: rides edges.</span> <span style="color:#f16657">3 Red: chips green.</span> <span style="color:#63dce8">4 Blue: hunts on green.</span> <span style="color:#bc94ed">5 Purple: warns, then charges.</span> <span style="color:#75d58a">6 Green: plows through turf.</span></p></div></div><div class="guide-row"><span class="badge" aria-hidden="true" style="color:#ff5353">ϟ</span><div><strong>Beat the red surge.</strong><p>Red on your line gets faster every second. Finish on green to escape. Earn a Freeze every 30% claimed. Freeze stops ghosts; surges keep running.</p></div></div></div>
       <div class="keys"><b>MOVE</b> Arrows / WASD / drag the board<br><b>FREEZE</b> Space / X &nbsp; <b>PAUSE</b> P / Esc<br><b>CONTROLLER</b> Stick / D-pad · A to freeze</div>
-      <div class="touch-controls" aria-label="Touch controls"><div class="dpad"><button class="touch" data-control="up" aria-label="Move up">↑</button><button class="touch" data-control="left" aria-label="Move left">←</button><button class="touch" data-control="down" aria-label="Move down">↓</button><button class="touch" data-control="right" aria-label="Move right">→</button></div><button class="touch freeze" id="freeze" aria-label="Freeze ghosts"><span>❄ FREEZE</span><small id="freezeLabel">1 READY</small></button></div>
+      <div class="touch-controls" aria-label="Touch controls"><div class="dpad"><button class="touch" data-control="up" aria-label="Move up">↑</button><button class="touch" data-control="left" aria-label="Move left">←</button><button class="touch" data-control="down" aria-label="Move down">↓</button><button class="touch" data-control="right" aria-label="Move right">→</button></div><button class="touch freeze" id="freeze" aria-label="Freeze ghosts"><span>❄ FREEZE</span><small id="freezeLabel">30% TO CHARGE</small></button></div>
       <p class="status" id="status" role="status" aria-live="polite">Good fences. Questionable neighbors.</p><p class="storage" id="storageNote" hidden>Browser storage is unavailable. Your best score will last for this session.</p>
     </aside>
   </div>
@@ -45,31 +45,38 @@
 <script>
 (()=>{'use strict';
 const $=id=>document.getElementById(id),canvas=$('canvas'),ctx=canvas.getContext('2d');
-const COLS=40,ROWS=28,TILE=20,W=800,H=560,OPEN=0,SAFE=1,TRAIL=2,STEP=1/120,PLAYER_SPEED=5.5,RADIUS=.34;
+const COLS=40,ROWS=28,TILE=20,W=800,H=560,OPEN=0,SAFE=1,TRAIL=2,STEP=1/120,PLAYER_SPEED=5.5,RADIUS=.34,NON_RED_SPEED=1.5,GHOST_SPEED_FACTOR=.95,SURGE_SPEED=8,SURGE_DELAY=.12,BLUE_CHASE_CHANCE=.05;
 const DIRS={up:[0,-1],down:[0,1],left:[-1,0],right:[1,0]},KEYS={ArrowUp:'up',KeyW:'up',ArrowDown:'down',KeyS:'down',ArrowLeft:'left',KeyA:'left',ArrowRight:'right',KeyD:'right'};
 const input=new Map(),touches=new Map(),terrain=document.createElement('canvas'),terrainCtx=terrain.getContext('2d');terrain.width=W;terrain.height=H;
 const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 let boundary=[],boundaryByKey=new Map();
 let world,state='menu',time=0,last=performance.now(),accumulator=0,buffered=null,best=0,sound=false,audio=null,focused=document.hasFocus(),padNeedsRelease=true,padSelect=false,padPause=false,padDirection=null,terrainDirty=true;
+const TEST_SEQUENCE=['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowRight','ArrowLeft','ArrowRight','KeyB','KeyA'],cheatKeys=[];
 const index=(c,r)=>r*COLS+c,valid=(c,r)=>c>=0&&r>=0&&c<COLS&&r<ROWS,cell=(c,r)=>valid(c,r)?world.grid[index(c,r)]:SAFE;
 try{best=Math.max(0,Math.floor(Number(localStorage.getItem('eviction.best.v1'))||0));if(!Number.isFinite(best))best=0}catch{$('storageNote').hidden=false}
-function persist(){if(world.score<=best)return;best=world.score;try{localStorage.setItem('eviction.best.v1',String(best))}catch{$('storageNote').hidden=false}}
+function persist(){if(world.testing||world.score<=best)return;best=world.score;try{localStorage.setItem('eviction.best.v1',String(best))}catch{$('storageNote').hidden=false}}
+function awardScore(points){world.score=world.testing?0:world.score+points}
 function status(message){$('status').textContent=message}
 function tone(freq=500,duration=.1,type='triangle'){if(!sound)return;try{audio??=new (window.AudioContext||window.webkitAudioContext)();if(audio.state==='suspended')audio.resume().catch(()=>{});const o=audio.createOscillator(),g=audio.createGain();o.type=type;o.frequency.setValueAtTime(freq,audio.currentTime);o.frequency.exponentialRampToValueAtTime(Math.max(50,freq*.55),audio.currentTime+duration);g.gain.setValueAtTime(.035,audio.currentTime);g.gain.exponentialRampToValueAtTime(.001,audio.currentTime+duration);o.connect(g);g.connect(audio.destination);o.start();o.stop(audio.currentTime+duration)}catch{}}
 function clearInput(){input.clear();touches.clear();buffered=null;padDirection=null;drag=null;for(const b of document.querySelectorAll('[data-control]'))b.classList.remove('active')}
 function setDirection(key,dir){if(input.get(key)!==dir){input.delete(key);input.set(key,dir);buffered=dir}}
 function targetPercent(){return Math.min(95,80+world.level-1)}
-function sync(){const w=world,pct=percentage(),goal=targetPercent();$('percent').textContent=pct.toFixed(1)+'%';$('goal').textContent='/ '+goal+'% TO WIN';$('guideGoal').textContent=goal+'%';$('progress').setAttribute('aria-valuemax',String(goal));$('progress').setAttribute('aria-valuenow',String(Math.min(goal,pct).toFixed(1)));$('progress').setAttribute('aria-valuetext',pct.toFixed(1)+'% claimed; '+goal+'% to win');$('progressFill').style.width=Math.min(100,pct/goal*100)+'%';$('score').textContent=String(w.score).padStart(6,'0');$('best').textContent=String(best).padStart(6,'0');$('level').textContent=String(w.level).padStart(2,'0');$('lives').textContent=Array(w.lives).fill('♥').join(' ')||'—';$('lives').setAttribute('aria-label',w.lives+' lives');$('pause').disabled=!['playing','paused','dying'].includes(state);$('pause').textContent=state==='paused'?'Resume':'Pause';$('freeze').disabled=state!=='playing'||!w.charges||w.freeze>0;$('freeze').classList.toggle('active',w.freeze>0);$('freezeLabel').textContent=w.freeze>0?'FROZEN':w.charges?w.charges+' READY':Math.max(1,Math.ceil(w.nextFreeze-pct))+'% TO CHARGE';$('boardLabel').textContent=state==='playing'?'LEVEL '+String(w.level).padStart(2,'0')+' / '+w.ghosts.length+' UNINVITED':'NO RENT. ALL TERRITORY.'}
+function sync(){const w=world,pct=percentage(),goal=targetPercent();if(w.testing)w.score=0;$('percent').textContent=pct.toFixed(1)+'%';$('goal').textContent='/ '+goal+'% TO WIN';$('guideGoal').textContent=goal+'%';$('progress').setAttribute('aria-valuemax',String(goal));$('progress').setAttribute('aria-valuenow',String(Math.min(goal,pct).toFixed(1)));$('progress').setAttribute('aria-valuetext',pct.toFixed(1)+'% claimed; '+goal+'% to win');$('progressFill').style.width=Math.min(100,pct/goal*100)+'%';$('score').textContent=String(w.score).padStart(6,'0');$('scoreLabel').textContent=w.testing?'SCORE · TEST':'SCORE';$('best').textContent=String(best).padStart(6,'0');$('level').textContent=String(w.level).padStart(2,'0');$('lives').textContent=Array(w.lives).fill('♥').join(' ')||'—';$('lives').setAttribute('aria-label',w.lives+' lives');$('pause').disabled=!['playing','paused','dying'].includes(state);$('pause').textContent=state==='paused'?'Resume':'Pause';$('freeze').disabled=state!=='playing'||!w.charges||w.freeze>0;$('freeze').classList.toggle('active',w.freeze>0);$('freezeLabel').textContent=w.freeze>0?'FROZEN':w.charges?w.charges+' READY':Math.max(1,Math.ceil(w.nextFreeze-pct))+'% TO CHARGE';$('boardLabel').textContent=state==='playing'?(w.testing?'TEST ':'')+'WAVE '+String(w.level).padStart(2,'0')+' / '+w.ghosts.length+' UNINVITED':'NO RENT. ALL TERRITORY.'}
 function percentage(){return world.claimed/((COLS-2)*(ROWS-2))*100}
 function panel(eyebrow,title,text,button,restart=false){clearInput();padNeedsRelease=true;$('panelEyebrow').textContent=eyebrow;$('panelTitle').textContent=title;$('panelText').textContent=text;$('play').textContent=button;$('restart').hidden=!restart;$('panelHint').hidden=true;$('overlay').hidden=false;$('play').focus({preventScroll:true})}
 function loadLevel(){const w=world;w.grid=new Uint8Array(COLS*ROWS);for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++)if(c===0||r===0||c===COLS-1||r===ROWS-1)w.grid[index(c,r)]=SAFE;
-  w.player={c:0,r:14,x:.5,y:14.5,fromX:.5,fromY:14.5,target:null,dir:'right',anchor:{c:0,r:14},invulnerable:0};w.trail=[];w.claimed=0;w.freeze=0;w.charges=1;w.nextFreeze=15;w.elapsed=0;w.transition=0;w.particles=[];w.labels=[];w.captureFlash=0;
-  const spots=[[28,7],[21,20],[33,17],[12,9],[9,21],[19,5],[31,23],[7,5]],palette=['#ed8ead','#84c9ed','#bbabea','#edb276','#94cfad','#ed8ead','#84c9ed','#bbabea'];
-  w.ghosts=spots.slice(0,Math.min(2+w.level-1,8)).map(([c,r],i)=>{const a=(.22+i*.47)*Math.PI,speed=2.65+Math.min(2.1,(w.level-1)*.23)+i*.12;return{kind:'roamer',x:c+.5,y:r+.5,vx:Math.cos(a)*speed,vy:Math.sin(a)*speed,color:palette[i],id:i}});
-  const edge={kind:'edge',x:COLS-1,y:1,vx:0,vy:1,distance:0,speed:3.8+Math.min(1.4,(w.level-1)*.09),color:'#ffad6b',id:8};w.ghosts.push(edge);rebuildBoundary();
-  terrainDirty=true;clearInput();status('Level '+w.level+' · Claim '+targetPercent()+'%. Watch the orange ghost on the territory edge.');sync();
+  w.player={c:0,r:14,x:.5,y:14.5,fromX:.5,fromY:14.5,target:null,dir:'right',anchor:{c:0,r:14},invulnerable:0};w.trail=[];w.burns=[];w.claimed=0;w.freeze=0;w.charges=0;w.nextFreeze=30;w.elapsed=0;w.transition=0;w.particles=[];w.labels=[];w.captureFlash=0;
+  const spots=[[28,7],[21,20],[33,17],[12,9],[9,21],[19,5],[31,23],[7,5]],roster=['roamer','edge','breaker','turf','charger','plow'];w.ghosts=[];
+  for(let i=0;i<w.level;i++){const kind=roster[i%roster.length],rank=Math.floor(i/roster.length),[c,r]=spots[i%spots.length],a=(.22+i*.47)*Math.PI;let speed;
+    if(kind==='edge'){speed=(3.8+Math.min(1.4,(w.level-1)*.09))*NON_RED_SPEED*GHOST_SPEED_FACTOR;w.ghosts.push({kind,x:COLS-1,y:1+(rank*9)%(ROWS-2),vx:0,vy:1,distance:0,speed,color:'#ffad6b',id:i});continue}
+    if(kind==='turf'){speed=(3.6+Math.min(.8,(w.level-1)*.07))*NON_RED_SPEED*GHOST_SPEED_FACTOR;w.ghosts.push({kind,c:COLS-1,r:1+(i*7)%(ROWS-2),x:COLS-.5,y:1.5+(i*7)%(ROWS-2),target:null,dir:'up',vx:0,vy:0,speed,color:'#63dce8',id:i,grace:.75});continue}
+    speed=(kind==='breaker'?2.65+Math.min(2.1,(w.level-1)*.23)+rank*.12:(kind==='plow'?2.2:kind==='charger'?2.9:2.4)*NON_RED_SPEED+Math.min(1.2,(w.level-1)*.08))*GHOST_SPEED_FACTOR;
+    w.ghosts.push({kind,x:c+.5,y:r+.5,vx:Math.cos(a)*speed,vy:Math.sin(a)*speed,speed,color:kind==='breaker'?'#f16657':kind==='charger'?'#bc94ed':kind==='plow'?'#75d58a':'#ed8ead',id:i,chipCooldown:0,attackIn:4.5+rank*.7,warning:0,dash:0,turnIn:2.2+Math.random()*2.8});
+  }rebuildBoundary();
+  terrainDirty=true;clearInput();status('Wave '+w.level+' · '+w.ghosts.length+' ghost'+(w.ghosts.length===1?'':'s')+'. Claim '+targetPercent()+'%. Freeze at 30%.');sync();
 }
-function start(){world={level:1,score:0,lives:3};state='playing';loadLevel();$('overlay').hidden=true;canvas.focus({preventScroll:true});padNeedsRelease=true;tone(620,.15)}
+function start(){world={level:1,score:0,lives:3,testing:false};cheatKeys.length=0;state='playing';loadLevel();$('overlay').hidden=true;canvas.focus({preventScroll:true});padNeedsRelease=true;tone(620,.15)}
+function testSequence(e){if(e.repeat)return false;if(e.ctrlKey||e.altKey||e.metaKey||e.shiftKey||e.isComposing){cheatKeys.length=0;return false}cheatKeys.push(e.code);if(cheatKeys.length>TEST_SEQUENCE.length)cheatKeys.shift();if(cheatKeys.length!==TEST_SEQUENCE.length||!TEST_SEQUENCE.every((key,i)=>key===cheatKeys[i]))return false;cheatKeys.length=0;world={level:10,score:0,lives:3,testing:true};state='playing';loadLevel();$('overlay').hidden=true;canvas.focus({preventScroll:true});padNeedsRelease=true;status('Testing wave 10. Score locked at zero for this run.');tone(880,.2);return true}
 function nextLevel(){world.level++;state='playing';loadLevel();$('overlay').hidden=true;canvas.focus({preventScroll:true});padNeedsRelease=true;tone(800,.15)}
 let resumeState='playing';
 function pause(){if(state==='paused'){state=resumeState;$('overlay').hidden=true;clearInput();padNeedsRelease=true;canvas.focus({preventScroll:true})}else if(['playing','dying'].includes(state)){resumeState=state;state='paused';panel('NO RUSH / YOUR TURF IS SAFE','On the fence?','Take your time. Your territory, line, and Freeze will be right here.','Back to the lawn',true)}sync()}
@@ -77,23 +84,48 @@ function freeze(){const w=world;if(state!=='playing'||w.charges<1||w.freeze>0)re
 function circleTouches(x,y,c,r,radius=RADIUS){const dx=x-Math.max(c,Math.min(x,c+1)),dy=y-Math.max(r,Math.min(y,r+1));return dx*dx+dy*dy<radius*radius-1e-9}
 function touchesCellType(x,y,type){for(let r=Math.floor(y-RADIUS);r<=Math.floor(y+RADIUS);r++)for(let c=Math.floor(x-RADIUS);c<=Math.floor(x+RADIUS);c++)if(cell(c,r)===type&&circleTouches(x,y,c,r))return true;return false}
 function canOccupy(x,y){return !touchesCellType(x,y,SAFE)}
+function greenPosition(x,y){if(x<RADIUS||x>COLS-RADIUS||y<RADIUS||y>ROWS-RADIUS)return false;for(let r=Math.floor(y-RADIUS);r<=Math.floor(y+RADIUS);r++)for(let c=Math.floor(x-RADIUS);c<=Math.floor(x+RADIUS);c++)if(cell(c,r)!==SAFE&&circleTouches(x,y,c,r))return false;return true}
+function findGreen(x,y,spawn=false){let result=null,best=Infinity;for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++)if(cell(c,r)===SAFE){const d=(c+.5-x)**2+(r+.5-y)**2,cost=spawn?-d+(c===0||r===0||c===COLS-1||r===ROWS-1?10000:0):d;if(cost<best){best=cost;result={c,r,x:c+.5,y:r+.5}}}return result}
+function repairTurfGhosts(){for(const g of world.ghosts)if(g.kind==='turf'&&(!greenPosition(g.x,g.y)||(g.target&&cell(g.target.c,g.target.r)!==SAFE))){const spot=findGreen(g.x,g.y);if(spot)Object.assign(g,spot,{target:null,grace:.35,active:true});else g.active=false}}
 function burst(x,y,color,count=18){if(reduced)return;for(let i=0;i<count;i++){const a=i/count*Math.PI*2,s=20+Math.random()*65;world.particles.push({x:x*TILE,y:y*TILE,vx:Math.cos(a)*s,vy:Math.sin(a)*s,life:.65,color})}}
-function hurt(message='A ghost cut your line.'){if(state!=='playing')return;const w=world;w.lives--;state='dying';w.transition=.8;w.player.target=null;for(const i of w.trail)w.grid[i]=OPEN;w.trail=[];w.freeze=0;terrainDirty=true;clearInput();burst(w.player.x,w.player.y,'#f2d878',24);status(message+' Territory kept. Try a shorter line.');tone(160,.35,'sawtooth');sync()}
+function hurt(message='The red surge reached you.'){if(state!=='playing')return;const w=world;w.lives--;state='dying';w.transition=.8;w.player.target=null;for(const i of w.trail)w.grid[i]=OPEN;w.trail=[];w.burns=[];w.freeze=0;terrainDirty=true;clearInput();burst(w.player.x,w.player.y,'#f2d878',24);status(message+' Territory kept. Try a shorter line.');tone(160,.35,'sawtooth');sync()}
 function exposed(){const p=world.player;return world.trail.length>0||cell(p.c,p.r)!==SAFE||!!(p.target&&cell(p.target.c,p.target.r)!==SAFE)}
-function checkDanger(){if(state!=='playing')return false;const w=world,p=w.player;for(const g of w.ghosts){const contact=!(p.invulnerable>0)&&Math.hypot(g.x-p.x,g.y-p.y)<RADIUS+.31;if(g.kind==='edge'){if(g.active!==false&&!(g.grace>0)&&contact){hurt('The edge ghost caught you.');return true}}else if(touchesCellType(g.x,g.y,TRAIL)||(exposed()&&contact)){hurt();return true}}return false}
-// Every roaming ghost seeds the flood fill. Edge ghosts follow the territory boundary.
+// Arc length follows the actual drawn route, including the green anchor and
+// moving tip. Returning along the last segment shortens that same route.
+function lineGeometry(){const w=world,p=w.player;if(!w.trail.length&&!(p.target&&cell(p.target.c,p.target.r)!==SAFE))return {points:[],length:0};const points=[];
+  const add=(x,y)=>{const previous=points.at(-1);if(!previous||Math.hypot(x-previous.x,y-previous.y)>1e-9)points.push({x,y,at:previous?previous.at+Math.hypot(x-previous.x,y-previous.y):0})};
+  add(p.anchor.c+.5,p.anchor.r+.5);let trail=w.trail;
+  if(p.target&&trail.length){const previous=trail.length>1?trail[trail.length-2]:index(p.anchor.c,p.anchor.r);if(index(p.target.c,p.target.r)===previous)trail=trail.slice(0,-1)}
+  for(const i of trail)add(i%COLS+.5,Math.floor(i/COLS)+.5);add(p.x,p.y);return {points,length:points.at(-1)?.at||0};
+}
+function lineContact(g,line){let nearest=null,best=(RADIUS+.075)**2;for(let i=1;i<line.points.length;i++){const a=line.points[i-1],b=line.points[i],dx=b.x-a.x,dy=b.y-a.y,length=b.at-a.at,t=Math.max(0,Math.min(1,((g.x-a.x)*dx+(g.y-a.y)*dy)/(length*length))),d=(g.x-a.x-dx*t)**2+(g.y-a.y-dy*t)**2;if(d<=best){best=d;nearest=a.at+t*length}}return nearest}
+function igniteLine(at){if(world.burns.some(b=>at>=b.lo-.2&&at<=b.hi+.2))return;world.burns.push({lo:at,hi:at,age:0});status('Line hit! Reach green before the red surge catches you.');tone(230,.08)}
+function updateBurns(dt){const w=world,line=lineGeometry();if(!line.length){w.burns=[];return}for(const b of w.burns){const previous=Math.max(0,b.age-SURGE_DELAY);b.age+=dt;const active=Math.max(0,b.age-SURGE_DELAY),travel=SURGE_SPEED*((active+active*active/2)-(previous+previous*previous/2));b.lo=Math.max(0,b.lo-travel);b.hi+=travel;if(b.age>=SURGE_DELAY&&line.length>=b.lo-1e-9&&line.length<=b.hi+1e-9){hurt();return}}
+  // Keep independent ages even when fronts overlap: each accelerates from its
+  // own ignition, rather than inheriting another front's faster clock.
+}
+function checkDanger(){if(state!=='playing')return false;const w=world,p=w.player,line=lineGeometry();for(const g of w.ghosts){if(g.active===false)continue;
+  const hit=lineContact(g,line);if(hit!==null){igniteLine(hit);continue}
+  const contact=!(p.invulnerable>0)&&!(g.grace>0)&&Math.hypot(g.x-p.x,g.y-p.y)<RADIUS+.31;
+  if(contact&&(g.kind==='edge'||g.kind==='turf'||g.kind==='plow'||exposed())){hurt(g.kind==='edge'?'The edge ghost caught you.':g.kind==='turf'?'The cyan ghost caught you on green.':g.kind==='plow'?'The green ghost plowed into you.':'A ghost caught you in the open.');return true}
+}return false}
+// Every ghost overlapping empty space seeds the flood fill, including the empty
+// half of orange boundary ghosts. Cyan ghosts live entirely on green territory.
 // The entire pass is synchronous, so a capture never leaves a half-updated board.
 function capture(){const w=world;if(!w.trail.length)return;if(checkDanger())return;const reachable=new Uint8Array(COLS*ROWS),queue=[];
-  for(const g of w.ghosts.filter(g=>g.kind!=='edge'))for(let r=Math.floor(g.y-RADIUS);r<=Math.floor(g.y+RADIUS);r++)for(let c=Math.floor(g.x-RADIUS);c<=Math.floor(g.x+RADIUS);c++){const i=index(c,r);if(valid(c,r)&&cell(c,r)===OPEN&&!reachable[i]&&circleTouches(g.x,g.y,c,r)){reachable[i]=1;queue.push(i)}}
+  // A completed line extinguishes surges. Keep cut cells occupied by red or
+  // orange open so closing over a ghost never traps it inside solid green.
+  for(const g of w.ghosts.filter(g=>g.kind!=='turf'&&g.active!==false))for(let r=Math.floor(g.y-RADIUS);r<=Math.floor(g.y+RADIUS);r++)for(let c=Math.floor(g.x-RADIUS);c<=Math.floor(g.x+RADIUS);c++)if(cell(c,r)===TRAIL&&circleTouches(g.x,g.y,c,r))w.grid[index(c,r)]=OPEN;
+  for(const g of w.ghosts.filter(g=>g.kind!=='turf'&&g.active!==false))for(let r=Math.floor(g.y-RADIUS);r<=Math.floor(g.y+RADIUS);r++)for(let c=Math.floor(g.x-RADIUS);c<=Math.floor(g.x+RADIUS);c++){const i=index(c,r);if(valid(c,r)&&cell(c,r)===OPEN&&!reachable[i]&&circleTouches(g.x,g.y,c,r)){reachable[i]=1;queue.push(i)}}
   for(let head=0;head<queue.length;head++){const i=queue[head],c=i%COLS,r=Math.floor(i/COLS);for(const [dc,dr] of Object.values(DIRS)){const nc=c+dc,nr=r+dr,ni=index(nc,nr);if(valid(nc,nr)&&w.grid[ni]===OPEN&&!reachable[ni]){reachable[ni]=1;queue.push(ni)}}}
   let gained=0;for(let i=0;i<w.grid.length;i++)if(w.grid[i]===TRAIL||(w.grid[i]===OPEN&&!reachable[i])){w.grid[i]=SAFE;gained++}
-  w.claimed+=gained;w.score+=gained*10;w.trail=[];rebuildBoundary();w.captureFlash=reduced?0:.38;terrainDirty=true;const pct=percentage();let recharged=false;while(pct+1e-8>=w.nextFreeze){w.charges=Math.min(3,w.charges+1);w.nextFreeze+=15;recharged=true}
+  w.claimed+=gained;awardScore(gained*10);w.trail=[];w.burns=[];rebuildBoundary();w.captureFlash=reduced?0:.38;terrainDirty=true;const pct=percentage();let recharged=false;while(pct+1e-8>=w.nextFreeze){w.charges=Math.min(3,w.charges+1);w.nextFreeze+=30;recharged=true}
   w.labels.push({x:w.player.x*TILE,y:w.player.y*TILE,text:'+'+(gained/((COLS-2)*(ROWS-2))*100).toFixed(1)+'%',life:1.5});burst(w.player.x,w.player.y,'#d4f578');tone(730,.16);status('Claimed '+gained+' tiles. '+(recharged?'Freeze recharged!':pct.toFixed(1)+'% yours. Keep drawing.'));
-  if(pct+1e-8>=targetPercent()){w.score+=500*w.level+100*w.lives;state='cleared';tone(1100,.3);panel('NOTICE '+String(w.level).padStart(3,'0')+' / DELIVERED','Consider them evicted.',pct.toFixed(1)+'% claimed. Level bonus: '+(500*w.level+100*w.lives).toLocaleString()+' points. More neighbors are moving in.','Next neighborhood ↗',true);status('Level '+w.level+' clear. Your lawn is getting bigger.')}
+  if(pct+1e-8>=targetPercent()){awardScore(500*w.level+100*w.lives);state='cleared';tone(1100,.3);panel('NOTICE '+String(w.level).padStart(3,'0')+' / DELIVERED','Consider them evicted.',pct.toFixed(1)+'% claimed. '+(w.testing?'Testing run: score stays zero.':'Level bonus: '+(500*w.level+100*w.lives).toLocaleString()+' points.')+' More neighbors are moving in.','Next neighborhood ↗',true);status('Wave '+w.level+' clear. Your lawn is getting bigger.')}
   persist();sync();
 }
 function finishMove(){const w=world,p=w.player,t=p.target,old=index(p.c,p.r),ni=index(t.c,t.r);p.x=t.c+.5;p.y=t.r+.5;p.target=null;
-  const retreat=w.trail.length>0&&((w.trail.length>1&&ni===w.trail[w.trail.length-2])||(w.trail.length===1&&t.c===p.anchor.c&&t.r===p.anchor.r));
+  const retreat=w.trail.length>0&&((w.trail.length>1&&ni===w.trail[w.trail.length-2])||(w.trail.length===1&&t.c===p.anchor.c&&t.r===p.anchor.r&&w.grid[ni]===SAFE));
   if(retreat){w.grid[old]=OPEN;w.trail.pop();terrainDirty=true;p.c=t.c;p.r=t.r;return}
   if(w.grid[ni]===TRAIL){hurt('You crossed your own line.');return}
   p.c=t.c;p.r=t.r;
@@ -140,27 +172,61 @@ function advanceEdge(g,distance){
   }
   positionEdge(g);
 }
-function moveGhosts(dt){if(world.freeze>0)return;for(const g of world.ghosts){const speed=g.kind==='edge'?g.speed:Math.hypot(g.vx,g.vy),steps=Math.max(1,Math.ceil(speed*dt/.12)),slice=dt/steps;for(let s=0;s<steps;s++){
+function solidCells(x,y){const hits=[];for(let r=Math.floor(y-RADIUS);r<=Math.floor(y+RADIUS);r++)for(let c=Math.floor(x-RADIUS);c<=Math.floor(x+RADIUS);c++)if(cell(c,r)===SAFE&&circleTouches(x,y,c,r))hits.push({c,r});return hits}
+function chipTerritory(g,hits){if(g.chipCooldown>0)return;const tile=hits.filter(({c,r})=>c>0&&r>0&&c<COLS-1&&r<ROWS-1&&cell(c,r)===SAFE).sort((a,b)=>Math.hypot(a.c+.5-g.x,a.r+.5-g.y)-Math.hypot(b.c+.5-g.x,b.r+.5-g.y))[0];if(!tile)return;
+  erodeTiles([tile],'#f16657','Red ghost chipped your green.');g.chipCooldown=.12;
+}
+function erodeTiles(tiles,color,message){let removed=0;for(const {c,r} of tiles)if(c>0&&r>0&&c<COLS-1&&r<ROWS-1&&cell(c,r)===SAFE){world.grid[index(c,r)]=OPEN;removed++;burst(c+.5,r+.5,color,5)}if(!removed)return;world.claimed=Math.max(0,world.claimed-removed);terrainDirty=true;rebuildBoundary();repairTurfGhosts();status(message+' '+percentage().toFixed(1)+'% still yours.');sync()}
+function endCharge(g){const angle=Math.atan2(g.vy,g.vx);g.dash=0;g.warning=0;g.attackIn=4.5+Math.random()*2.5;g.vx=Math.cos(angle)*g.speed;g.vy=Math.sin(angle)*g.speed}
+function prepareGhost(g,dt){
+  if(g.kind==='charger'){
+    if(g.warning>0){g.warning=Math.max(0,g.warning-dt);if(g.warning>1e-9)return false;g.warning=0;const speed=20*NON_RED_SPEED*GHOST_SPEED_FACTOR;g.vx=g.aim.x*speed;g.vy=g.aim.y*speed;g.dash=.65;tone(420,.1)}
+    else if(g.dash>0){g.dash=Math.max(0,g.dash-dt);if(g.dash===0)endCharge(g)}
+    else{g.attackIn-=dt;if(g.attackIn<=0){const dx=world.player.x-g.x,dy=world.player.y-g.y,d=Math.hypot(dx,dy)||1;g.aim={x:dx/d,y:dy/d};g.warning=.75;status('Purple warning! Move before it charges.');tone(650,.07);return false}}
+  }
+  if(g.kind==='plow'){g.turnIn-=dt;if(g.turnIn<=0){const angle=Math.atan2(g.vy,g.vx)+(Math.random()-.5)*Math.PI*1.3;g.vx=Math.cos(angle)*g.speed;g.vy=Math.sin(angle)*g.speed;g.turnIn=2.2+Math.random()*2.8}}
+  return true;
+}
+function turfDirection(g){const reverse={up:'down',down:'up',left:'right',right:'left'},options=Object.keys(DIRS).filter(dir=>{const [dc,dr]=DIRS[dir];return valid(g.c+dc,g.r+dr)&&cell(g.c+dc,g.r+dr)===SAFE});
+  const wander=()=>{const forward=options.filter(d=>d!==reverse[g.dir]),choices=forward.length?forward:options;if(!choices.length)return;if(choices.includes(g.dir)&&(choices.length===1||Math.random()<.65))return g.dir;return choices[Math.floor(Math.random()*choices.length)]};
+  // Mostly patrol without considering the player; only one in twenty cell
+  // decisions may steer toward them. Patrols avoid reversing at every junction.
+  if(Math.random()>=BLUE_CHASE_CHANCE)return wander();
+  const goal=findGreen(world.player.x,world.player.y),queue=[{c:g.c,r:g.r,first:null}],seen=new Set([index(g.c,g.r)]);
+  for(let head=0;head<queue.length;head++){const n=queue[head];if(goal&&n.c===goal.c&&n.r===goal.r&&n.first)return n.first;for(const [dir,[dc,dr]] of Object.entries(DIRS)){const c=n.c+dc,r=n.r+dr,i=index(c,r);if(valid(c,r)&&cell(c,r)===SAFE&&!seen.has(i)){seen.add(i);queue.push({c,r,first:n.first||dir})}}}
+  return wander();
+}
+function moveTurf(g,dt){if(g.active===false)return;if(!g.target){const dir=turfDirection(g);if(!dir)return;const [dc,dr]=DIRS[dir];g.dir=dir;g.vx=dc*g.speed;g.vy=dr*g.speed;g.target={c:g.c+dc,r:g.r+dr}}const t=g.target,tx=t.c+.5,ty=t.r+.5,dx=tx-g.x,dy=ty-g.y,d=Math.hypot(dx,dy),step=g.speed*dt;if(d<=step){Object.assign(g,{c:t.c,r:t.r,x:tx,y:ty,target:null})}else{g.x+=dx/d*step;g.y+=dy/d*step}}
+function moveGhosts(dt){if(world.freeze>0)return;for(const g of world.ghosts){if(!prepareGhost(g,dt)){if(checkDanger())return;continue}const speed=g.kind==='edge'||g.kind==='turf'?g.speed:Math.hypot(g.vx,g.vy),steps=Math.max(1,Math.ceil(speed*dt/.12)),slice=dt/steps;for(let s=0;s<steps;s++){
   if(g.kind==='edge'){advanceEdge(g,g.speed*slice);if(checkDanger())return;continue}
-  const nx=g.x+g.vx*slice;if(canOccupy(nx,g.y))g.x=nx;else g.vx=-g.vx;
-  const ny=g.y+g.vy*slice;if(canOccupy(g.x,ny))g.y=ny;else g.vy=-g.vy;
+  if(g.kind==='turf'){moveTurf(g,slice);if(checkDanger())return;continue}
+  if(g.kind==='plow'){
+    const nx=g.x+g.vx*slice;if(nx-RADIUS<=1||nx+RADIUS>=COLS-1)g.vx=-g.vx;else g.x=nx;
+    const ny=g.y+g.vy*slice;if(ny-RADIUS<=1||ny+RADIUS>=ROWS-1)g.vy=-g.vy;else g.y=ny;
+    erodeTiles(solidCells(g.x,g.y),'#75d58a','Green ghost is plowing through your turf.');if(checkDanger())return;continue;
+  }
+  const hits=[],nx=g.x+g.vx*slice,xHits=solidCells(nx,g.y);if(!xHits.length)g.x=nx;else{g.vx=-g.vx;hits.push(...xHits)}
+  const ny=g.y+g.vy*slice,yHits=solidCells(g.x,ny);if(!yHits.length)g.y=ny;else{g.vy=-g.vy;hits.push(...yHits)}
+  if(g.kind==='breaker'&&hits.length)chipTerritory(g,hits);
+  if(g.kind==='charger'&&g.dash>0&&hits.length)endCharge(g);
   if(checkDanger())return;
 }}}
 function respawn(){const w=world;if(w.lives<=0){state='over';persist();panel('NOTICE / RETURN TO SENDER','The neighbors won.',w.score.toLocaleString()+' points. '+percentage().toFixed(1)+'% claimed on level '+w.level+'. There’s always another patch of lawn.','Take it back ↗');status('Your best: '+best.toLocaleString()+'. Room for one more?');sync();return}
-  const p=w.player,a=p.anchor;Object.assign(p,{c:a.c,r:a.r,x:a.c+.5,y:a.r+.5,fromX:a.c+.5,fromY:a.r+.5,target:null,invulnerable:1.5});state='playing';clearInput();status('Back on green. 1.5 seconds of protection. '+w.lives+' lives left.');sync();
+  const p=w.player,a=cell(p.anchor.c,p.anchor.r)===SAFE?p.anchor:findGreen(p.anchor.c+.5,p.anchor.r+.5);Object.assign(p,{c:a.c,r:a.r,x:a.c+.5,y:a.r+.5,fromX:a.c+.5,fromY:a.r+.5,anchor:{c:a.c,r:a.r},target:null,invulnerable:1.5});state='playing';clearInput();status('Back on green. 1.5 seconds of protection. '+w.lives+' lives left.');sync();
 }
 function update(dt){if(!['playing','dying'].includes(state))return;time+=dt;const w=world;w.captureFlash=Math.max(0,w.captureFlash-dt);w.particles=w.particles.filter(a=>{a.life-=dt;a.x+=a.vx*dt;a.y+=a.vy*dt;return a.life>0});w.labels=w.labels.filter(a=>(a.life-=dt)>0);
-  if(state==='dying'){w.transition-=dt;if(w.transition<=0)respawn();return}w.elapsed+=dt;w.player.invulnerable=Math.max(0,(w.player.invulnerable||0)-dt);for(const g of w.ghosts)if(g.grace>0)g.grace=Math.max(0,g.grace-dt);
+  if(state==='dying'){w.transition-=dt;if(w.transition<=0)respawn();return}w.elapsed+=dt;w.player.invulnerable=Math.max(0,(w.player.invulnerable||0)-dt);for(const g of w.ghosts){if(g.grace>0)g.grace=Math.max(0,g.grace-dt);if(g.chipCooldown>0)g.chipCooldown=Math.max(0,g.chipCooldown-dt)}
   if(w.freeze>0){w.freeze=Math.max(0,w.freeze-dt);if(w.freeze===0){status('The neighbors are on the move again.');sync()}}
-  moveGhosts(dt);if(state!=='playing')return;movePlayer(dt);
+  moveGhosts(dt);if(state!=='playing')return;movePlayer(dt);if(state==='playing')updateBurns(dt);
 }
 function paintTerrain(){terrainDirty=false;const c=terrainCtx;c.fillStyle='#11282f';c.fillRect(0,0,W,H);
   for(let r=0;r<ROWS;r++)for(let col=0;col<COLS;col++){const type=cell(col,r),x=col*TILE,y=r*TILE;if(type===SAFE){c.fillStyle=(col+r)%2?'#3c7565':'#3a7162';c.fillRect(x,y,TILE,TILE);c.fillStyle='#c2eab310';c.fillRect(x+3,y+3,2,2);c.strokeStyle='#8acba0';c.lineWidth=1.3;c.beginPath();if(cell(col-1,r)!==SAFE){c.moveTo(x+.5,y);c.lineTo(x+.5,y+TILE)}if(cell(col+1,r)!==SAFE){c.moveTo(x+TILE-.5,y);c.lineTo(x+TILE-.5,y+TILE)}if(cell(col,r-1)!==SAFE){c.moveTo(x,y+.5);c.lineTo(x+TILE,y+.5)}if(cell(col,r+1)!==SAFE){c.moveTo(x,y+TILE-.5);c.lineTo(x+TILE,y+TILE-.5)}c.stroke()}else{c.strokeStyle='#264049';c.lineWidth=.6;c.strokeRect(x+.5,y+.5,TILE,TILE);if(type===TRAIL){c.fillStyle='#d4f57826';c.fillRect(x+1,y+1,TILE-2,TILE-2)}}}
 }
 function drawGhost(g){ctx.save();const frozen=world.freeze>0;ctx.translate(g.x*TILE,g.y*TILE);const bob=reduced||g.kind==='edge'?0:Math.sin(time*4+g.id)*1;ctx.translate(0,bob);ctx.shadowColor=frozen?'#acf0ed':g.color;ctx.shadowBlur=9;ctx.fillStyle=frozen?'#b4e9e5':g.color;ctx.beginPath();ctx.moveTo(-7,7);ctx.lineTo(-7,-1);ctx.quadraticCurveTo(-7,-9,0,-9);ctx.quadraticCurveTo(7,-9,7,-1);ctx.lineTo(7,7);ctx.lineTo(3,4);ctx.lineTo(0,7);ctx.lineTo(-3,4);ctx.closePath();ctx.fill();ctx.shadowBlur=0;ctx.fillStyle='#f8f7e5';ctx.fillRect(-5,-4,4,5);ctx.fillRect(2,-4,4,5);ctx.fillStyle='#1a3346';const ex=Math.sign(g.vx),ey=Math.sign(g.vy);ctx.fillRect(-4+ex,-3+ey,2,3);ctx.fillRect(3+ex,-3+ey,2,3);if(g.kind==='edge'){ctx.strokeStyle=frozen?'#e4ffff':'#ffcf98';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(-9,-7);ctx.lineTo(0,-13);ctx.lineTo(9,-7);ctx.stroke()}if(frozen){ctx.strokeStyle='#e4ffff';ctx.lineWidth=1;ctx.strokeRect(-10,-12,20,23)}ctx.restore()}
+function drawLineRange(line,lo,hi,color,width){ctx.strokeStyle=color;ctx.fillStyle=color;ctx.lineWidth=width;ctx.lineCap='round';ctx.lineJoin='round';ctx.shadowColor=color;ctx.shadowBlur=reduced?0:7;ctx.beginPath();for(let i=1;i<line.points.length;i++){const a=line.points[i-1],b=line.points[i],start=Math.max(lo,a.at),end=Math.min(hi,b.at);if(end<start)continue;const length=b.at-a.at,t0=(start-a.at)/length,t1=(end-a.at)/length,x0=(a.x+(b.x-a.x)*t0)*TILE,y0=(a.y+(b.y-a.y)*t0)*TILE;ctx.moveTo(x0,y0);ctx.lineTo((a.x+(b.x-a.x)*t1)*TILE,(a.y+(b.y-a.y)*t1)*TILE);if(end-start<1e-9){ctx.moveTo(x0+width/2,y0);ctx.arc(x0,y0,width/2,0,Math.PI*2)}}ctx.stroke();ctx.shadowBlur=0}
 function draw(){const w=world;if(terrainDirty)paintTerrain();ctx.drawImage(terrain,0,0);const p=w.player;
-  if(w.trail.length){ctx.strokeStyle='#d4f578';ctx.lineWidth=3;ctx.lineCap='round';ctx.lineJoin='round';ctx.shadowColor='#d4f578';ctx.shadowBlur=reduced?0:7;ctx.beginPath();ctx.moveTo((p.anchor.c+.5)*TILE,(p.anchor.r+.5)*TILE);for(const i of w.trail)ctx.lineTo((i%COLS+.5)*TILE,(Math.floor(i/COLS)+.5)*TILE);ctx.lineTo(p.x*TILE,p.y*TILE);ctx.stroke();ctx.shadowBlur=0}
-  for(const g of w.ghosts)if(g.active!==false){ctx.globalAlpha=g.grace>0?.5:1;drawGhost(g)}ctx.globalAlpha=1;
+  const line=lineGeometry();if(line.length){drawLineRange(line,0,line.length,'#d4f578',3);for(const b of w.burns)drawLineRange(line,Math.max(0,b.lo),Math.min(line.length,b.hi),'#ff5353',4)}
+  for(const g of w.ghosts)if(g.active!==false){ctx.globalAlpha=g.grace>0?.5:1;drawGhost(g);if(g.kind==='charger'&&g.warning>0){ctx.strokeStyle='#d7b6ff';ctx.lineWidth=2;ctx.setLineDash([3,4]);ctx.beginPath();ctx.moveTo(g.x*TILE,g.y*TILE);ctx.lineTo((g.x+g.aim.x*2)*TILE,(g.y+g.aim.y*2)*TILE);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle='#ffe39c';ctx.textAlign='center';ctx.font='bold 24px Consolas,monospace';ctx.fillText('!',g.x*TILE,g.y*TILE-18)}}ctx.globalAlpha=1;
   if(state!=='dying'){ctx.save();ctx.translate(p.x*TILE,p.y*TILE);ctx.shadowColor='#f6dd7b';ctx.shadowBlur=reduced?0:12;ctx.fillStyle='#f6dd7b';ctx.fillRect(-7,-7,14,14);ctx.shadowBlur=0;ctx.fillStyle='#fff3bd';ctx.fillRect(-4,-4,8,4);ctx.fillStyle='#314a34';const [dx,dy]=DIRS[p.dir];ctx.fillRect(dx*3-1,dy*3-1,3,3);ctx.strokeStyle='#f3e7b6';ctx.lineWidth=1;ctx.strokeRect(-10,-10,20,20);if(p.invulnerable>0){ctx.strokeStyle='#b3f2ed';ctx.setLineDash([3,3]);ctx.strokeRect(-13,-13,26,26)}ctx.restore()}
   for(const a of w.particles){ctx.globalAlpha=Math.min(1,a.life*2);ctx.fillStyle=a.color;ctx.fillRect(a.x,a.y,3,3)}ctx.globalAlpha=1;
   for(const a of w.labels){ctx.font='bold 20px Consolas,monospace';ctx.textAlign='center';const x=Math.max(55,Math.min(W-55,a.x)),y=Math.max(35,a.y-(1.5-a.life)*25);ctx.fillStyle='#10241c';ctx.fillText(a.text,x+1,y+1);ctx.fillStyle='#e7ffa6';ctx.fillText(a.text,x,y)}
@@ -174,14 +240,14 @@ function pollGamepad(){for(const k of [...input.keys()])if(k.startsWith('pad:'))
   const previous=state;if(menu&&!padPause)pause();else if(select&&!padSelect){if(state==='playing')freeze();else activate()}padSelect=select;padPause=menu;if(state!==previous){padNeedsRelease=true;return}
   if(state!=='playing')return;const x=pad.axes[0]||0,y=pad.axes[1]||0;let dir=null;if(Math.max(Math.abs(x),Math.abs(y))>.25)dir=Math.abs(x)>Math.abs(y)?(x<0?'left':'right'):(y<0?'up':'down');for(const [i,d] of [[12,'up'],[13,'down'],[14,'left'],[15,'right']])if(pressed(i))dir=d;if(dir){input.set('pad:dir',dir);if(dir!==padDirection)buffered=dir}padDirection=dir;
 }
-window.addEventListener('keydown',e=>{if(e.ctrlKey||e.altKey||e.metaKey||e.target.closest('input,select,textarea'))return;if(['KeyP','Escape'].includes(e.code)){if(!e.repeat){e.preventDefault();pause()}return}if(e.target.closest('button,a'))return;if(state!=='playing')return;if(KEYS[e.code]){e.preventDefault();if(!e.repeat)setDirection(e.code,KEYS[e.code])}else if(['Space','KeyX'].includes(e.code)){e.preventDefault();if(!e.repeat)freeze()}});
+window.addEventListener('keydown',e=>{if(testSequence(e)){e.preventDefault();return}if(e.ctrlKey||e.altKey||e.metaKey||e.target.closest('input,select,textarea'))return;if(['KeyP','Escape'].includes(e.code)){if(!e.repeat){e.preventDefault();pause()}return}if(e.target.closest('button,a'))return;if(state!=='playing')return;if(KEYS[e.code]){e.preventDefault();if(!e.repeat)setDirection(e.code,KEYS[e.code])}else if(['Space','KeyX'].includes(e.code)){e.preventDefault();if(!e.repeat)freeze()}});
 window.addEventListener('keyup',e=>input.delete(e.code));
 for(const b of document.querySelectorAll('[data-control]')){b.addEventListener('pointerdown',e=>{if(e.button!==0||state!=='playing')return;e.preventDefault();canvas.focus({preventScroll:true});b.setPointerCapture(e.pointerId);touches.set(e.pointerId,b);setDirection('touch:'+e.pointerId,b.dataset.control);b.classList.add('active')});const release=e=>{input.delete('touch:'+e.pointerId);touches.delete(e.pointerId);if(![...touches.values()].includes(b))b.classList.remove('active')};b.addEventListener('pointerup',release);b.addEventListener('pointercancel',release);b.addEventListener('lostpointercapture',release);b.addEventListener('contextmenu',e=>e.preventDefault())}
 let drag=null;
 canvas.addEventListener('pointerdown',e=>{if(e.button!==0||state!=='playing'||drag)return;e.preventDefault();canvas.focus({preventScroll:true});canvas.setPointerCapture(e.pointerId);drag={id:e.pointerId,x:e.clientX,y:e.clientY}});
 canvas.addEventListener('pointermove',e=>{if(!drag||drag.id!==e.pointerId||state!=='playing')return;const dx=e.clientX-drag.x,dy=e.clientY-drag.y;if(Math.hypot(dx,dy)<8)return;setDirection('drag',Math.abs(dx)>Math.abs(dy)?(dx<0?'left':'right'):(dy<0?'up':'down'));drag.x=e.clientX;drag.y=e.clientY});
 for(const name of ['pointerup','pointercancel','lostpointercapture'])canvas.addEventListener(name,e=>{if(drag?.id===e.pointerId){drag=null;input.delete('drag')}});
-function focusLost(){focused=false;padNeedsRelease=true;drag=null;clearInput();if(['playing','dying'].includes(state))pause()}
+function focusLost(){focused=false;padNeedsRelease=true;drag=null;cheatKeys.length=0;clearInput();if(['playing','dying'].includes(state))pause()}
 window.addEventListener('blur',focusLost);window.addEventListener('focus',()=>{focused=true;clearInput();padNeedsRelease=true});document.addEventListener('visibilitychange',()=>{if(document.hidden)focusLost();else focused=document.hasFocus()});window.addEventListener('gamepaddisconnected',()=>{for(const k of [...input.keys()])if(k.startsWith('pad:'))input.delete(k);padNeedsRelease=true;padDirection=null;buffered=null});
 function touchFreeze(){freeze();if(state==='playing')canvas.focus({preventScroll:true})}
 $('freeze').addEventListener('pointerdown',e=>{if(e.button!==0)return;e.preventDefault();touchFreeze()});$('freeze').addEventListener('click',e=>{if(e.detail===0)touchFreeze()});
