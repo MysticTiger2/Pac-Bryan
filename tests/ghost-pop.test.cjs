@@ -387,7 +387,7 @@ test('win waits for the reaction and restarting cancels a pending chain', async 
   await page.evaluate(()=>gameTest.update(.085));
   assert.equal((await state(page)).ended,true);
   assert.equal((await state(page)).points,300);
-  await page.locator('#again').click();await setup();
+  await page.locator('#again').click();await page.waitForFunction(()=>!Arcade.busy);await setup();
   await page.locator('#restart').click();
   await page.evaluate(()=>gameTest.update(2));
   const s=await state(page);assert.equal(s.reaction,null);assert.equal(s.points,0);assert.equal(s.misses,0);

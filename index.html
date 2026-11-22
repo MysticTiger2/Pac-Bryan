@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#101719">
-  <meta name="description" content="Good games. Questionable infringement. Play Ghost Pop, Dad Dug, and Eviction, and meet Pac-Bryan, Quarters Please, and Power Struggle.">
+  <meta name="description" content="Good games. Questionable infringement. Play Ghost Pop, Dad Dug, Eviction, Pac-Bryan, and Quarters Please. Power Struggle is coming soon.">
   <title>Tiger’s Arcade</title>
   <style>
     :root{color-scheme:dark;--bg:#101719;--panel:#182124;--line:#334044;--text:#f3f0df;--muted:#a7b4b4;--lime:#d4f578;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text)}
@@ -36,7 +36,7 @@
           <button class="filter" data-filter="ready" aria-pressed="false">Ready to play</button>
           <button class="filter" data-filter="soon" aria-pressed="false">Coming soon</button>
         </div>
-        <span class="game-count mono" id="game-count" role="status">6 games · 4 ready</span>
+        <span class="game-count mono" id="game-count" role="status">6 games · 5 ready</span>
       </div>
       <section class="grid" aria-label="Games">
         <article class="card playable" data-status="ready">
@@ -57,9 +57,11 @@
           <div class="card-body"><div class="card-heading"><h2>Eviction</h2><span class="status ready mono">Ready to play</span></div><p class="description">Draw the line. Claim the board. Keep the ghosts off your lawn.</p><div class="card-bottom"><span class="genre mono">ARCADE / TERRITORY</span><span class="play-cta">Claim your corner <span class="arrow" aria-hidden="true">↗</span></span></div></div>
           </a>
         </article>
-        <article class="card" data-status="soon">
+        <article class="card playable" data-status="ready">
+          <a class="card-link" href="pac-bryan" aria-label="Play Pac-Bryan">
           <div class="scene"><canvas id="pac-scene" width="640" height="308" role="img" aria-label="Yellow Pac-Bryan munches pellets in a blue neon maze with colorful ghosts in pursuit"></canvas><span class="scene-label mono" aria-hidden="true">04 / ONE MORE PELLET.</span><span class="scene-corner mono" aria-hidden="true">AN APPETITE FOR ARCADE</span></div>
-          <div class="card-body"><div class="card-heading"><h2>Pac-Bryan</h2><span class="status mono">Coming soon</span></div><p class="description">You know the drill. Eat the dots. Avoid the ghosts. Be Bryan.</p><div class="card-bottom"><span class="genre mono">ARCADE / MAZE CHASE</span><span class="soon-note mono">In the works</span></div></div>
+          <div class="card-body"><div class="card-heading"><h2>Pac-Bryan</h2><span class="status ready mono">Ready to play</span></div><p class="description">Eat the dots. Read the ghosts. A fresh random maze with every new course.</p><div class="card-bottom"><span class="genre mono">ARCADE / MAZE CHASE</span><span class="play-cta">Let’s munch <span class="arrow" aria-hidden="true">↗</span></span></div></div>
+          </a>
         </article>
         <article class="card playable" data-status="ready" id="quarters-please">
           <a class="card-link" href="quarters-please.html" aria-label="Open Quarters Please">

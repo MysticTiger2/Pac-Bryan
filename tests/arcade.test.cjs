@@ -46,13 +46,13 @@ async function start(page){await page.locator('#play').click();await idle(page)}
 
 test('direct-file home links open index.html and game cards resolve to real files',async()=>withPage(async page=>{
   const home=pathToFileURL(path.join(root,'index.html')).href;
-  for(const game of ['ghost-pop','dad-dug','eviction','quarters-please']){
+  for(const game of ['ghost-pop','dad-dug','eviction','pac-bryan','quarters-please']){
     await page.goto(pathToFileURL(path.join(root,game+'.html')).href);
     const homeLink=page.getByRole('link',{name:game==='quarters-please'?'Back to home':'Other Games',exact:true});
     assert.equal(await homeLink.getAttribute('href'),home);
     await homeLink.click();assert.equal(page.url(),home);
     assert.equal(await page.title(),'Tiger’s Arcade');
-    const name=game==='ghost-pop'?'Play Ghost Pop':game==='dad-dug'?'Play Dad Dug':game==='eviction'?'Play Eviction':'Open Quarters Please';
+    const name=game==='ghost-pop'?'Play Ghost Pop':game==='dad-dug'?'Play Dad Dug':game==='eviction'?'Play Eviction':game==='pac-bryan'?'Play Pac-Bryan':'Open Quarters Please';
     const destination=pathToFileURL(path.join(root,game+'.html')).href;
     assert.equal(await page.getByRole('link',{name,exact:true}).evaluate(el=>el.href),destination);
     await page.getByRole('link',{name,exact:true}).click();assert.equal(page.url(),destination);
@@ -66,7 +66,7 @@ test('shared credits start at 5 and persist across every playable arcade game an
   assert.equal(await balance(page),5);
   assert.equal(await page.locator('[data-arcade-wallet]').textContent(),'5 quarters');
   assert.deepEqual(await page.locator('.genre').allTextContents(),['ARCADE / BUBBLE SHOOTER','ARCADE / DIGGING','ARCADE / TERRITORY','ARCADE / MAZE CHASE','ARCADE / META / CLICKER','IDLER / TOWER DEFENSE']);
-  for(const [i,game] of ['ghost-pop','dad-dug','eviction'].entries()){
+  for(const [i,game] of ['ghost-pop','dad-dug','eviction','pac-bryan'].entries()){
     await page.goto(base+game);
     assert.equal(await page.getByRole('link',{name:'Other Games',exact:true}).evaluate(el=>el.href),base);
     await page.locator('#play').click();
@@ -74,10 +74,11 @@ test('shared credits start at 5 and persist across every playable arcade game an
     await idle(page);
     assert.equal(await balance(page),4-i);
     await page.getByRole('link',{name:'Other Games',exact:true}).click();
+    await page.waitForLoadState('load');
     assert.equal(page.url(),base);
     assert.equal(await balance(page),4-i);
   }
-  await page.reload();assert.equal(await balance(page),2);
+  await page.reload();assert.equal(await balance(page),1);
 }));
 
 test('last quarter permits a game, retries at zero are blocked, and get more quarters opens the free Quarters Please page',async()=>withPage(async page=>{
@@ -276,7 +277,7 @@ test('simultaneous clicker tabs and paid games serialize earnings, heat and upgr
   await seed(page,10);await page.goto(base+'quarters-please.html');const other=await context.newPage();await other.goto(base+'quarters-please.html');
   await Promise.all([page.locator('#buy-alloy').click(),other.locator('#buy-ac').click()]);
   await page.waitForFunction(()=>Arcade.balance()===0);const state=await clickerState(page);assert.equal(state.alloy+state.ac,1);
-  await Promise.all([earn(page),earn(other)]);assert.equal(await balance(page),2);assert((await clickerState(page)).temperature>39);
+  await Promise.all([earn(page),earn(other)]);await page.waitForFunction(()=>Arcade.balance()===2);assert((await clickerState(page)).temperature>39);
   await other.goto(base+'dad-dug');
   await Promise.all([page.locator('#quarter').click(),start(other)]);assert.equal(await balance(page),2);
   await page.reload();assert.equal(await balance(page),2);

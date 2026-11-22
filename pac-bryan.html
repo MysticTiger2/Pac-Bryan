@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101719">
+  <meta name="description" content="Pac-Bryan: a Ms. Pac-Man inspired maze chase with a fresh random maze every level, ghost intelligence, and local top scores.">
+  <title>Pac-Bryan · Tiger’s Arcade</title>
+  <link rel="stylesheet" href="arcade.css">
+  <link rel="stylesheet" href="pac-bryan/pac-bryan.css">
+</head>
+<body>
+<main class="shell">
+  <header class="topbar">
+    <div class="arcade-brand-group"><a class="brand" href="./">↖ TIGER’S ARCADE</a><span data-arcade-wallet></span></div>
+    <nav class="top-actions" aria-label="Game actions"><button id="sound" aria-pressed="false">Sound off</button><button id="pause" disabled>Pause</button><a class="button" href="./">Other Games</a></nav>
+  </header>
+  <div class="layout">
+    <section class="cabinet" aria-label="Pac-Bryan game">
+      <div class="hud"><div><small>SCORE</small><b id="score">000000</b></div><div><small>HIGH SCORE</small><b id="best">000000</b></div><div><small>LEVEL</small><b id="level">01</b></div><div><small>LIVES</small><b id="lives">3</b></div></div>
+      <div class="stage">
+        <canvas id="canvas" width="648" height="744" tabindex="0" aria-label="Pac-Bryan maze. Move with arrows or WASD, swipe, or use the direction buttons. P or Escape pauses."></canvas>
+        <div class="overlay" id="overlay"><div class="panel">
+          <p class="eyebrow" id="panelEyebrow">A FAMILIAR APPETITE. A NEW MAZE.</p>
+          <h2 id="panelTitle">One more pellet.</h2>
+          <p id="panelText">Eat every dot. Turn the tables with power pellets. Four familiar ghosts, a different maze every level.</p>
+          <p class="result" id="result" hidden></p>
+          <form id="nameForm" hidden><label for="scoreName">You made the local top 10</label><div class="name-controls"><input id="scoreName" maxlength="20" autocomplete="nickname" placeholder="Anonymous" aria-label="Leaderboard name"><button type="submit">Save name</button></div><small id="nameNotice">Score saved as Anonymous.</small></form>
+          <div class="panel-actions"><button class="primary" id="play" disabled>Let’s munch · 1 quarter</button><button id="restart" hidden>New game · 1 quarter</button></div>
+          <p class="panel-hint">Arrows / WASD · Swipe / D-pad · Controller</p>
+        </div></div>
+      </div>
+      <div class="life-strip"><span id="lifeText">10,000 to your bonus life</span><span class="mono" id="dots">DOTS —</span><progress id="lifeProgress" max="10000" value="0" aria-label="Score toward bonus life"></progress></div>
+    </section>
+    <aside class="rail">
+      <p class="eyebrow">04 / AN APPETITE FOR ARCADE</p>
+      <h1>PAC–<br><span>BRYAN.</span><span class="title-dot" aria-hidden="true">●</span></h1>
+      <p class="tagline">Same hungry habits.<br>A fresh way through, every time.</p>
+      <div class="run-info"><span class="mode-dot" aria-hidden="true"></span><strong id="ghostMode">FOUR GHOSTS. ZERO FIXED MAZES.</strong><span id="powerTime"></span></div>
+      <section class="intel" aria-labelledby="ghostHeading"><div class="section-heading"><h2 id="ghostHeading">Know your ghosts</h2><span class="mono">THE CHASE FILES</span></div><div id="ghostGuide"></div><p class="difficulty-note">each maze is slightly harder than the previous</p></section>
+      <section class="fruit-guide" aria-labelledby="fruitHeading"><div class="section-heading"><h2 id="fruitHeading">Follow the fruit</h2><span class="mono" id="fruitNext">LEVEL 1 / CHERRY</span></div><div class="fruits" id="fruitGuide"></div><p class="fine" id="fruitStatus">Two moving bonuses per maze: after 70 and 170 dots. From level 8, each fruit is random.</p></section>
+      <div class="score-guide"><span>DOT <b>10</b></span><span>POWER <b>50</b></span><span>GHOSTS <b>200 → 1,600</b></span></div>
+      <button id="showScores" class="scores-button">Local leaderboard <span aria-hidden="true">↗</span></button>
+      <div class="touch-controls" aria-label="Touch direction controls"><div class="dpad"><button data-dir="up" aria-label="Move up">↑</button><button data-dir="left" aria-label="Move left">←</button><button data-dir="down" aria-label="Move down">↓</button><button data-dir="right" aria-label="Move right">→</button></div><p>Eat. Evade. Repeat.<br><span>Power pellets reverse the chase.</span></p></div>
+      <p class="keys"><b>MOVE</b> Arrows / WASD / Swipe<br><b>PAUSE</b> P / Esc &nbsp; <b>CONTROLLER</b> Stick / D-pad</p>
+      <p class="status" id="status" role="status" aria-live="polite">One quarter per new game. A fresh maze every level.</p>
+      <p class="storage-note" id="storageNote" hidden>Browser storage is unavailable. Scores will last for this page session.</p>
+    </aside>
+  </div>
+  <footer><span>HOMEMADE / FAMILY ARCADE</span><span>No two dinners take the same route.</span></footer>
+</main>
+<dialog id="scoresDialog" aria-labelledby="scoresTitle"><div class="dialog-heading"><div><p class="eyebrow">THIS BROWSER / CLASSIC</p><h2 id="scoresTitle">Local legends.</h2></div><button id="closeScores" aria-label="Close leaderboard">✕</button></div><p class="fine">Top 10 completed games. Your high score updates as you play.</p><div class="table-wrap"><table><thead><tr><th>#</th><th>Name</th><th>Score</th><th>Level</th></tr></thead><tbody id="scoreRows"></tbody></table></div><p id="emptyScores">A clean slate. Set the score to beat.</p><p class="fine" id="leaderboardStorage">Saved on this browser.</p></dialog>
+<script src="arcade.js"></script>
+<script src="pac-bryan/rules.js"></script>
+<script src="pac-bryan/maze.js"></script>
+<script src="pac-bryan/ai.js"></script>
+<script src="pac-bryan/engine.js"></script>
+<script src="pac-bryan/storage.js"></script>
+<script src="pac-bryan/renderer.js"></script>
+<script src="pac-bryan/ui.js"></script>
+</body>
+</html>

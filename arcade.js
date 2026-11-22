@@ -6,7 +6,7 @@
   // A file URL opens a directory listing for "./" and cannot resolve extensionless pages.
   // Keep all HTTP(S) destinations untouched, including GitHub Pages' project root.
   if (location.protocol === 'file:') {
-    const gameFiles = new Set(['ghost-pop', 'dad-dug', 'eviction']);
+    const gameFiles = new Set(['ghost-pop', 'dad-dug', 'eviction', 'pac-bryan']);
     for (const link of document.querySelectorAll('a[href]')) {
       const target = new URL(link.getAttribute('href'), location.href);
       if (target.protocol !== 'file:' || !target.pathname.startsWith(root.pathname)) continue;
